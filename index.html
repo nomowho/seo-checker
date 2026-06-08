@@ -6,25 +6,30 @@
 <title>Nomo 文章健檢室 — SEO · GEO · AEO 三維分析</title>
 <meta name="description" content="遠見雜誌廣編文章 AI 能見度分析工具，評估 SEO 排名潛力、GEO AI 引用率、AEO 精選摘要能見度。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #F2F5FA;
+  /* 灰黑白單色系・科技感 */
+  --bg: #FAFAFA;
   --card: #FFFFFF;
-  --border: #DDE3EE;
-  --text: #0D1B2E;
-  --text2: #3D5068;
-  --text3: #8A9BB0;
-  --primary: #00479D;
-  --primary-dark: #003278;
-  --primary-bg: #EBF1FB;
-  --gvm-red: #C11920;
-  --gvm-red-bg: #FEF0F0;
-  --blue2: #1660CB;
-  --green: #0E7A56;
-  --yellow: #C47A00;
-  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05);
-  --radius: 10px;
+  --border: #E6E6E6;
+  --text: #0A0A0A;
+  --text2: #5C5C5C;
+  --text3: #A0A0A0;
+  --primary: #111111;
+  --primary-dark: #000000;
+  --primary-bg: #F1F1F1;
+  --gvm-red: #111111;
+  --gvm-red-bg: #F1F1F1;
+  --blue2: #444444;
+  /* 分數：高=黑、中=灰、低=淺灰（單色強弱） */
+  --green: #0A0A0A;
+  --yellow: #8E8E8E;
+  --red: #C4C4C4;
+  --mono: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 30px rgba(0,0,0,.05);
+  --radius: 12px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,76 +44,86 @@ body {
 
 /* ─── HEADER ─── */
 header {
-  background: var(--primary-dark);
-  color: #F8FAFC;
-  padding: 16px 24px;
+  background: var(--card);
+  color: var(--text);
+  padding: 18px 28px;
   display: flex;
   align-items: center;
   gap: 14px;
-  border-bottom: 3px solid var(--gvm-red);
+  border-bottom: 1px solid var(--border);
 }
 .logo {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 18px;
+  font-family: var(--mono);
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: .5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
 }
 .logo-badge {
-  background: var(--gvm-red);
-  color: #fff;
-  font-size: 10px;
-  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--text);
+  color: var(--card);
+  font-size: 9px;
+  font-family: var(--mono);
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 3px;
-  letter-spacing: .5px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
 .tagline {
-  font-size: 13px;
-  color: #93B4D8;
+  font-size: 11px;
+  color: var(--text3);
   margin-left: auto;
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
 
 /* ─── HERO ─── */
 .hero {
-  background: linear-gradient(135deg, #003278 0%, #001D4A 100%);
-  padding: 48px 24px 44px;
+  background: var(--card);
+  padding: 64px 24px 52px;
   text-align: center;
+  border-bottom: 1px solid var(--border);
 }
 .hero h1 {
-  font-family: 'Noto Serif TC', serif;
-  font-size: clamp(20px, 4vw, 30px);
+  font-family: var(--mono);
+  font-size: clamp(28px, 6vw, 56px);
   font-weight: 700;
-  color: #F0F5FF;
-  line-height: 1.35;
-  margin-bottom: 10px;
+  color: var(--text);
+  line-height: 1.08;
+  letter-spacing: -.02em;
+  margin-bottom: 16px;
 }
-.hero h1 em { color: #6BAEFF; font-style: normal; }
+.hero h1 em { color: var(--text3); font-style: normal; }
 .hero p {
   font-size: 14px;
-  color: #7AAAD4;
-  margin-bottom: 24px;
+  color: var(--text2);
+  margin-bottom: 28px;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .badge-row {
   display: flex;
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 26px;
+  margin-bottom: 28px;
 }
 .badge {
-  padding: 4px 12px;
-  border-radius: 3px;
+  padding: 5px 14px;
+  border-radius: 999px;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .4px;
+  font-weight: 500;
+  letter-spacing: .03em;
+  background: transparent;
+  color: var(--text2);
+  border: 1px solid var(--border);
 }
-.badge-seo { background: rgba(0,71,157,.4); color: #90BFFF; border: 1px solid rgba(0,71,157,.6); }
-.badge-geo { background: rgba(193,25,32,.3); color: #FFA0A5; border: 1px solid rgba(193,25,32,.5); }
-.badge-aeo { background: rgba(22,96,203,.3); color: #90C8FF; border: 1px solid rgba(22,96,203,.5); }
+.badge-seo, .badge-geo, .badge-aeo { background: transparent; color: var(--text2); border: 1px solid var(--border); }
 
 /* ─── INPUT AREA ─── */
 .input-wrap {
@@ -118,51 +133,52 @@ header {
 .input-row {
   display: flex;
   gap: 0;
-  background: #fff;
-  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--text);
+  border-radius: 999px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,.25);
 }
 .input-row input {
   flex: 1;
   border: none;
   outline: none;
-  padding: 14px 18px;
+  padding: 15px 22px;
   font-size: 15px;
   color: var(--text);
   background: transparent;
 }
-.input-row input::placeholder { color: #9CA3AF; }
+.input-row input::placeholder { color: var(--text3); }
 #analyzeBtn {
-  background: var(--gvm-red);
-  color: #fff;
+  background: var(--text);
+  color: var(--card);
   border: none;
-  padding: 14px 22px;
-  font-size: 15px;
+  padding: 14px 26px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  transition: background .2s;
-  letter-spacing: .3px;
+  transition: opacity .2s;
+  letter-spacing: .04em;
 }
-#analyzeBtn:hover { background: #A01017; }
-#analyzeBtn:disabled { background: #8A9BB0; cursor: not-allowed; }
+#analyzeBtn:hover { opacity: .82; }
+#analyzeBtn:disabled { background: var(--text3); cursor: not-allowed; }
 
 /* ─── MAIN CONTENT ─── */
 main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 
 /* ─── ERROR / NOTICE ─── */
 .notice {
-  background: #FEF3C7;
-  border: 1px solid #FDE68A;
-  border-radius: 10px;
+  background: var(--primary-bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text);
+  border-radius: 8px;
   padding: 12px 16px;
   font-size: 13px;
-  color: #92400E;
+  color: var(--text2);
   margin-bottom: 20px;
   display: none;
 }
-.notice.error { background: #FEE2E2; border-color: #FECACA; color: #991B1B; }
+.notice.error { background: #0A0A0A; border-color: #0A0A0A; color: #fff; }
 .notice.show { display: block; }
 
 /* ─── PROGRESS ─── */
@@ -259,8 +275,9 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 24px;
-  font-weight: 800;
+  font-family: var(--mono);
+  font-size: 26px;
+  font-weight: 700;
   line-height: 1;
 }
 .score-sublabel {
@@ -321,18 +338,18 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
   font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 999px;
   flex-shrink: 0; letter-spacing: .03em;
 }
-.ind-scope.page { background: var(--primary-bg); color: var(--primary); }
-.ind-scope.site { background: #FEF6E7; color: #B7791F; border: 1px solid #F6E0B0; }
-.ind-score { margin-left: auto; font-size: 22px; font-weight: 800; line-height: 1; flex-shrink: 0; }
+.ind-scope.page { background: var(--primary-bg); color: var(--text2); }
+.ind-scope.site { background: var(--text); color: var(--card); }
+.ind-score { margin-left: auto; font-family: var(--mono); font-size: 23px; font-weight: 700; line-height: 1; flex-shrink: 0; }
 .ind-score.pass { color: var(--green); }
 .ind-score.warn { color: var(--yellow); }
 .ind-score.fail { color: var(--red); }
 .ind-score.na { color: var(--text3); font-size: 16px; }
 .ind-bar { height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
 .ind-bar-fill { height: 100%; border-radius: 999px; transition: width .6s ease; }
-.ind-bar-fill.pass { background: linear-gradient(90deg,#34D399,#10B981); }
-.ind-bar-fill.warn { background: linear-gradient(90deg,#FCD34D,#F59E0B); }
-.ind-bar-fill.fail { background: linear-gradient(90deg,#FCA5A5,#EF4444); }
+.ind-bar-fill.pass { background: linear-gradient(90deg,#2A2A2A,#0A0A0A); }
+.ind-bar-fill.warn { background: linear-gradient(90deg,#B0B0B0,#8E8E8E); }
+.ind-bar-fill.fail { background: linear-gradient(90deg,#DADADA,#C4C4C4); }
 .ind-bar-fill.na { background: var(--border); }
 .ind-detail { font-size: 12px; color: var(--text2); line-height: 1.5; }
 .ind-tip-toggle {
@@ -347,13 +364,13 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
   border-radius: 3px;
   font-weight: 600;
 }
-.ind-tip-toggle:hover { background: #d4e4fc; }
+.ind-tip-toggle:hover { background: var(--border); }
 .ind-tip-body {
   display: none;
   margin-top: 8px;
   padding: 8px 10px;
-  background: #F8FAFF;
-  border-left: 3px solid var(--primary);
+  background: var(--bg);
+  border-left: 3px solid var(--text);
   border-radius: 0 6px 6px 0;
   font-size: 12px;
   color: var(--text2);
@@ -398,9 +415,9 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
   flex-shrink: 0;
   margin-top: 1px;
 }
-.sug-priority.high { background: #FEE2E2; color: #B91C1C; }
-.sug-priority.mid { background: #FFFBEB; color: #92400E; }
-.sug-priority.low { background: #ECFDF5; color: #065F46; }
+.sug-priority.high { background: #0A0A0A; color: #fff; }
+.sug-priority.mid { background: #E2E2E2; color: #333; }
+.sug-priority.low { background: #F1F1F1; color: #888; }
 .sug-text { font-size: 14px; }
 .sug-title { font-weight: 600; margin-bottom: 2px; }
 .sug-desc { font-size: 12px; color: var(--text2); }
@@ -412,9 +429,9 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
   font-weight: 600;
   margin-top: 3px;
 }
-.sug-tag.seo { background: #EFF6FF; color: #1D4ED8; }
-.sug-tag.geo { background: #F5F3FF; color: #6D28D9; }
-.sug-tag.aeo { background: #ECFDF5; color: #065F46; }
+.sug-tag.seo { background: var(--primary-bg); color: var(--text2); }
+.sug-tag.geo { background: var(--primary-bg); color: var(--text2); }
+.sug-tag.aeo { background: var(--primary-bg); color: var(--text2); }
 
 /* ─── EDUCATION ─── */
 .edu-section { margin-top: 40px; }
@@ -436,7 +453,7 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 .edu-scoring {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px dashed #dde3ef;
+  border-top: 1px dashed var(--border);
 }
 .edu-scoring-title {
   font-size: 12px;
@@ -463,7 +480,7 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 }
 .edu-pts {
   flex-shrink: 0;
-  background: #eef2fb;
+  background: var(--primary-bg);
   color: var(--primary);
   font-weight: 700;
   font-size: 11px;
@@ -511,8 +528,8 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 }
 .sort-btn:hover { border-color: var(--primary); color: var(--primary); }
 .sort-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.sort-btn.clear-btn { border-color: #FECACA; color: #DC2626; }
-.sort-btn.clear-btn:hover { background: #FEE2E2; }
+.sort-btn.clear-btn { border-color: var(--border); color: var(--text3); }
+.sort-btn.clear-btn:hover { background: var(--primary-bg); color: var(--text); }
 .history-table {
   background: var(--card);
   border-radius: var(--radius);
@@ -531,7 +548,7 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 .history-row:last-child { border-bottom: none; }
 .history-row:hover { background: var(--bg); }
 .history-row.header-row {
-  background: #F0F4FB;
+  background: var(--primary-bg);
   font-size: 11px;
   font-weight: 700;
   color: var(--text3);
@@ -562,9 +579,9 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
   font-weight: 700;
   text-align: center;
 }
-.hist-score.seo { color: #00479D; }
-.hist-score.geo { color: #C11920; }
-.hist-score.aeo { color: #1660CB; }
+.hist-score.seo { color: var(--text); }
+.hist-score.geo { color: var(--text); }
+.hist-score.aeo { color: var(--text); }
 .hist-date {
   font-size: 11px;
   color: var(--text3);
@@ -581,7 +598,7 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
   line-height: 1.4;
   transition: all .15s;
 }
-.hist-del:hover { border-color: #FECACA; color: #DC2626; background: #FEF2F2; }
+.hist-del:hover { border-color: var(--text); color: var(--text); background: var(--primary-bg); }
 .history-empty {
   text-align: center;
   color: var(--text3);
@@ -593,10 +610,11 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 
 /* ─── FOOTER ─── */
 footer {
-  background: #0F172A;
-  color: #64748B;
+  background: var(--card);
+  color: var(--text3);
   text-align: center;
   padding: 20px;
+  border-top: 1px solid var(--border);
   font-size: 12px;
   margin-top: 40px;
 }
@@ -616,15 +634,20 @@ footer {
   align-items: center;
   gap: 10px;
   margin-top: 10px;
-  background: rgba(255,255,255,.08);
-  border-radius: 8px;
-  padding: 8px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 9px 18px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .brand-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: #60A5FA;
+  color: var(--text2);
   white-space: nowrap;
+  letter-spacing: .03em;
 }
 .brand-row input {
   flex: 1;
@@ -632,9 +655,9 @@ footer {
   border: none;
   outline: none;
   font-size: 14px;
-  color: #F8FAFC;
+  color: var(--text);
 }
-.brand-row input::placeholder { color: #64748B; }
+.brand-row input::placeholder { color: var(--text3); }
 
 /* ─── ADVERTORIAL ─── */
 .adv-card {
@@ -643,7 +666,7 @@ footer {
   box-shadow: var(--shadow);
   padding: 20px;
   margin-bottom: 20px;
-  border-left: 4px solid var(--purple);
+  border-left: 4px solid var(--text);
 }
 .adv-header {
   display: flex;
@@ -653,9 +676,10 @@ footer {
 }
 .adv-title { font-size: 15px; font-weight: 700; }
 .adv-score {
+  font-family: var(--mono);
   font-size: 22px;
-  font-weight: 800;
-  color: var(--purple);
+  font-weight: 700;
+  color: var(--text);
 }
 .adv-grid {
   display: grid;
@@ -664,7 +688,7 @@ footer {
   margin-bottom: 14px;
 }
 .adv-item {
-  background: #F5F3FF;
+  background: var(--primary-bg);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 13px;
@@ -735,7 +759,7 @@ footer {
   <!-- Results -->
   <div id="resultsWrap">
     <!-- noindex 警告橫幅（預設隱藏） -->
-    <div id="noindexBanner" style="display:none; background:#C11920; color:#fff; border-radius:10px; padding:14px 18px; margin-bottom:18px; font-size:14px; line-height:1.6; font-weight:600;">
+    <div id="noindexBanner" style="display:none; background:#0A0A0A; color:#fff; border-radius:12px; padding:14px 18px; margin-bottom:18px; font-size:14px; line-height:1.6; font-weight:600;">
       🚨 <strong>重大警告：此頁面設有 noindex！</strong><br>
       <span style="font-weight:400;">robots meta 標籤設定了 <code style="background:rgba(255,255,255,0.2);padding:1px 5px;border-radius:3px;">noindex</code>，Google 與所有 AI 爬蟲（ChatGPT、Claude、Perplexity）都<strong>不會收錄這篇文章</strong>。廣編曝光效益幾乎歸零，建議立即請技術部門確認並移除 noindex 設定。</span>
     </div>
@@ -748,7 +772,7 @@ footer {
         <div class="ring-wrap">
           <svg viewBox="0 0 90 90" width="90" height="90">
             <circle class="ring-bg" cx="45" cy="45" r="38"/>
-            <circle class="ring-fg" id="ringSeo" cx="45" cy="45" r="38" stroke="#00479D"/>
+            <circle class="ring-fg" id="ringSeo" cx="45" cy="45" r="38" stroke="#0A0A0A"/>
           </svg>
           <div class="ring-num" id="numSeo">—</div>
         </div>
@@ -759,7 +783,7 @@ footer {
         <div class="ring-wrap">
           <svg viewBox="0 0 90 90" width="90" height="90">
             <circle class="ring-bg" cx="45" cy="45" r="38"/>
-            <circle class="ring-fg" id="ringGeo" cx="45" cy="45" r="38" stroke="#C11920"/>
+            <circle class="ring-fg" id="ringGeo" cx="45" cy="45" r="38" stroke="#0A0A0A"/>
           </svg>
           <div class="ring-num" id="numGeo">—</div>
         </div>
@@ -770,7 +794,7 @@ footer {
         <div class="ring-wrap">
           <svg viewBox="0 0 90 90" width="90" height="90">
             <circle class="ring-bg" cx="45" cy="45" r="38"/>
-            <circle class="ring-fg" id="ringAeo" cx="45" cy="45" r="38" stroke="#1660CB"/>
+            <circle class="ring-fg" id="ringAeo" cx="45" cy="45" r="38" stroke="#0A0A0A"/>
           </svg>
           <div class="ring-num" id="numAeo">—</div>
         </div>
@@ -814,7 +838,7 @@ footer {
 
     <!-- Re-analyze -->
     <div style="text-align:center; margin-top: 8px;">
-      <button onclick="startAnalysis()" style="background:var(--primary-bg);color:var(--primary);border:1px solid #BFDBFE;padding:10px 22px;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer;">
+      <button onclick="startAnalysis()" style="background:var(--card);color:var(--text);border:1px solid var(--text);padding:10px 24px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;">
         🔄 重新分析
       </button>
     </div>
@@ -852,7 +876,8 @@ footer {
             <li><span class="edu-pts">25 pts</span> Google SEO 基礎評分 — PageSpeed Lighthouse 可索引性、連結品質</li>
             <li><span class="edu-pts">20 pts</span> 網頁標題（Title Tag）— 是否存在、長度 10–60 字</li>
             <li><span class="edu-pts">15 pts</span> Meta Description — 是否存在、長度 50–160 字</li>
-            <li><span class="edu-pts">15 pts</span> Canonical 標籤 — 是否防止重複索引</li>
+            <li><span class="edu-pts">10 pts</span> Canonical 標籤 — 是否防止重複索引</li>
+            <li><span class="edu-pts">5 pts</span> Mobile 行動友善 — viewport 響應式設定（行動優先索引）</li>
             <li><span class="edu-pts">5 pts</span> 可索引性 + Sitemap — robots meta 是否 noindex、是否有 sitemap.xml</li>
           </ul>
         </div>
@@ -864,13 +889,14 @@ footer {
         <div class="edu-scoring">
           <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
           <ul class="edu-scoring-list">
-            <li><span class="edu-pts">25 pts</span> 結構化資料 — JSON-LD（首選）或 Microdata，偵測 NewsArticle、FAQPage 等</li>
-            <li><span class="edu-pts">20 pts</span> 自包含段落 — 100-200 字、結論句開頭的可引用段落（中文計字）</li>
+            <li><span class="edu-pts">22 pts</span> 結構化資料 — JSON-LD（首選）或 Microdata，偵測 NewsArticle、FAQPage 等</li>
+            <li><span class="edu-pts">18 pts</span> 自包含段落 — 100-200 字、結論句開頭的可引用段落（中文計字）</li>
             <li><span class="edu-pts">10 pts</span> 數據密度 — 段落是否含具體數字（AI 偏好可驗證事實）</li>
             <li><span class="edu-pts">10 pts</span> 權威外連 — 是否引用 .gov／.edu／Wikipedia 等高權威來源</li>
             <li><span class="edu-pts">15 pts</span> E-E-A-T — 作者、發布／更新日期、6 個月內新鮮度</li>
-            <li><span class="edu-pts">12 pts</span> AI 爬蟲開放度 — GPTBot／ClaudeBot／PerplexityBot／Google-Extended／CCBot</li>
-            <li><span class="edu-pts">8 pts</span> Open Graph — og:title／description／image／type 完整度</li>
+            <li><span class="edu-pts">8 pts</span> 品牌權威 — Organization schema、sameAs 社群連結、Wikipedia 提及</li>
+            <li><span class="edu-pts">7 pts</span> 平台優化 — Open Graph + Twitter Card 完整度</li>
+            <li><span class="edu-pts">10 pts</span> AI 爬蟲開放度 — GPTBot／ClaudeBot／PerplexityBot／Google-Extended／CCBot</li>
           </ul>
         </div>
       </div>
@@ -1226,7 +1252,22 @@ function scoreSEO(doc, html, ps, crux, sitemapOk) {
       detail: `${isNoindex ? '⚠️ robots meta 含 noindex，Google 不收錄此頁' : '✅ 頁面可被索引'}　|　${sitemapOk ? '✅ 找到 sitemap.xml' : '— 未找到 sitemap.xml'}`,
       tip: 'robots meta 設 noindex 時 Google 與 AI 爬蟲都不收錄這頁——部分媒體預設廣編為 noindex，若要被搜尋到必須確認。sitemap.xml 則是給搜尋引擎的「網站地圖」，讓爬蟲更快、更完整地發現所有頁面，是基本的可爬取性訊號。',
       pts: indexPts, max: 5,
-      pass: !isNoindex,
+      pass: !isNoindex, scope: 'site',
+    });
+
+    // 7. Mobile 行動友善 (5 pts)
+    const vp = doc.querySelector('meta[name="viewport"]')?.getAttribute('content') || '';
+    const hasDeviceWidth = /width\s*=\s*device-width/i.test(vp);
+    const blocksZoom = /user-scalable\s*=\s*(no|0)|maximum-scale\s*=\s*1(\D|$)/i.test(vp);
+    const mobilePts = hasDeviceWidth ? (blocksZoom ? 3 : 5) : 0;
+    total += mobilePts;
+    indicators.push({
+      name: 'Mobile 行動友善',
+      detail: !vp ? '❌ 未設定 viewport，行動裝置會以桌面版縮小顯示'
+        : hasDeviceWidth ? (blocksZoom ? '⚠️ 有 viewport 但禁止縮放（影響無障礙）' : '✅ 已設定響應式 viewport（width=device-width）')
+        : '⚠️ viewport 未使用 device-width',
+      tip: '行動友善是 Google「行動優先索引」的基礎。viewport meta 設 width=device-width 才能正確 RWD 響應式縮放。超過 60% 讀者用手機看新聞，未做行動優化會被降排名、跳出率也高。另避免 user-scalable=no（禁止縮放會傷害無障礙與 SEO）。',
+      pts: mobilePts, max: 5, pass: mobilePts >= 5, scope: 'page',
     });
   }
 
@@ -1256,14 +1297,14 @@ function scoreGEO(doc, html, robotsTxt) {
       } catch {}
     });
 
-    // 1. 結構化資料 (25 pts) — JSON-LD 優先，亦支援 Microdata
+    // 1. 結構化資料 (22 pts) — JSON-LD 優先，亦支援 Microdata
     const hasSchema = jsonLds.length > 0;
     const microNodes = doc.querySelectorAll('[itemscope][itemtype]');
     const hasMicrodata = microNodes.length > 0;
     const qualityTypes = ['Article','BlogPosting','NewsArticle','Product','Organization','WebSite','Person','FAQPage','HowTo'];
     const hasQuality = schemaTypes.some(t => qualityTypes.some(q => t.includes(q)));
-    // JSON-LD 含優質類型 25；只有 JSON-LD 18；只有 Microdata 15；都無 0
-    const schemaPts = hasSchema ? (hasQuality ? 25 : 18) : (hasMicrodata ? 15 : 0);
+    // JSON-LD 含優質類型 22；只有 JSON-LD 16；只有 Microdata 13；都無 0
+    const schemaPts = hasSchema ? (hasQuality ? 22 : 16) : (hasMicrodata ? 13 : 0);
     total += schemaPts;
     const schemaDetail = hasSchema
       ? `✅ 找到 ${jsonLds.length} 個 JSON-LD：${schemaTypes.join(', ').slice(0,55)}${hasMicrodata ? '（另有 Microdata）' : ''}`
@@ -1274,14 +1315,14 @@ function scoreGEO(doc, html, robotsTxt) {
       name: '結構化資料（JSON-LD / Microdata）',
       detail: schemaDetail,
       tip: '藏在原始碼裡「給機器看的說明書」，不影響讀者版面。首選 JSON-LD（Google 與各 AI 最推薦、最易解析）；Microdata（itemscope/itemtype）是舊式寫法，可被識別但建議升級。NewsArticle 類型讓 ChatGPT/Gemini 知道「這是媒體報導、作者、發布日期」，大幅提升被引用信任度。需請技術部門在 CMS 模板加入。',
-      pts: schemaPts, max: 25,
-      pass: schemaPts >= 15,
+      pts: schemaPts, max: 22,
+      pass: schemaPts >= 13, scope: 'page',
     });
 
     // 2. 自包含段落 citability (20 pts) — 改用中文計字，黃金區間 100-200 字
     const paragraphs = Array.from(doc.querySelectorAll('p, article p, main p, li'));
     const golden = paragraphs.filter(p => { const n = textLen(p.textContent); return n >= 80 && n <= 250; });
-    const contentPts = Math.min(20, golden.length * 3);
+    const contentPts = Math.min(18, golden.length * 3);
     total += contentPts;
     indicators.push({
       name: '自包含段落（AI 可引用性）',
@@ -1289,8 +1330,8 @@ function scoreGEO(doc, html, robotsTxt) {
         ? `✅ 找到 ${golden.length} 個 80-250 字的自包含段落（AI 容易整段摘取引用）`
         : '❌ 缺少 100-200 字的自包含段落，建議拆段、每段以結論句開頭',
       tip: 'Princeton 2024 論文實證：100-200 字（134-167 字最佳）、結論句開頭、自包含的段落，被 AI 引用機率比長段落高 40%。AI 引用的單位是「段落」不是全文——每段拿出來單看要能理解。段落太碎（<30 字）或太長（>400 字）都會降低被引用率。',
-      pts: contentPts, max: 20,
-      pass: contentPts >= 12,
+      pts: contentPts, max: 18,
+      pass: contentPts >= 11, scope: 'page',
     });
 
     // 3. 數據密度 citability (10 pts) — 含具體數字的段落
@@ -1355,33 +1396,61 @@ function scoreGEO(doc, html, robotsTxt) {
         : `⚠️ ${!authorEl?'未找到作者 ':''}${!dateEl?'未找到日期':''}`,
       tip: 'E-E-A-T（經驗、專業、權威、可信）是 Google 與 AI 評估內容可信度的框架。作者全名+職稱、發布/更新日期是基本訊號。「內容新鮮度」在 2026 年特別關鍵——AI 在 retrieval 階段給新鮮內容加權，內容更新後 30 天內引用率平均 +18%。建議每季更新並維護 dateModified。',
       pts: eeatPts, max: 15,
-      pass: eeatPts >= 10,
+      pass: eeatPts >= 10, scope: 'page',
     });
 
-    // 6. Open Graph / 平台一致性 (8 pts)
+    // 6. 品牌權威 Brand (8 pts) — Organization/Person schema、sameAs、社群檔案、Wikipedia
+    let sameAsCount = 0, hasOrgPerson = false;
+    jsonLds.forEach(el => {
+      try {
+        const j = JSON.parse(el.textContent);
+        const nodes = Array.isArray(j) ? j : (j['@graph'] ? j['@graph'] : [j]);
+        nodes.forEach(o => {
+          if (!o) return;
+          const t = [].concat(o['@type'] || '').join(',');
+          if (/Organization|Person/.test(t)) hasOrgPerson = true;
+          if (o.sameAs) sameAsCount += [].concat(o.sameAs).length;
+        });
+      } catch {}
+    });
+    const socialLinks = doc.querySelectorAll('a[href*="facebook.com"], a[href*="twitter.com"], a[href*="//x.com"], a[href*="linkedin.com"], a[href*="instagram.com"], a[href*="youtube.com"], a[href*="threads.net"]').length;
+    const wikiLink = doc.querySelector('a[href*="wikipedia.org"]') ? 1 : 0;
+    let brandPts = (hasOrgPerson ? 3 : 0) + ((sameAsCount >= 2 || socialLinks >= 2) ? 3 : 0) + wikiLink * 2;
+    brandPts = Math.min(8, brandPts);
+    total += brandPts;
+    const brandBits = [hasOrgPerson && 'Organization/Person schema', (sameAsCount>=2||socialLinks>=2) && '社群檔案連結', wikiLink && 'Wikipedia 提及'].filter(Boolean);
+    indicators.push({
+      name: '品牌權威（Brand）',
+      detail: brandPts > 0 ? `✅ ${brandBits.join('、')}` : '❌ 缺乏品牌權威訊號，建議加 Organization schema 與官方社群連結（sameAs）',
+      tip: 'AI 訓練資料大量來自 Reddit、Wikipedia、YouTube。一個品牌在這些平台被討論越多，越容易被 AI「認識」並引用。本工具從單頁可偵測的訊號：Organization/Person JSON-LD、sameAs 官方社群連結、Wikipedia 提及。長期策略：在相關 Reddit / Wikipedia 累積真誠的品牌提及。',
+      pts: brandPts, max: 8, pass: brandPts >= 4, scope: 'page',
+    });
+
+    // 7. 平台優化 OG + Twitter Card (7 pts)
     const ogTitle = doc.querySelector('meta[property="og:title"]')?.getAttribute('content');
     const ogDesc = doc.querySelector('meta[property="og:description"]')?.getAttribute('content');
     const ogImage = doc.querySelector('meta[property="og:image"]')?.getAttribute('content');
     const ogType = doc.querySelector('meta[property="og:type"]')?.getAttribute('content');
-    const ogPts = (ogTitle?2:0) + (ogDesc?2:0) + (ogImage?2:0) + (ogType?2:0);
+    const twCard = doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content');
+    const ogPts = (ogTitle?2:0) + (ogDesc?1:0) + (ogImage?2:0) + (ogType?1:0) + (twCard?1:0);
     total += ogPts;
-    const missing = [!ogTitle&&'og:title', !ogDesc&&'og:description', !ogImage&&'og:image', !ogType&&'og:type'].filter(Boolean);
+    const missing = [!ogTitle&&'og:title', !ogDesc&&'og:description', !ogImage&&'og:image', !ogType&&'og:type', !twCard&&'twitter:card'].filter(Boolean);
     indicators.push({
-      name: 'Open Graph 社群分享標籤',
-      detail: ogPts === 8 ? '✅ og:title、og:description、og:image、og:type 完整' : `⚠️ 缺少：${missing.join('、')}`,
-      tip: '決定文章分享到 LINE、Facebook、Threads 時的預覽樣式。OG 標籤完整的文章點擊率明顯較高，也是 Perplexity、Bing AI 比對品牌資訊一致性的來源之一。',
-      pts: ogPts, max: 8,
-      pass: ogPts >= 6,
+      name: '平台優化（OG / Twitter Card）',
+      detail: ogPts === 7 ? '✅ Open Graph 與 Twitter Card 標籤完整' : `⚠️ 缺少：${missing.join('、')}`,
+      tip: '決定文章分享到 LINE、Facebook、Threads、X 時的預覽樣式（標題、說明、封面圖）。標籤完整的文章點擊率明顯較高，也是 Perplexity、Bing AI 比對品牌跨平台資訊一致性的來源之一。',
+      pts: ogPts, max: 7,
+      pass: ogPts >= 5, scope: 'page',
     });
   } else {
-    indicators.push({ name: 'Schema / 內容結構 / E-E-A-T', detail: '⚠️ 無法取得 HTML，略過', pts: 0, max: 88, pass: null });
+    indicators.push({ name: 'Schema / 內容結構 / E-E-A-T', detail: '⚠️ 無法取得 HTML，略過', pts: 0, max: 90, pass: null });
   }
 
-  // 7. AI Crawlers in robots.txt (12 pts) — 5 隻主流 AI 爬蟲
+  // 8. AI Crawlers in robots.txt (10 pts) — 5 隻主流 AI 爬蟲
   const crawlers = checkAICrawlers(robotsTxt);
   const botList = ['GPTBot','ClaudeBot','PerplexityBot','Google-Extended','CCBot'];
   const allowedCount = botList.filter(b => crawlers[b]).length;
-  const crawlerPts = Math.round((allowedCount / botList.length) * 12);
+  const crawlerPts = Math.round((allowedCount / botList.length) * 10);
   total += crawlerPts;
   const blocked = botList.filter(b => crawlers[b] === false);
   indicators.push({
@@ -1392,8 +1461,8 @@ function scoreGEO(doc, html, robotsTxt) {
         ? '✅ GPTBot、ClaudeBot、PerplexityBot、Google-Extended、CCBot 皆允許'
         : `⚠️ 封鎖中：${blocked.join('、')}（這些 AI 將無法引用你的內容）`,
     tip: 'GPTBot（ChatGPT）、ClaudeBot（Claude）、PerplexityBot（Perplexity）、Google-Extended（Gemini 訓練）、CCBot（Common Crawl，多數 LLM 的資料源）。封鎖 = 主動把文章從該 AI 的資料庫移除。特別注意 Google-Extended：若要被 Gemini 訓練引用，建議明確 Allow。',
-    pts: crawlerPts, max: 12,
-    pass: crawlerPts >= 8,
+    pts: crawlerPts, max: 10,
+    pass: crawlerPts >= 7, scope: 'site',
   });
 
   return { score: Math.min(100, total), indicators };
@@ -1731,6 +1800,9 @@ function renderSuggestions(scores) {
     '比較表格': { action: '文章若涉及「A vs B／方案比較／規格對照」，請改用 HTML 表格呈現。表格式精選摘要競爭最低——多數對手用圖片，Google 抓不到，你做結構化表格就有機會直接拿下第 0 位。', priority: 'mid' },
     '列表結構': { action: '遇到「步驟、方法、種類、重點」時改用條列清單（真實的項目符號，不是純文字的 1.2.3.）。每項 5-15 字、動詞開頭、至少 4 項，利於被精選摘要與 AI 擷取。', priority: 'low' },
     '頁面速度': { action: '【請技術處理】依 CrUX 真實用戶數據，重點壓低 LCP（圖片壓至 500KB 以下、延後第三方腳本）與 CLS（廣告版位預留高度）。Core Web Vitals 直接影響 Google 排名。', priority: 'mid' },
+    'Mobile': { action: '【請技術處理】確認頁面有 <meta name="viewport" content="width=device-width, initial-scale=1">，並避免 user-scalable=no。Google 採行動優先索引，超過 6 成讀者用手機看新聞。', priority: 'mid' },
+    '品牌權威': { action: '加上 Organization 結構化標記與官方社群連結（sameAs：FB / IG / LinkedIn / YouTube）。長期則在相關 Reddit、Wikipedia 累積真誠的品牌提及——AI 訓練資料大量來自這些平台，被討論越多越容易被引用。', priority: 'mid' },
+    '平台優化': { action: '補齊 Open Graph 與 Twitter Card 標籤（標題、說明、封面圖）。分享到 LINE／FB／X 時有圖有摘要的點閱率高出數倍，也讓 AI 比對品牌跨平台資訊一致性。', priority: 'low' },
   };
 
   const list = document.getElementById('suggestionList');
