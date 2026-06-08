@@ -1001,10 +1001,29 @@ async function fetchHTML(url) {
 }
 
 async function fetchPageSpeed(url) {
-  const apiUrl = `${PAGESPEED_API}?url=${encodeURIComponent(url)}&category=performance&category=seo&strategy=mobile&key=${PAGESPEED_KEY}`;
-  const resp = await fetch(apiUrl, { signal: AbortSignal.timeout(30000) });
-  if (!resp.ok) throw new Error('PageSpeed API 錯誤');
-  return resp.json();
+  // 兩類別獨立平行呼叫：SEO 約 40 秒穩定回來；效能(performance)對廣告/腳本爆量的
+  // 重型頁面常逾時，拆開後效能逾時也不會拖垮 SEO 評分。
+  const base = `${PAGESPEED_API}?url=${encodeURIComponent(url)}&strategy=mobile&key=${PAGESPEED_KEY}`;
+  const call = (cat, ms) => fetch(`${base}&category=${cat}`, { signal: AbortSignal.timeout(ms) })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('http ' + r.status)))
+    .then(d => d.error ? Promise.reject(new Error(d.error.message)) : d);
+
+  const [seoRes, perfRes] = await Promise.allSettled([
+    call('seo', 55000),
+    call('performance', 50000),
+  ]);
+  const seo = seoRes.status === 'fulfilled' ? seoRes.value : null;
+  const perf = perfRes.status === 'fulfilled' ? perfRes.value : null;
+  if (!seo && !perf) throw new Error('PageSpeed 全部失敗');
+
+  // 合併成 scoreSEO 期望的結構（categories.seo / categories.performance / audits）
+  const merged = { lighthouseResult: { categories: {}, audits: {} } };
+  if (seo) merged.lighthouseResult.categories.seo = seo.lighthouseResult?.categories?.seo;
+  if (perf) {
+    merged.lighthouseResult.categories.performance = perf.lighthouseResult?.categories?.performance;
+    merged.lighthouseResult.audits = perf.lighthouseResult?.audits || {};
+  }
+  return merged;
 }
 
 // ══════════════════════════════════════════════════
