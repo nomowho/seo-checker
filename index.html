@@ -889,8 +889,9 @@ footer {
         <div class="edu-scoring">
           <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
           <ul class="edu-scoring-list">
-            <li><span class="edu-pts">22 pts</span> 結構化資料 — JSON-LD（首選）或 Microdata，偵測 NewsArticle、FAQPage 等</li>
-            <li><span class="edu-pts">18 pts</span> 自包含段落 — 100-200 字、結論句開頭的可引用段落（中文計字）</li>
+            <li><span class="edu-pts">18 pts</span> 結構化資料 — JSON-LD（首選）或 Microdata，偵測 NewsArticle、FAQPage 等</li>
+            <li><span class="edu-pts">14 pts</span> 自包含段落 — 100-200 字、結論句開頭的可引用段落（中文計字）</li>
+            <li><span class="edu-pts">8 pts</span> 文章結構 — 目錄錨點(href=#)、標題 id、H2/H3 層級</li>
             <li><span class="edu-pts">10 pts</span> 數據密度 — 段落是否含具體數字（AI 偏好可驗證事實）</li>
             <li><span class="edu-pts">10 pts</span> 權威外連 — 是否引用 .gov／.edu／Wikipedia 等高權威來源</li>
             <li><span class="edu-pts">15 pts</span> E-E-A-T — 作者、發布／更新日期、6 個月內新鮮度</li>
@@ -1297,14 +1298,14 @@ function scoreGEO(doc, html, robotsTxt) {
       } catch {}
     });
 
-    // 1. 結構化資料 (22 pts) — JSON-LD 優先，亦支援 Microdata
+    // 1. 結構化資料 (18 pts) — JSON-LD 優先，亦支援 Microdata
     const hasSchema = jsonLds.length > 0;
     const microNodes = doc.querySelectorAll('[itemscope][itemtype]');
     const hasMicrodata = microNodes.length > 0;
     const qualityTypes = ['Article','BlogPosting','NewsArticle','Product','Organization','WebSite','Person','FAQPage','HowTo'];
     const hasQuality = schemaTypes.some(t => qualityTypes.some(q => t.includes(q)));
-    // JSON-LD 含優質類型 22；只有 JSON-LD 16；只有 Microdata 13；都無 0
-    const schemaPts = hasSchema ? (hasQuality ? 22 : 16) : (hasMicrodata ? 13 : 0);
+    // JSON-LD 含優質類型 18；只有 JSON-LD 13；只有 Microdata 10；都無 0
+    const schemaPts = hasSchema ? (hasQuality ? 18 : 13) : (hasMicrodata ? 10 : 0);
     total += schemaPts;
     const schemaDetail = hasSchema
       ? `✅ 找到 ${jsonLds.length} 個 JSON-LD：${schemaTypes.join(', ').slice(0,55)}${hasMicrodata ? '（另有 Microdata）' : ''}`
@@ -1315,14 +1316,14 @@ function scoreGEO(doc, html, robotsTxt) {
       name: '結構化資料（JSON-LD / Microdata）',
       detail: schemaDetail,
       tip: '藏在原始碼裡「給機器看的說明書」，不影響讀者版面。首選 JSON-LD（Google 與各 AI 最推薦、最易解析）；Microdata（itemscope/itemtype）是舊式寫法，可被識別但建議升級。NewsArticle 類型讓 ChatGPT/Gemini 知道「這是媒體報導、作者、發布日期」，大幅提升被引用信任度。需請技術部門在 CMS 模板加入。',
-      pts: schemaPts, max: 22,
-      pass: schemaPts >= 13, scope: 'page',
+      pts: schemaPts, max: 18,
+      pass: schemaPts >= 10, scope: 'page',
     });
 
-    // 2. 自包含段落 citability (20 pts) — 改用中文計字，黃金區間 100-200 字
+    // 2. 自包含段落 citability (14 pts) — 改用中文計字，黃金區間 100-200 字
     const paragraphs = Array.from(doc.querySelectorAll('p, article p, main p, li'));
     const golden = paragraphs.filter(p => { const n = textLen(p.textContent); return n >= 80 && n <= 250; });
-    const contentPts = Math.min(18, golden.length * 3);
+    const contentPts = Math.min(14, golden.length * 3);
     total += contentPts;
     indicators.push({
       name: '自包含段落（AI 可引用性）',
@@ -1330,8 +1331,32 @@ function scoreGEO(doc, html, robotsTxt) {
         ? `✅ 找到 ${golden.length} 個 80-250 字的自包含段落（AI 容易整段摘取引用）`
         : '❌ 缺少 100-200 字的自包含段落，建議拆段、每段以結論句開頭',
       tip: 'Princeton 2024 論文實證：100-200 字（134-167 字最佳）、結論句開頭、自包含的段落，被 AI 引用機率比長段落高 40%。AI 引用的單位是「段落」不是全文——每段拿出來單看要能理解。段落太碎（<30 字）或太長（>400 字）都會降低被引用率。',
-      pts: contentPts, max: 18,
-      pass: contentPts >= 11, scope: 'page',
+      pts: contentPts, max: 14,
+      pass: contentPts >= 9, scope: 'page',
+    });
+
+    // 3. 文章結構：目錄錨點 + 標題層級 (8 pts)
+    const anchorLinks = Array.from(doc.querySelectorAll('a[href^="#"]'))
+      .filter(a => (a.getAttribute('href') || '').length > 1);
+    const h2c = doc.querySelectorAll('h2').length;
+    const h3c = doc.querySelectorAll('h3').length;
+    const headingsWithId = doc.querySelectorAll('h2[id], h3[id], h2 a[id], section[id]').length;
+    let structPts = 0;
+    if (anchorLinks.length >= 3) structPts += 4; else if (anchorLinks.length >= 1) structPts += 2;
+    if (h2c >= 3) structPts += 2; else if (h2c >= 1) structPts += 1;
+    if (headingsWithId >= 1) structPts += 2;
+    structPts = Math.min(8, structPts);
+    total += structPts;
+    const structBits = [
+      anchorLinks.length > 0 ? `${anchorLinks.length} 個頁內錨點連結` : '無目錄錨點',
+      `H2×${h2c}／H3×${h3c}`,
+      headingsWithId > 0 ? '標題可錨定' : '標題無 id',
+    ];
+    indicators.push({
+      name: '文章結構（目錄錨點）',
+      detail: (structPts >= 5 ? '✅ ' : structPts > 0 ? '⚠️ ' : '❌ ') + structBits.join('、'),
+      tip: '錨點目錄（Table of Contents）是強 GEO/AEO 訊號：AI 靠章節結構理解長文、精準引用某一段；Google 也可顯示「跳到段落」子連結。做法：文章開頭放目錄，用 <a href="#段落id"> 連到各 H2/H3（標題加 id）。標題層級清楚（H2 主段、H3 子段）也讓 AI 更容易切分內容單元。',
+      pts: structPts, max: 8, pass: structPts >= 5, scope: 'page',
     });
 
     // 3. 數據密度 citability (10 pts) — 含具體數字的段落
@@ -1807,6 +1832,7 @@ function renderSuggestions(scores) {
     'Mobile': { action: '【請技術處理】確認頁面有 <meta name="viewport" content="width=device-width, initial-scale=1">，並避免 user-scalable=no。Google 採行動優先索引，超過 6 成讀者用手機看新聞。', priority: 'mid' },
     '品牌權威': { action: '加上 Organization 結構化標記與官方社群連結（sameAs：FB / IG / LinkedIn / YouTube）。長期則在相關 Reddit、Wikipedia 累積真誠的品牌提及——AI 訓練資料大量來自這些平台，被討論越多越容易被引用。', priority: 'mid' },
     '平台優化': { action: '補齊 Open Graph 與 Twitter Card 標籤（標題、說明、封面圖）。分享到 LINE／FB／X 時有圖有摘要的點閱率高出數倍，也讓 AI 比對品牌跨平台資訊一致性。', priority: 'low' },
+    '文章結構': { action: '長文開頭加「章節目錄」：用錨點連結(a href=#段落)連到各 H2/H3 小標（標題加 id）。AI 靠章節結構精準引用某一段，Google 也可能顯示「跳到段落」子連結。標題層級分明（H2 主段、H3 子段）也讓 AI 更易切分內容。', priority: 'mid' },
   };
 
   const list = document.getElementById('suggestionList');
