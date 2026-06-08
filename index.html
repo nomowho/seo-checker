@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>遠見廣編 AI 健檢 — SEO · GEO · AEO 三維分析</title>
+<title>Nomo 文章健檢室 — SEO · GEO · AEO 三維分析</title>
 <meta name="description" content="遠見雜誌廣編文章 AI 能見度分析工具，評估 SEO 排名潛力、GEO AI 引用率、AEO 精選摘要能見度。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
@@ -326,6 +326,31 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 .ind-icon.fail { background: #FEF2F2; }
 .ind-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
 .ind-detail { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.ind-tip-toggle {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--primary);
+  cursor: pointer;
+  border: none;
+  background: var(--primary-bg);
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+.ind-tip-toggle:hover { background: #d4e4fc; }
+.ind-tip-body {
+  display: none;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #F8FAFF;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.65;
+}
+.ind-tip-body.open { display: block; }
 .ind-pts {
   margin-left: auto;
   font-size: 13px;
@@ -607,15 +632,15 @@ footer {
 
 <header>
   <div class="logo">
-    遠見廣編健檢
+    Nomo 文章健檢室
     <span class="logo-badge">AI 評分</span>
   </div>
   <div class="tagline">SEO · GEO · AEO 三維分析 · 貼網址 90 秒出分</div>
 </header>
 
 <div class="hero">
-  <h1>你的網站，<em>AI 看得到嗎</em>？</h1>
-  <p>貼上任何網址，90 秒告訴你 Google 排名潛力、AI 引用率、精選摘要能見度</p>
+  <h1>這篇文章，<em>AI 看得到嗎</em>？</h1>
+  <p>貼上任何文章或網頁網址，90 秒告訴你 Google 排名潛力、AI 引用率、精選摘要能見度</p>
   <div class="badge-row">
     <span class="badge badge-seo">🔍 SEO Google 排名</span>
     <span class="badge badge-geo">🤖 GEO AI 引用</span>
@@ -783,7 +808,7 @@ footer {
 </main>
 
 <footer>
-  遠見廣編 AI 健檢 · 資料僅儲存於本機瀏覽器 · 使用 Google PageSpeed Insights API
+  Nomo 文章健檢室 · 資料僅儲存於本機瀏覽器 · 使用 Google PageSpeed Insights API
 </footer>
 
 <script>
@@ -921,6 +946,7 @@ function scoreSEO(doc, html, ps) {
     indicators.push({
       name: '頁面速度（Core Web Vitals）',
       detail: `PageSpeed 效能分：${Math.round(perfScore * 100)} / LCP: ${lcp} / CLS: ${cls}`,
+      tip: 'Google 的頁面體驗評分，直接影響搜尋排名。LCP（最大內容繪製）應 < 2.5 秒、CLS（版面位移）應 < 0.1。常見問題：圖片太大、未壓縮、廣告版位跳動。速度慢也是讀者跳離的第一原因。',
       pts, max: 20,
       pass: pts >= 14,
     });
@@ -936,6 +962,7 @@ function scoreSEO(doc, html, ps) {
     indicators.push({
       name: 'Google SEO 基礎評分',
       detail: `PageSpeed SEO 分：${Math.round(seoScore * 100)} / 100（含連結、可爬取性、可索引性）`,
+      tip: 'Google Lighthouse 的 SEO 審查，涵蓋 10+ 項基礎技術檢查：連結可爬取性、文字大小可讀性、meta 完整性、robots 設定等。分數 < 80 代表有明顯技術問題需修正，即使內容再好也難被 Google 收錄。',
       pts, max: 25,
       pass: pts >= 18,
     });
@@ -953,6 +980,7 @@ function scoreSEO(doc, html, ps) {
     indicators.push({
       name: '網頁標題（<title>）',
       detail: title ? `「${title.slice(0,50)}${title.length>50?'…':''}」（${titleLen} 字）${titleLen<10||titleLen>60?' ⚠️ 建議 10-60 字':''}` : '❌ 未設定 title 標籤',
+      tip: '搜尋結果第一行顯示的文字，是 Google 判斷文章主題最重要的依據。最佳長度 30-60 字，核心關鍵字盡量放最前面。廣編文章建議格式：「[核心主題] — [媒體/品牌]」，避免用「廣告」「特輯」等字開頭。',
       pts: titlePts, max: 20,
       pass: titlePts >= 15,
     });
@@ -966,6 +994,7 @@ function scoreSEO(doc, html, ps) {
     indicators.push({
       name: 'Meta Description',
       detail: metaDesc ? `${metaDesc.slice(0,60)}…（${descLen} 字）${descLen<80||descLen>160?' ⚠️ 建議 80-160 字':''}` : '❌ 未設定 meta description',
+      tip: '搜尋結果標題下方的說明文字。雖然不直接影響排名，但好的摘要可提升點閱率 20-30%。建議 80-160 字，說明文章核心內容與讀者能獲得什麼。AI 引擎也用這段來快速理解文章是否與查詢相關。',
       pts: descPts, max: 20,
       pass: descPts >= 15,
     });
@@ -977,6 +1006,7 @@ function scoreSEO(doc, html, ps) {
     indicators.push({
       name: 'Canonical URL',
       detail: canonical ? `✅ ${canonical.slice(0,60)}` : '❌ 未設定 canonical 標籤（可能導致重複內容問題）',
+      tip: '告訴 Google「這篇文章的正規網址是這個」，防止同一內容出現在多個 URL（如有無 www、http/https 差異）時相互稀釋排名。廣編文章常見於多個頻道轉載，canonical 特別重要。',
       pts: canonicalPts, max: 10,
       pass: !!canonical,
     });
@@ -990,6 +1020,7 @@ function scoreSEO(doc, html, ps) {
     indicators.push({
       name: 'HTTPS + 可索引性',
       detail: isNoindex ? '⚠️ robots meta 包含 noindex，Google 不會索引此頁' : '✅ HTTPS 正常，頁面可被索引',
+      tip: 'robots meta 標籤若設定 noindex，Google 和 AI 爬蟲都不會收錄這頁。部分媒體預設廣編文章為 noindex（避免影響編輯內容的 SEO），但如果目標是讓廣編被搜尋到，必須確認此設定。',
       pts: httpsPts, max: 5,
       pass: !isNoindex,
     });
@@ -1022,6 +1053,7 @@ function scoreGEO(doc, html, robotsTxt) {
     indicators.push({
       name: 'Schema.org JSON-LD 結構化資料',
       detail: hasSchema ? `✅ 找到 ${jsonLds.length} 個 JSON-LD：${schemaTypes.join(', ').slice(0,60)}` : '❌ 未找到 JSON-LD 結構化資料（AI 無法理解頁面類型）',
+      tip: '藏在頁面原始碼裡「給機器看的說明書」，不影響讀者看到的版面。NewsArticle 類型讓 ChatGPT/Gemini 知道「這是媒體報導、作者是誰、發布日期是什麼」，大幅提升被 AI 引用的信任度。需請技術部門在 CMS 模板加入。',
       pts: schemaPts, max: 30,
       pass: schemaPts >= 18,
     });
@@ -1037,6 +1069,7 @@ function scoreGEO(doc, html, robotsTxt) {
     indicators.push({
       name: 'Open Graph 社群分享標籤',
       detail: ogPts === 20 ? '✅ og:title、og:description、og:image、og:type 完整' : `⚠️ 缺少：${missing.join('、')}`,
+      tip: '決定文章分享到 LINE、Facebook、Threads 時的預覽樣式（標題、說明、封面圖）。OG 標籤完整的文章點擊率明顯較高，同時也是 Perplexity、Bing AI 等解析文章基本資訊的主要來源之一。',
       pts: ogPts, max: 20,
       pass: ogPts >= 15,
     });
@@ -1054,6 +1087,7 @@ function scoreGEO(doc, html, robotsTxt) {
       detail: selfContained.length > 0
         ? `✅ 找到 ${selfContained.length} 個 60-300 字段落（AI 容易摘取引用）`
         : '❌ 缺少完整的資訊段落，建議每段寫 100-200 字並以結論句開頭',
+      tip: 'AI 引用的單位是「段落」，不是全文。每段需獨立完整、拿出來單看也能理解。最佳長度 60-300 字。第一句就給結論（答案前置原則），AI 爬取時才抓得到重點。段落太碎（< 30 字）或太長（> 400 字）都會降低被引用的機率。',
       pts: contentPts, max: 20,
       pass: contentPts >= 12,
     });
@@ -1068,6 +1102,7 @@ function scoreGEO(doc, html, robotsTxt) {
       name: 'E-E-A-T：作者 & 日期',
       detail: (authorEl && dateEl) ? '✅ 找到作者與發布日期（提升 AI 信任度）'
         : `⚠️ ${!authorEl?'未找到作者資訊 ':''}${!dateEl?'未找到日期資訊':''}`,
+      tip: 'E-E-A-T（Experience, Expertise, Authoritativeness, Trustworthiness）是 Google 與 AI 評估內容可信度的框架。記者全名 + 職稱 + 發布日期是最基本的訊號。沒有署名的文章，AI 無法判斷可信度，引用優先度會大幅降低。',
       pts: authorPts + datePts, max: 15,
       pass: (authorPts + datePts) >= 10,
     });
@@ -1088,6 +1123,7 @@ function scoreGEO(doc, html, robotsTxt) {
       : !robotsTxt
         ? '⚠️ 無法取得 robots.txt（預設允許，但建議明確設定）'
         : `⚠️ 封鎖中：${blocked.join('、')}（這些 AI 將無法引用你的內容）`,
+    tip: 'GPTBot（ChatGPT）、ClaudeBot（Claude）、PerplexityBot（Perplexity）是各大 AI 的爬蟲名稱，在 robots.txt 中可個別允許或封鎖。封鎖 = 主動把文章從 AI 資料庫中移除，再好的內容也不會被引用。預設狀態（未設定）為允許。',
     pts: crawlerPts, max: 15,
     pass: crawlerPts >= 10,
   });
@@ -1119,6 +1155,7 @@ function scoreAEO(doc, html) {
   indicators.push({
     name: 'FAQPage 結構化資料',
     detail: hasFaq ? '✅ 找到 FAQPage JSON-LD（Google 精選摘要加分項）' : '❌ 未設定 FAQPage schema（加入後可搶佔精選摘要位置）',
+    tip: '在文章末尾加 3-5 個 Q&A，並標注 FAQPage JSON-LD。Google 搜尋結果頁會直接展開這些問答——使用者不需要點進文章就能看到，但這個展示本身就是曝光。操作方式：在 HTML 中加一個 <script type="application/ld+json"> 區塊，格式為 FAQPage。',
     pts: faqPts, max: 30,
     pass: hasFaq,
   });
@@ -1133,6 +1170,7 @@ function scoreAEO(doc, html) {
     detail: questionHeadings.length > 0
       ? `✅ 找到 ${questionHeadings.length} 個問句標題（如：「${questionHeadings[0].textContent.trim().slice(0,30)}…」）`
       : '❌ 建議加入以問句結尾的 H2/H3 標題（提高「大家也問」命中率）',
+    tip: '以「？」結尾的 H2/H3 標題，是搶佔 Google「大家也問（People Also Ask）」欄位的核心方法。當讀者 Google 類似問題時，PAA 框會直接顯示你的標題，點擊率極高。例：「台積電 2024 年能維持高獲利嗎？」比「台積電 2024 年展望」更有效。',
     pts: qhPts, max: 25,
     pass: qhPts >= 10,
   });
@@ -1150,6 +1188,7 @@ function scoreAEO(doc, html) {
     detail: shortAnswers.length > 0
       ? `✅ 找到 ${shortAnswers.length} 個適合被摘取的短答段落`
       : '❌ 建議在問句標題後加 40-120 字的直接回答（第一句就給結論）',
+    tip: 'Google 精選摘要（Featured Snippet，第零位結果）幾乎都從這種結構摘取：問句標題 → 第一段直接給 40-120 字的結論。寫法：先給答案，再補充說明。不要先鋪陳背景才給結論，那樣 AI 抓不到重點。',
     pts: saPts, max: 20,
     pass: saPts >= 12,
   });
@@ -1167,6 +1206,7 @@ function scoreAEO(doc, html) {
   indicators.push({
     name: 'HowTo 結構化資料',
     detail: hasHowTo ? '✅ 找到 HowTo JSON-LD（步驟型內容的精選摘要利器）' : '— 未設定 HowTo schema（有步驟型內容的頁面建議加入）',
+    tip: '適用於有「步驟」的文章：如「5 步驟申辦綠色債券」「如何評估 ESG 評級」。加入 HowTo JSON-LD 後，Google 搜尋結果會直接在頁面展示步驟清單，佔據更多版面，無需點入文章就能吸引讀者。',
     pts: howToPts, max: 15,
     pass: howToPts >= 10,
   });
@@ -1180,6 +1220,7 @@ function scoreAEO(doc, html) {
     detail: lists.length > 0
       ? `✅ 找到 ${lists.length} 個列表（結構化清單有助於摘要框抓取）`
       : '— 建議在重要段落後加入條列式清單',
+    tip: '條列清單（• 重點一 / • 重點二）是 Google 和 AI 都偏好的格式，比長段落更容易被擷取進精選摘要。適合用在：重點整理、優缺點比較、步驟說明、注意事項。記者習慣用段落，但清單對 SEO 更有利。',
     pts: listPts, max: 10,
     pass: listPts >= 6,
   });
@@ -1331,20 +1372,28 @@ function getScoreLabel(score) {
 function renderIndicators(dim, indicators) {
   const grid = document.getElementById('grid' + dim.charAt(0).toUpperCase() + dim.slice(1));
   grid.innerHTML = '';
-  indicators.forEach(ind => {
+  indicators.forEach((ind, i) => {
     const pctClass = ind.pass === null ? 'warn' : ind.pass ? 'pass' : (ind.pts > 0 ? 'warn' : 'fail');
     const emoji = ind.pass === null ? '⚠️' : ind.pass ? '✅' : (ind.pts > 0 ? '⚠️' : '❌');
-    const pct = ind.max > 0 ? Math.round((ind.pts / ind.max) * 100) : 0;
+    const tipId = `tip-${dim}-${i}`;
     grid.innerHTML += `
       <div class="indicator-card">
         <div class="ind-icon ${pctClass}">${emoji}</div>
         <div style="flex:1;min-width:0;">
           <div class="ind-name">${ind.name}</div>
           <div class="ind-detail">${ind.detail}</div>
+          ${ind.tip ? `<button class="ind-tip-toggle" onclick="toggleTip('${tipId}',this)">ℹ 什麼是這個</button>
+          <div class="ind-tip-body" id="${tipId}">${ind.tip}</div>` : ''}
         </div>
         <div class="ind-pts ${pctClass}">${ind.pts}/${ind.max}</div>
       </div>`;
   });
+}
+
+function toggleTip(id, btn) {
+  const el = document.getElementById(id);
+  const open = el.classList.toggle('open');
+  btn.textContent = open ? '✕ 收起' : 'ℹ 什麼是這個';
 }
 
 function renderSuggestions(scores) {
