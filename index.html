@@ -201,6 +201,10 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 .step-item.active .step-icon { background: var(--primary); color: #fff; animation: pulse 1s infinite; }
 .step-item.error .step-icon { background: var(--yellow); color: #fff; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .6; } }
+.step-item .step-text { display: flex; flex-direction: column; gap: 1px; }
+.step-item .step-main { font-size: 14px; color: var(--text2); }
+.step-item.active .step-main, .step-item.done .step-main { color: var(--text); font-weight: 600; }
+.step-item .step-sub { font-size: 11.5px; color: var(--text3); letter-spacing: .01em; }
 
 /* ─── RESULTS ─── */
 #resultsWrap { display: none; }
@@ -702,22 +706,23 @@ footer {
   <!-- Progress -->
   <div id="progressWrap">
     <div class="progress-title">⚙️ 分析中，請稍候…</div>
+    <div style="font-size:12.5px;color:var(--text3);margin:-4px 0 14px;">完整分析需要 30–60 秒（含 Google 速度量測），請稍候</div>
     <ul class="step-list">
       <li class="step-item" id="step1">
         <div class="step-icon">1</div>
-        <span>抓取網頁 HTML 內容</span>
+        <div class="step-text"><span class="step-main">抓取網頁內容</span><span class="step-sub">HTML · OpenGraph · 結構化資料</span></div>
       </li>
       <li class="step-item" id="step2">
         <div class="step-icon">2</div>
-        <span>讀取 robots.txt（AI 爬蟲設定）</span>
+        <div class="step-text"><span class="step-main">檢查爬取與索引設定</span><span class="step-sub">robots.txt · sitemap.xml · AI 爬蟲</span></div>
       </li>
       <li class="step-item" id="step3">
         <div class="step-icon">3</div>
-        <span>呼叫 Google PageSpeed API</span>
+        <div class="step-text"><span class="step-main">量測頁面速度</span><span class="step-sub">Google PSI · CrUX 真實用戶數據（LCP / CLS / INP）</span></div>
       </li>
       <li class="step-item" id="step4">
         <div class="step-icon">4</div>
-        <span>計算 SEO / GEO / AEO 三維分數</span>
+        <div class="step-text"><span class="step-main">計算三維分數</span><span class="step-sub">SEO · GEO · AEO 共 18 項指標</span></div>
       </li>
     </ul>
   </div>
@@ -843,7 +848,7 @@ footer {
             <li><span class="edu-pts">20 pts</span> 網頁標題（Title Tag）— 是否存在、長度 10–60 字</li>
             <li><span class="edu-pts">15 pts</span> Meta Description — 是否存在、長度 50–160 字</li>
             <li><span class="edu-pts">15 pts</span> Canonical 標籤 — 是否防止重複索引</li>
-            <li><span class="edu-pts">5 pts</span> 可索引性 — robots meta 是否含 noindex（含則扣分）</li>
+            <li><span class="edu-pts">5 pts</span> 可索引性 + Sitemap — robots meta 是否 noindex、是否有 sitemap.xml</li>
           </ul>
         </div>
       </div>
@@ -854,7 +859,7 @@ footer {
         <div class="edu-scoring">
           <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
           <ul class="edu-scoring-list">
-            <li><span class="edu-pts">25 pts</span> JSON-LD 結構化資料 — 偵測 NewsArticle、Article、FAQPage 等 Schema.org 標記</li>
+            <li><span class="edu-pts">25 pts</span> 結構化資料 — JSON-LD（首選）或 Microdata，偵測 NewsArticle、FAQPage 等</li>
             <li><span class="edu-pts">20 pts</span> 自包含段落 — 100-200 字、結論句開頭的可引用段落（中文計字）</li>
             <li><span class="edu-pts">10 pts</span> 數據密度 — 段落是否含具體數字（AI 偏好可驗證事實）</li>
             <li><span class="edu-pts">10 pts</span> 權威外連 — 是否引用 .gov／.edu／Wikipedia 等高權威來源</li>
@@ -934,15 +939,20 @@ async function startAnalysis() {
       showNotice('⚠️ 無法抓取網站 HTML（可能有 CORS 防護）。SEO 數據仍可從 PageSpeed 取得，GEO / AEO 部分指標以「未知」計入。', 'warn');
     }
 
-    // Step 2: Robots.txt
+    // Step 2: robots.txt + sitemap.xml（爬取與索引設定）
     setStep(2, 'active');
-    let robotsTxt = '';
-    try {
+    let robotsTxt = '', sitemapOk = false;
+    {
       const origin = new URL(url).origin;
-      robotsTxt = await fetchHTML(origin + '/robots.txt', 20);
-      setStep(2, 'done');
-    } catch {
-      setStep(2, 'error');
+      const [rRes, sRes] = await Promise.allSettled([
+        fetchHTML(origin + '/robots.txt', 20),
+        fetchHTML(origin + '/sitemap.xml', 20),
+      ]);
+      if (rRes.status === 'fulfilled') robotsTxt = rRes.value;
+      // sitemap：直接抓到，或在 robots.txt 裡有宣告，都算有
+      sitemapOk = (sRes.status === 'fulfilled' && /<urlset|<sitemapindex/i.test(sRes.value))
+        || /sitemap:\s*http/i.test(robotsTxt);
+      setStep(2, robotsTxt || sitemapOk ? 'done' : 'error');
     }
 
     // Step 3: PageSpeed（SEO 分析）+ CrUX（真實用戶速度數據），平行取得
@@ -969,7 +979,7 @@ async function startAnalysis() {
 
     // Step 4: Score
     setStep(4, 'active');
-    const scores = calculateScores(doc, html, robotsTxt, ps, crux, brandName);
+    const scores = calculateScores(doc, html, robotsTxt, ps, crux, sitemapOk, brandName);
     setStep(4, 'done');
 
     renderResults(url, scores, brandName);
@@ -1063,11 +1073,11 @@ async function fetchCrux(url) {
 // ══════════════════════════════════════════════════
 // SCORING ENGINE
 // ══════════════════════════════════════════════════
-function calculateScores(doc, html, robotsTxt, ps, crux, brandName) {
+function calculateScores(doc, html, robotsTxt, ps, crux, sitemapOk, brandName) {
   const robotsMeta = doc ? (doc.querySelector('meta[name="robots"]')?.getAttribute('content') || '') : '';
   const isNoindex = /noindex/i.test(robotsMeta);
   return {
-    seo: scoreSEO(doc, html, ps, crux),
+    seo: scoreSEO(doc, html, ps, crux, sitemapOk),
     geo: scoreGEO(doc, html, robotsTxt),
     aeo: scoreAEO(doc, html),
     adv: scoreAdvertorial(doc, html, brandName),
@@ -1118,7 +1128,7 @@ function hasNumber(s) {
 }
 
 // ── SEO Scoring (100 pts) ──────────────────────────
-function scoreSEO(doc, html, ps, crux) {
+function scoreSEO(doc, html, ps, crux, sitemapOk) {
   const indicators = [];
   let total = 0;
 
@@ -1200,17 +1210,16 @@ function scoreSEO(doc, html, ps, crux) {
       pass: !!canonical,
     });
 
-    // 6. HTTPS + Robots meta (5 pts)
-    const isHttps = html.includes('https://') || true; // we validated URL
+    // 6. 可索引性 + Sitemap (5 pts) = 非 noindex(3) + sitemap(2)
     const robotsMeta = doc.querySelector('meta[name="robots"]')?.getAttribute('content') || '';
     const isNoindex = /noindex/i.test(robotsMeta);
-    const httpsPts = isNoindex ? 0 : 5;
-    total += httpsPts;
+    const indexPts = (isNoindex ? 0 : 3) + (sitemapOk ? 2 : 0);
+    total += indexPts;
     indicators.push({
-      name: 'HTTPS + 可索引性',
-      detail: isNoindex ? '⚠️ robots meta 包含 noindex，Google 不會索引此頁' : '✅ HTTPS 正常，頁面可被索引',
-      tip: 'robots meta 標籤若設定 noindex，Google 和 AI 爬蟲都不會收錄這頁。部分媒體預設廣編文章為 noindex（避免影響編輯內容的 SEO），但如果目標是讓廣編被搜尋到，必須確認此設定。',
-      pts: httpsPts, max: 5,
+      name: '可索引性 + Sitemap',
+      detail: `${isNoindex ? '⚠️ robots meta 含 noindex，Google 不收錄此頁' : '✅ 頁面可被索引'}　|　${sitemapOk ? '✅ 找到 sitemap.xml' : '— 未找到 sitemap.xml'}`,
+      tip: 'robots meta 設 noindex 時 Google 與 AI 爬蟲都不收錄這頁——部分媒體預設廣編為 noindex，若要被搜尋到必須確認。sitemap.xml 則是給搜尋引擎的「網站地圖」，讓爬蟲更快、更完整地發現所有頁面，是基本的可爬取性訊號。',
+      pts: indexPts, max: 5,
       pass: !isNoindex,
     });
   }
@@ -1241,16 +1250,24 @@ function scoreGEO(doc, html, robotsTxt) {
       } catch {}
     });
 
-    // 1. JSON-LD Schema.org (25 pts)
+    // 1. 結構化資料 (25 pts) — JSON-LD 優先，亦支援 Microdata
     const hasSchema = jsonLds.length > 0;
+    const microNodes = doc.querySelectorAll('[itemscope][itemtype]');
+    const hasMicrodata = microNodes.length > 0;
     const qualityTypes = ['Article','BlogPosting','NewsArticle','Product','Organization','WebSite','Person','FAQPage','HowTo'];
     const hasQuality = schemaTypes.some(t => qualityTypes.some(q => t.includes(q)));
-    const schemaPts = hasSchema ? (hasQuality ? 25 : 15) : 0;
+    // JSON-LD 含優質類型 25；只有 JSON-LD 18；只有 Microdata 15；都無 0
+    const schemaPts = hasSchema ? (hasQuality ? 25 : 18) : (hasMicrodata ? 15 : 0);
     total += schemaPts;
+    const schemaDetail = hasSchema
+      ? `✅ 找到 ${jsonLds.length} 個 JSON-LD：${schemaTypes.join(', ').slice(0,55)}${hasMicrodata ? '（另有 Microdata）' : ''}`
+      : hasMicrodata
+        ? `⚠️ 僅找到 Microdata（${microNodes.length} 項），建議改用 JSON-LD（AI 較易解析）`
+        : '❌ 未找到結構化資料（JSON-LD / Microdata 皆無，AI 無法理解頁面類型）';
     indicators.push({
-      name: 'Schema.org JSON-LD 結構化資料',
-      detail: hasSchema ? `✅ 找到 ${jsonLds.length} 個 JSON-LD：${schemaTypes.join(', ').slice(0,60)}` : '❌ 未找到 JSON-LD 結構化資料（AI 無法理解頁面類型）',
-      tip: '藏在頁面原始碼裡「給機器看的說明書」，不影響讀者看到的版面。NewsArticle 類型讓 ChatGPT/Gemini 知道「這是媒體報導、作者是誰、發布日期是什麼」，大幅提升被 AI 引用的信任度。需請技術部門在 CMS 模板加入。',
+      name: '結構化資料（JSON-LD / Microdata）',
+      detail: schemaDetail,
+      tip: '藏在原始碼裡「給機器看的說明書」，不影響讀者版面。首選 JSON-LD（Google 與各 AI 最推薦、最易解析）；Microdata（itemscope/itemtype）是舊式寫法，可被識別但建議升級。NewsArticle 類型讓 ChatGPT/Gemini 知道「這是媒體報導、作者、發布日期」，大幅提升被引用信任度。需請技術部門在 CMS 模板加入。',
       pts: schemaPts, max: 25,
       pass: schemaPts >= 15,
     });
