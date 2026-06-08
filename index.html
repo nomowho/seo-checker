@@ -949,18 +949,20 @@ async function startAnalysis() {
     setStep(3, 'active');
     let ps = null, crux = null;
     {
-      const [psRes, cruxRes] = await Promise.allSettled([
-        fetchPageSpeed(url),
-        fetchCrux(url),
-      ]);
-      ps = psRes.status === 'fulfilled' ? psRes.value : null;
-      crux = cruxRes.status === 'fulfilled' ? cruxRes.value : null;
+      // 硬性保險：60 秒內無論如何都往下走，避免 AbortSignal 在某些環境沒中斷而無限卡住
+      const hardCap = new Promise(res => setTimeout(() => res('TIMEOUT'), 60000));
+      const work = Promise.allSettled([fetchPageSpeed(url), fetchCrux(url)]);
+      const raced = await Promise.race([work, hardCap]);
+      if (raced !== 'TIMEOUT') {
+        ps = raced[0].status === 'fulfilled' ? raced[0].value : null;
+        crux = raced[1].status === 'fulfilled' ? raced[1].value : null;
+      }
       if (ps || crux) {
         setStep(3, 'done');
       } else {
         setStep(3, 'error');
         showNotice(corsOk
-          ? '⚠️ PageSpeed 與 CrUX 皆無回應，略過效能評分，繼續其他分析。'
+          ? '⚠️ PageSpeed 與 CrUX 無回應（已略過效能評分），其餘分析正常顯示。'
           : '⚠️ HTML 抓取與速度數據皆失敗（網站可能有防爬保護或需登入）。顯示可用的部分結果。', 'warn');
       }
     }
