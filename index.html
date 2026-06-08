@@ -821,6 +821,7 @@ footer {
 // CONFIG
 // ══════════════════════════════════════════════════
 const PAGESPEED_API = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
+const PAGESPEED_KEY = 'AIzaSyBwANmZJdQMQgFvN8SknlmI5CgScD2wgy8';
 const CORS_PROXY = url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 const CIRCUMFERENCE = 2 * Math.PI * 38; // r=38
 
@@ -931,7 +932,7 @@ async function fetchHTML(url) {
 }
 
 async function fetchPageSpeed(url) {
-  const apiUrl = `${PAGESPEED_API}?url=${encodeURIComponent(url)}&category=performance&category=seo&strategy=mobile`;
+  const apiUrl = `${PAGESPEED_API}?url=${encodeURIComponent(url)}&category=performance&category=seo&strategy=mobile&key=${PAGESPEED_KEY}`;
   const resp = await fetch(apiUrl, { signal: AbortSignal.timeout(30000) });
   if (!resp.ok) throw new Error('PageSpeed API 錯誤');
   return resp.json();
