@@ -942,25 +942,29 @@ async function startAnalysis() {
       setStep(2, 'error');
     }
 
-    // Step 3: PageSpeed
+    // Step 3: PageSpeed（SEO 分析）+ CrUX（真實用戶速度數據），平行取得
     setStep(3, 'active');
-    let ps = null;
-    try {
-      ps = await fetchPageSpeed(url);
-      setStep(3, 'done');
-    } catch {
-      setStep(3, 'error');
-      if (!corsOk) {
-        showNotice('⚠️ HTML 抓取與 PageSpeed 皆失敗（網站可能有防爬保護或需登入）。顯示可用的部分結果。', 'warn');
+    let ps = null, crux = null;
+    {
+      const [psRes, cruxRes] = await Promise.allSettled([
+        fetchPageSpeed(url),
+        fetchCrux(url),
+      ]);
+      ps = psRes.status === 'fulfilled' ? psRes.value : null;
+      crux = cruxRes.status === 'fulfilled' ? cruxRes.value : null;
+      if (ps || crux) {
+        setStep(3, 'done');
       } else {
-        showNotice('⚠️ PageSpeed API 無回應，略過效能評分，繼續其他分析。', 'warn');
+        setStep(3, 'error');
+        showNotice(corsOk
+          ? '⚠️ PageSpeed 與 CrUX 皆無回應，略過效能評分，繼續其他分析。'
+          : '⚠️ HTML 抓取與速度數據皆失敗（網站可能有防爬保護或需登入）。顯示可用的部分結果。', 'warn');
       }
-      // 繼續執行，不 return
     }
 
     // Step 4: Score
     setStep(4, 'active');
-    const scores = calculateScores(doc, html, robotsTxt, ps, brandName);
+    const scores = calculateScores(doc, html, robotsTxt, ps, crux, brandName);
     setStep(4, 'done');
 
     renderResults(url, scores, brandName);
@@ -1001,39 +1005,50 @@ async function fetchHTML(url) {
 }
 
 async function fetchPageSpeed(url) {
-  // 兩類別獨立平行呼叫：SEO 約 40 秒穩定回來；效能(performance)對廣告/腳本爆量的
-  // 重型頁面常逾時，拆開後效能逾時也不會拖垮 SEO 評分。
-  const base = `${PAGESPEED_API}?url=${encodeURIComponent(url)}&strategy=mobile&key=${PAGESPEED_KEY}`;
-  const call = (cat, ms) => fetch(`${base}&category=${cat}`, { signal: AbortSignal.timeout(ms) })
-    .then(r => r.ok ? r.json() : Promise.reject(new Error('http ' + r.status)))
-    .then(d => d.error ? Promise.reject(new Error(d.error.message)) : d);
+  // 只取 SEO 類別的 Lighthouse 分析（約 40 秒穩定回來）。
+  // 效能(performance)的實驗室測試對廣告/腳本爆量的重型頁面常逾時 75 秒以上，
+  // 已改用 CrUX 真實用戶數據（fetchCrux）取得 Core Web Vitals，瞬間回傳。
+  const api = `${PAGESPEED_API}?url=${encodeURIComponent(url)}&category=seo&strategy=mobile&key=${PAGESPEED_KEY}`;
+  const resp = await fetch(api, { signal: AbortSignal.timeout(55000) });
+  if (!resp.ok) throw new Error('PageSpeed API 錯誤 ' + resp.status);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error.message);
+  return data;
+}
 
-  const [seoRes, perfRes] = await Promise.allSettled([
-    call('seo', 55000),
-    call('performance', 50000),
-  ]);
-  const seo = seoRes.status === 'fulfilled' ? seoRes.value : null;
-  const perf = perfRes.status === 'fulfilled' ? perfRes.value : null;
-  if (!seo && !perf) throw new Error('PageSpeed 全部失敗');
-
-  // 合併成 scoreSEO 期望的結構（categories.seo / categories.performance / audits）
-  const merged = { lighthouseResult: { categories: {}, audits: {} } };
-  if (seo) merged.lighthouseResult.categories.seo = seo.lighthouseResult?.categories?.seo;
-  if (perf) {
-    merged.lighthouseResult.categories.performance = perf.lighthouseResult?.categories?.performance;
-    merged.lighthouseResult.audits = perf.lighthouseResult?.audits || {};
-  }
-  return merged;
+// CrUX 真實用戶體驗數據（Chrome UX Report）：取 Core Web Vitals。
+// 先試單一網址，無資料(404)則退回整站 origin 數據。回傳 null 代表完全無資料。
+async function fetchCrux(url) {
+  const endpoint = `https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=${PAGESPEED_KEY}`;
+  const query = async (body, scope) => {
+    const r = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...body, formFactor: 'PHONE' }),
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (d.error || !d.record) return null;
+    return { metrics: d.record.metrics, scope };
+  };
+  try {
+    let origin;
+    try { origin = new URL(url).origin; } catch { origin = null; }
+    // 先試 URL 層級（精準到單篇），沒資料再退回整站
+    return (await query({ url }, 'url'))
+        || (origin ? await query({ origin }, 'origin') : null);
+  } catch { return null; }
 }
 
 // ══════════════════════════════════════════════════
 // SCORING ENGINE
 // ══════════════════════════════════════════════════
-function calculateScores(doc, html, robotsTxt, ps, brandName) {
+function calculateScores(doc, html, robotsTxt, ps, crux, brandName) {
   const robotsMeta = doc ? (doc.querySelector('meta[name="robots"]')?.getAttribute('content') || '') : '';
   const isNoindex = /noindex/i.test(robotsMeta);
   return {
-    seo: scoreSEO(doc, html, ps),
+    seo: scoreSEO(doc, html, ps, crux),
     geo: scoreGEO(doc, html, robotsTxt),
     aeo: scoreAEO(doc, html),
     adv: scoreAdvertorial(doc, html, brandName),
@@ -1041,27 +1056,55 @@ function calculateScores(doc, html, robotsTxt, ps, brandName) {
   };
 }
 
+// CrUX Core Web Vitals 評分輔助：依 Google 官方門檻，三項共 20 分
+function scoreCWV(crux) {
+  const m = crux.metrics;
+  const p75 = (k) => m[k]?.percentiles?.p75;
+  const lcp = parseFloat(p75('largest_contentful_paint'));   // ms
+  const cls = parseFloat(p75('cumulative_layout_shift'));    // 數值
+  const inp = parseFloat(p75('interaction_to_next_paint'));  // ms
+  // 各項：良好 / 待改善 / 差，依官方門檻給分
+  const grade = (v, good, poor, full) =>
+    isNaN(v) ? { p: 0, label: '無資料' }
+    : v <= good ? { p: full, label: '✅ 良好' }
+    : v <= poor ? { p: Math.round(full * 0.5), label: '⚠️ 待改善' }
+    : { p: 0, label: '❌ 差' };
+  const gL = grade(lcp, 2500, 4000, 8);
+  const gC = grade(cls, 0.1, 0.25, 6);
+  const gI = grade(inp, 200, 500, 6);
+  const pts = gL.p + gC.p + gI.p;
+  const fmt = (v, unit) => isNaN(v) ? '—' : (unit === 'ms' ? Math.round(v) + 'ms' : v.toFixed(2));
+  return {
+    pts,
+    detail: `LCP ${fmt(lcp,'ms')} ${gL.label}　CLS ${fmt(cls,'')} ${gC.label}　INP ${fmt(inp,'ms')} ${gI.label}`,
+    scope: crux.scope,
+  };
+}
+
 // ── SEO Scoring (100 pts) ──────────────────────────
-function scoreSEO(doc, html, ps) {
+function scoreSEO(doc, html, ps, crux) {
   const indicators = [];
   let total = 0;
 
-  // 1. PageSpeed Performance (20 pts)
-  const perfScore = ps?.lighthouseResult?.categories?.performance?.score;
-  if (perfScore != null) {
-    const pts = Math.round(perfScore * 20);
-    total += pts;
-    const lcp = ps.lighthouseResult.audits?.['largest-contentful-paint']?.displayValue || '—';
-    const cls = ps.lighthouseResult.audits?.['cumulative-layout-shift']?.displayValue || '—';
+  // 1. Core Web Vitals — 改用 CrUX 真實用戶數據 (20 pts)
+  if (crux && crux.metrics) {
+    const cwv = scoreCWV(crux);
+    total += cwv.pts;
+    const scopeLabel = cwv.scope === 'url' ? '本篇文章' : '整站平均';
     indicators.push({
       name: '頁面速度（Core Web Vitals）',
-      detail: `PageSpeed 效能分：${Math.round(perfScore * 100)} / LCP: ${lcp} / CLS: ${cls}`,
-      tip: 'Google 的頁面體驗評分，直接影響搜尋排名。LCP（最大內容繪製）應 < 2.5 秒、CLS（版面位移）應 < 0.1。常見問題：圖片太大、未壓縮、廣告版位跳動。速度慢也是讀者跳離的第一原因。',
-      pts, max: 20,
-      pass: pts >= 14,
+      detail: `${cwv.detail}　〔來源：Google 真實用戶數據・${scopeLabel}〕`,
+      tip: 'Core Web Vitals 是 Google 用真實使用者體驗（CrUX）評估的速度指標，直接影響搜尋排名。LCP（最大內容繪製）應 < 2.5 秒、CLS（版面位移）< 0.1、INP（互動回應）< 200 毫秒。常見問題：圖片太大未壓縮、廣告版位載入時跳動、第三方追蹤腳本過多。單篇文章若流量不足，會以「整站平均」數據呈現。',
+      pts: cwv.pts, max: 20,
+      pass: cwv.pts >= 14,
     });
   } else {
-    indicators.push({ name: '頁面速度（Core Web Vitals）', detail: '無法取得 PageSpeed 數據', pts: 0, max: 20, pass: null });
+    indicators.push({
+      name: '頁面速度（Core Web Vitals）',
+      detail: '此網址尚無 Google 真實用戶數據（流量不足，CrUX 無收錄）',
+      tip: 'Core Web Vitals 採用 Google 的真實使用者體驗報告（CrUX）。流量較低的網站或新頁面可能尚未被收錄，因此無法取得速度數據——這不代表頁面速度差，只是樣本不足。',
+      pts: 0, max: 20, pass: null,
+    });
   }
 
   // 2. PageSpeed SEO category (25 pts)
