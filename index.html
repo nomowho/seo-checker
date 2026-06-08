@@ -686,6 +686,11 @@ footer {
 
   <!-- Results -->
   <div id="resultsWrap">
+    <!-- noindex 警告橫幅（預設隱藏） -->
+    <div id="noindexBanner" style="display:none; background:#C11920; color:#fff; border-radius:10px; padding:14px 18px; margin-bottom:18px; font-size:14px; line-height:1.6; font-weight:600;">
+      🚨 <strong>重大警告：此頁面設有 noindex！</strong><br>
+      <span style="font-weight:400;">robots meta 標籤設定了 <code style="background:rgba(255,255,255,0.2);padding:1px 5px;border-radius:3px;">noindex</code>，Google 與所有 AI 爬蟲（ChatGPT、Claude、Perplexity）都<strong>不會收錄這篇文章</strong>。廣編曝光效益幾乎歸零，建議立即請技術部門確認並移除 noindex 設定。</span>
+    </div>
     <p class="result-url">分析網址：<a id="resultUrl" href="#" target="_blank"></a></p>
 
     <!-- Score overview -->
@@ -876,9 +881,11 @@ async function startAnalysis() {
     } catch {
       setStep(3, 'error');
       if (!corsOk) {
-        showNotice('❌ 無法取得 PageSpeed 資料，且網頁 HTML 抓取也失敗。請確認網址是否正確。', 'error');
-        return;
+        showNotice('⚠️ HTML 抓取與 PageSpeed 皆失敗（網站可能有防爬保護或需登入）。顯示可用的部分結果。', 'warn');
+      } else {
+        showNotice('⚠️ PageSpeed API 無回應，略過效能評分，繼續其他分析。', 'warn');
       }
+      // 繼續執行，不 return
     }
 
     // Step 4: Score
@@ -899,17 +906,28 @@ async function startAnalysis() {
 // FETCH HELPERS
 // ══════════════════════════════════════════════════
 async function fetchHTML(url) {
-  const proxyUrl = CORS_PROXY(url);
-  const resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
-  if (!resp.ok) throw new Error('proxy 回傳錯誤');
-  const data = await resp.json();
-  if (!data.contents) throw new Error('空回應');
-  if (data.contents.length < 500 && (
-    data.contents.includes('Attention Required') ||
-    data.contents.includes('cf-error') ||
-    data.contents.includes('Access Denied')
-  )) throw new Error('BLOCKED');
-  return data.contents;
+  // 先試 allorigins，失敗再試 corsproxy.io
+  const proxies = [
+    async () => {
+      const r = await fetch(CORS_PROXY(url), { signal: AbortSignal.timeout(12000) });
+      if (!r.ok) throw new Error('allorigins error');
+      const d = await r.json();
+      if (!d.contents || d.contents.length < 300) throw new Error('empty');
+      if (d.contents.includes('Attention Required') || d.contents.includes('cf-error')) throw new Error('blocked');
+      return d.contents;
+    },
+    async () => {
+      const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(12000) });
+      if (!r.ok) throw new Error('corsproxy error');
+      const text = await r.text();
+      if (text.length < 300) throw new Error('empty');
+      return text;
+    }
+  ];
+  for (const proxy of proxies) {
+    try { return await proxy(); } catch {}
+  }
+  throw new Error('所有 proxy 均失敗');
 }
 
 async function fetchPageSpeed(url) {
@@ -923,11 +941,14 @@ async function fetchPageSpeed(url) {
 // SCORING ENGINE
 // ══════════════════════════════════════════════════
 function calculateScores(doc, html, robotsTxt, ps, brandName) {
+  const robotsMeta = doc ? (doc.querySelector('meta[name="robots"]')?.getAttribute('content') || '') : '';
+  const isNoindex = /noindex/i.test(robotsMeta);
   return {
     seo: scoreSEO(doc, html, ps),
     geo: scoreGEO(doc, html, robotsTxt),
     aeo: scoreAEO(doc, html),
     adv: scoreAdvertorial(doc, html, brandName),
+    noindex: isNoindex,
   };
 }
 
@@ -1332,6 +1353,14 @@ function renderResults(url, scores, brandName) {
   const urlEl = document.getElementById('resultUrl');
   urlEl.textContent = url;
   urlEl.href = url;
+
+  // noindex 警告橫幅
+  const noindexBanner = document.getElementById('noindexBanner');
+  if (scores.noindex) {
+    noindexBanner.style.display = 'block';
+  } else {
+    noindexBanner.style.display = 'none';
+  }
 
   ['seo', 'geo', 'aeo'].forEach(dim => {
     const score = Math.round(scores[dim].score);
