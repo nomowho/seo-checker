@@ -312,23 +312,28 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
   border-radius: 10px;
   padding: 14px 16px;
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 9px;
 }
-.ind-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
+.ind-head { display: flex; align-items: center; gap: 8px; }
+.ind-name { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.ind-scope {
+  font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 999px;
+  flex-shrink: 0; letter-spacing: .03em;
 }
-.ind-icon.pass { background: #ECFDF5; }
-.ind-icon.warn { background: #FFFBEB; }
-.ind-icon.fail { background: #FEF2F2; }
-.ind-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.ind-scope.page { background: var(--primary-bg); color: var(--primary); }
+.ind-scope.site { background: #FEF6E7; color: #B7791F; border: 1px solid #F6E0B0; }
+.ind-score { margin-left: auto; font-size: 22px; font-weight: 800; line-height: 1; flex-shrink: 0; }
+.ind-score.pass { color: var(--green); }
+.ind-score.warn { color: var(--yellow); }
+.ind-score.fail { color: var(--red); }
+.ind-score.na { color: var(--text3); font-size: 16px; }
+.ind-bar { height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
+.ind-bar-fill { height: 100%; border-radius: 999px; transition: width .6s ease; }
+.ind-bar-fill.pass { background: linear-gradient(90deg,#34D399,#10B981); }
+.ind-bar-fill.warn { background: linear-gradient(90deg,#FCD34D,#F59E0B); }
+.ind-bar-fill.fail { background: linear-gradient(90deg,#FCA5A5,#EF4444); }
+.ind-bar-fill.na { background: var(--border); }
 .ind-detail { font-size: 12px; color: var(--text2); line-height: 1.5; }
 .ind-tip-toggle {
   display: inline-block;
@@ -1143,6 +1148,7 @@ function scoreSEO(doc, html, ps, crux, sitemapOk) {
       tip: 'Core Web Vitals 是 Google 用真實使用者體驗（CrUX）評估的速度指標，直接影響搜尋排名。LCP（最大內容繪製）應 < 2.5 秒、CLS（版面位移）< 0.1、INP（互動回應）< 200 毫秒。常見問題：圖片太大未壓縮、廣告版位載入時跳動、第三方追蹤腳本過多。單篇文章若流量不足，會以「整站平均」數據呈現。',
       pts: cwv.pts, max: 20,
       pass: cwv.pts >= 14,
+      scope: cwv.scope === 'url' ? 'page' : 'site',
     });
   } else {
     indicators.push({
@@ -1662,19 +1668,24 @@ function renderIndicators(dim, indicators) {
   const grid = document.getElementById('grid' + dim.charAt(0).toUpperCase() + dim.slice(1));
   grid.innerHTML = '';
   indicators.forEach((ind, i) => {
-    const pctClass = ind.pass === null ? 'warn' : ind.pass ? 'pass' : (ind.pts > 0 ? 'warn' : 'fail');
-    const emoji = ind.pass === null ? '⚠️' : ind.pass ? '✅' : (ind.pts > 0 ? '⚠️' : '❌');
+    const noData = ind.pass === null;
+    // 0-100 正規化分數
+    const score = noData ? null : Math.round((ind.pts / ind.max) * 100);
+    const cls = noData ? 'na' : score >= 70 ? 'pass' : score >= 40 ? 'warn' : 'fail';
+    // 單頁 / 全站 範圍：明確指定優先，否則依名稱推斷（爬蟲、sitemap 為全站）
+    const scope = ind.scope || (/AI 爬蟲|Sitemap/.test(ind.name) ? 'site' : 'page');
+    const scopeLabel = scope === 'site' ? '🌐 全站' : '📄 單頁';
     const tipId = `tip-${dim}-${i}`;
     grid.innerHTML += `
       <div class="indicator-card">
-        <div class="ind-icon ${pctClass}">${emoji}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="ind-name">${ind.name}</div>
-          <div class="ind-detail">${ind.detail}</div>
-          ${ind.tip ? `<button class="ind-tip-toggle" onclick="toggleTip('${tipId}',this)">ℹ 什麼是這個</button>
-          <div class="ind-tip-body" id="${tipId}">${ind.tip}</div>` : ''}
+        <div class="ind-head">
+          <div class="ind-name">${ind.name} <span class="ind-scope ${scope}">${scopeLabel}</span></div>
+          <div class="ind-score ${cls}">${noData ? '—' : score}</div>
         </div>
-        <div class="ind-pts ${pctClass}">${ind.pts}/${ind.max}</div>
+        <div class="ind-bar"><div class="ind-bar-fill ${cls}" style="width:${noData ? 0 : score}%"></div></div>
+        <div class="ind-detail">${ind.detail}　<span style="color:var(--text3)">（${ind.pts}/${ind.max} 分）</span></div>
+        ${ind.tip ? `<div><button class="ind-tip-toggle" onclick="toggleTip('${tipId}',this)">ℹ 什麼是這個</button></div>
+        <div class="ind-tip-body" id="${tipId}">${ind.tip}</div>` : ''}
       </div>`;
   });
 }
