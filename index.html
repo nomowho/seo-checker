@@ -890,7 +890,7 @@ footer {
 // CONFIG
 // ══════════════════════════════════════════════════
 const PAGESPEED_API = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
-const PAGESPEED_KEY = 'AIzaSyBwANmZJdQMQgFvN8SknlmI5CgScD2wgy8';
+const PAGESPEED_KEY = 'AIzaSyBwANmZJdQMQgFvN8SknImI5CgScD2wgy8';
 const CORS_PROXY = url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 const CIRCUMFERENCE = 2 * Math.PI * 38; // r=38
 
@@ -1184,8 +1184,28 @@ function scoreGEO(doc, html, robotsTxt) {
     });
 
     // 4. Author + Date signals (15 pts)
-    const authorEl = doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]');
-    const dateEl = doc.querySelector('[datetime], [itemprop="datePublished"], time, .date, [class*="date"]');
+    // 多來源偵測：meta 標籤 / JSON-LD / 可見元素都查（SPA 靜態 HTML 通常只有 meta）
+    let jsonLdHasAuthor = false, jsonLdHasDate = false;
+    doc.querySelectorAll('script[type="application/ld+json"]').forEach(s => {
+      try {
+        const j = JSON.parse(s.textContent);
+        const arr = Array.isArray(j) ? j : (j['@graph'] ? j['@graph'] : [j]);
+        arr.forEach(o => {
+          if (o && o.author) jsonLdHasAuthor = true;
+          if (o && (o.datePublished || o.dateModified)) jsonLdHasDate = true;
+        });
+      } catch {}
+    });
+    const authorEl = !!(
+      doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]') ||
+      doc.querySelector('meta[name="author"], meta[property="article:author"]') ||
+      jsonLdHasAuthor
+    );
+    const dateEl = !!(
+      doc.querySelector('[datetime], [itemprop="datePublished"], time, .date, [class*="date"]') ||
+      doc.querySelector('meta[property="article:published_time"], meta[property="article:modified_time"], meta[itemprop="datePublished"]') ||
+      jsonLdHasDate
+    );
     const authorPts = authorEl ? 8 : 0;
     const datePts = dateEl ? 7 : 0;
     total += authorPts + datePts;
@@ -1363,8 +1383,14 @@ function scoreAdvertorial(doc, html, brandName) {
 
   // 1. AI 引用潛力（用 GEO 相關指標）
   const hasSchema = doc.querySelectorAll('script[type="application/ld+json"]').length > 0;
-  const hasAuthor = !!doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]');
-  const hasDate = !!doc.querySelector('[datetime], [itemprop="datePublished"], time');
+  const hasAuthor = !!(
+    doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]') ||
+    doc.querySelector('meta[name="author"], meta[property="article:author"]')
+  );
+  const hasDate = !!(
+    doc.querySelector('[datetime], [itemprop="datePublished"], time') ||
+    doc.querySelector('meta[property="article:published_time"], meta[property="article:modified_time"], meta[itemprop="datePublished"]')
+  );
   result.metrics.aiVisibility = hasSchema && hasAuthor ? '高' : hasSchema || hasAuthor ? '中' : '低';
   result.score += hasSchema ? 25 : 0;
   result.score += hasAuthor ? 15 : 0;
