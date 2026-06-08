@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 網站健檢 — SEO · GEO · AEO 三維分析</title>
+<meta name="description" content="免費分析你的網站 SEO 排名潛力、GEO AI 引用率、AEO 精選摘要能見度，貼網址 90 秒出分數。">
+<style>
+:root {
+  --bg: #F4F6F9;
+  --card: #FFFFFF;
+  --border: #E5E7EB;
+  --text: #111827;
+  --text2: #4B5563;
+  --text3: #9CA3AF;
+  --primary: #2563EB;
+  --primary-bg: #EFF6FF;
+  --green: #10B981;
+  --yellow: #F59E0B;
+  --red: #EF4444;
+  --purple: #7C3AED;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05);
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Noto Sans TC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ─── HEADER ─── */
+header {
+  background: #0F172A;
+  color: #F8FAFC;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+}
+.logo span { color: #60A5FA; }
+.tagline {
+  font-size: 13px;
+  color: #94A3B8;
+  margin-left: auto;
+}
+
+/* ─── HERO ─── */
+.hero {
+  background: linear-gradient(135deg, #1E3A5F 0%, #0F172A 100%);
+  padding: 52px 24px 48px;
+  text-align: center;
+}
+.hero h1 {
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 800;
+  color: #F8FAFC;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+.hero h1 em { color: #60A5FA; font-style: normal; }
+.hero p {
+  font-size: 15px;
+  color: #94A3B8;
+  margin-bottom: 28px;
+}
+.badge-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge-seo { background: rgba(37,99,235,.25); color: #93C5FD; }
+.badge-geo { background: rgba(124,58,237,.25); color: #C4B5FD; }
+.badge-aeo { background: rgba(16,185,129,.25); color: #6EE7B7; }
+
+/* ─── INPUT AREA ─── */
+.input-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.input-row {
+  display: flex;
+  gap: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,.25);
+}
+.input-row input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 14px 18px;
+  font-size: 15px;
+  color: var(--text);
+  background: transparent;
+}
+.input-row input::placeholder { color: #9CA3AF; }
+#analyzeBtn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 14px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .2s;
+}
+#analyzeBtn:hover { background: #1D4ED8; }
+#analyzeBtn:disabled { background: #6B7280; cursor: not-allowed; }
+
+/* ─── MAIN CONTENT ─── */
+main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
+
+/* ─── ERROR / NOTICE ─── */
+.notice {
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #92400E;
+  margin-bottom: 20px;
+  display: none;
+}
+.notice.error { background: #FEE2E2; border-color: #FECACA; color: #991B1B; }
+.notice.show { display: block; }
+
+/* ─── PROGRESS ─── */
+#progressWrap {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 24px;
+  margin-bottom: 24px;
+  display: none;
+}
+#progressWrap.show { display: block; }
+.progress-title { font-weight: 600; font-size: 16px; margin-bottom: 18px; }
+.step-list { list-style: none; }
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--text2);
+}
+.step-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  background: var(--border);
+  color: var(--text3);
+}
+.step-item.done .step-icon { background: var(--green); color: #fff; }
+.step-item.active .step-icon { background: var(--primary); color: #fff; animation: pulse 1s infinite; }
+.step-item.error .step-icon { background: var(--yellow); color: #fff; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .6; } }
+
+/* ─── RESULTS ─── */
+#resultsWrap { display: none; }
+#resultsWrap.show { display: block; }
+
+.result-url {
+  font-size: 13px;
+  color: var(--text3);
+  margin-bottom: 20px;
+  word-break: break-all;
+}
+.result-url a { color: var(--primary); text-decoration: none; }
+
+/* ─── SCORE OVERVIEW ─── */
+.score-overview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.score-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color .2s;
+}
+.score-card:hover { border-color: var(--border); }
+.score-card.active { border-color: var(--primary); }
+.score-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--text3);
+  margin-bottom: 14px;
+}
+.ring-wrap {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 12px;
+}
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+.ring-fg { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset .8s ease; }
+.ring-num {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+.score-sublabel {
+  font-size: 13px;
+  font-weight: 600;
+}
+.score-sublabel.good { color: var(--green); }
+.score-sublabel.ok { color: var(--yellow); }
+.score-sublabel.bad { color: var(--red); }
+
+/* ─── TABS ─── */
+.tabs {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  flex: 1;
+  padding: 14px 8px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all .2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-panel { display: none; padding: 20px; }
+.tab-panel.active { display: block; }
+
+/* ─── INDICATOR GRID ─── */
+.indicator-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+}
+.indicator-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.ind-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.ind-icon.pass { background: #ECFDF5; }
+.ind-icon.warn { background: #FFFBEB; }
+.ind-icon.fail { background: #FEF2F2; }
+.ind-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.ind-detail { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.ind-pts {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.ind-pts.pass { color: var(--green); }
+.ind-pts.warn { color: var(--yellow); }
+.ind-pts.fail { color: var(--red); }
+
+/* ─── SUGGESTIONS ─── */
+.suggestions {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.suggestions h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.suggestion-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.suggestion-item:last-child { border-bottom: none; }
+.sug-priority {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.sug-priority.high { background: #FEE2E2; color: #B91C1C; }
+.sug-priority.mid { background: #FFFBEB; color: #92400E; }
+.sug-priority.low { background: #ECFDF5; color: #065F46; }
+.sug-text { font-size: 14px; }
+.sug-title { font-weight: 600; margin-bottom: 2px; }
+.sug-desc { font-size: 12px; color: var(--text2); }
+.sug-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 3px;
+}
+.sug-tag.seo { background: #EFF6FF; color: #1D4ED8; }
+.sug-tag.geo { background: #F5F3FF; color: #6D28D9; }
+.sug-tag.aeo { background: #ECFDF5; color: #065F46; }
+
+/* ─── EDUCATION ─── */
+.edu-section { margin-top: 40px; }
+.edu-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+.edu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.edu-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+.edu-emoji { font-size: 24px; margin-bottom: 10px; }
+.edu-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.edu-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+/* ─── FOOTER ─── */
+footer {
+  background: #0F172A;
+  color: #64748B;
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  margin-top: 40px;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+  .score-overview { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .score-card { padding: 16px 8px; }
+  .ring-wrap { width: 70px; height: 70px; }
+  .ring-num { font-size: 20px; }
+  .tagline { display: none; }
+}
+
+/* ─── BRAND ROW ─── */
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  background: rgba(255,255,255,.08);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.brand-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #60A5FA;
+  white-space: nowrap;
+}
+.brand-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #F8FAFC;
+}
+.brand-row input::placeholder { color: #64748B; }
+
+/* ─── ADVERTORIAL ─── */
+.adv-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--purple);
+}
+.adv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.adv-title { font-size: 15px; font-weight: 700; }
+.adv-score {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--purple);
+}
+.adv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.adv-item {
+  background: #F5F3FF;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.adv-item-label { color: var(--text3); font-size: 11px; font-weight: 600; margin-bottom: 3px; }
+.adv-item-value { font-weight: 700; color: var(--text); }
+.adv-tips { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.adv-tips li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AI 網站<span>健檢</span></div>
+  <div class="tagline">SEO · GEO · AEO 三維分析 — 免費 · 90秒出分</div>
+</header>
+
+<div class="hero">
+  <h1>你的網站，<em>AI 看得到嗎</em>？</h1>
+  <p>貼上任何網址，90 秒告訴你 Google 排名潛力、AI 引用率、精選摘要能見度</p>
+  <div class="badge-row">
+    <span class="badge badge-seo">🔍 SEO Google 排名</span>
+    <span class="badge badge-geo">🤖 GEO AI 引用</span>
+    <span class="badge badge-aeo">💬 AEO 精選摘要</span>
+  </div>
+  <div class="input-wrap">
+    <div class="input-row">
+      <input type="url" id="urlInput" placeholder="https://your-website.com" autocomplete="off" />
+      <button id="analyzeBtn" onclick="startAnalysis()">開始分析</button>
+    </div>
+    <div class="brand-row">
+      <span class="brand-label">廣編模式（選填）</span>
+      <input type="text" id="brandInput" placeholder="輸入客戶品牌名稱，如：國泰金控" autocomplete="off" />
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="notice" id="notice"></div>
+
+  <!-- Progress -->
+  <div id="progressWrap">
+    <div class="progress-title">⚙️ 分析中，請稍候…</div>
+    <ul class="step-list">
+      <li class="step-item" id="step1">
+        <div class="step-icon">1</div>
+        <span>抓取網頁 HTML 內容</span>
+      </li>
+      <li class="step-item" id="step2">
+        <div class="step-icon">2</div>
+        <span>讀取 robots.txt（AI 爬蟲設定）</span>
+      </li>
+      <li class="step-item" id="step3">
+        <div class="step-icon">3</div>
+        <span>呼叫 Google PageSpeed API</span>
+      </li>
+      <li class="step-item" id="step4">
+        <div class="step-icon">4</div>
+        <span>計算 SEO / GEO / AEO 三維分數</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Results -->
+  <div id="resultsWrap">
+    <p class="result-url">分析網址：<a id="resultUrl" href="#" target="_blank"></a></p>
+
+    <!-- Score overview -->
+    <div class="score-overview">
+      <div class="score-card active" onclick="switchTab('seo')" id="cardSeo">
+        <div class="score-label">SEO</div>
+        <div class="ring-wrap">
+          <svg viewBox="0 0 90 90" width="90" height="90">
+            <circle class="ring-bg" cx="45" cy="45" r="38"/>
+            <circle class="ring-fg" id="ringSeo" cx="45" cy="45" r="38" stroke="#2563EB"/>
+          </svg>
+          <div class="ring-num" id="numSeo">—</div>
+        </div>
+        <div class="score-sublabel" id="labelSeo">—</div>
+      </div>
+      <div class="score-card" onclick="switchTab('geo')" id="cardGeo">
+        <div class="score-label">GEO</div>
+        <div class="ring-wrap">
+          <svg viewBox="0 0 90 90" width="90" height="90">
+            <circle class="ring-bg" cx="45" cy="45" r="38"/>
+            <circle class="ring-fg" id="ringGeo" cx="45" cy="45" r="38" stroke="#7C3AED"/>
+          </svg>
+          <div class="ring-num" id="numGeo">—</div>
+        </div>
+        <div class="score-sublabel" id="labelGeo">—</div>
+      </div>
+      <div class="score-card" onclick="switchTab('aeo')" id="cardAeo">
+        <div class="score-label">AEO</div>
+        <div class="ring-wrap">
+          <svg viewBox="0 0 90 90" width="90" height="90">
+            <circle class="ring-bg" cx="45" cy="45" r="38"/>
+            <circle class="ring-fg" id="ringAeo" cx="45" cy="45" r="38" stroke="#10B981"/>
+          </svg>
+          <div class="ring-num" id="numAeo">—</div>
+        </div>
+        <div class="score-sublabel" id="labelAeo">—</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab-nav">
+        <button class="tab-btn active" id="tabSeo" onclick="switchTab('seo')">🔍 SEO 分析</button>
+        <button class="tab-btn" id="tabGeo" onclick="switchTab('geo')">🤖 GEO 分析</button>
+        <button class="tab-btn" id="tabAeo" onclick="switchTab('aeo')">💬 AEO 分析</button>
+      </div>
+      <div class="tab-panel active" id="panelSeo">
+        <div class="indicator-grid" id="gridSeo"></div>
+      </div>
+      <div class="tab-panel" id="panelGeo">
+        <div class="indicator-grid" id="gridGeo"></div>
+      </div>
+      <div class="tab-panel" id="panelAeo">
+        <div class="indicator-grid" id="gridAeo"></div>
+      </div>
+    </div>
+
+    <!-- Advertorial -->
+    <div class="adv-card" id="advCard" style="display:none;">
+      <div class="adv-header">
+        <div class="adv-title">📰 廣編效益評估</div>
+        <div class="adv-score" id="advScore">—</div>
+      </div>
+      <div class="adv-grid" id="advGrid"></div>
+      <ul class="adv-tips" id="advTips"></ul>
+    </div>
+
+    <!-- Suggestions -->
+    <div class="suggestions">
+      <h3>🎯 記者改稿建議（依重要性排列）</h3>
+      <div id="suggestionList"></div>
+    </div>
+
+    <!-- Re-analyze -->
+    <div style="text-align:center; margin-top: 8px;">
+      <button onclick="startAnalysis()" style="background:var(--primary-bg);color:var(--primary);border:1px solid #BFDBFE;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">
+        🔄 重新分析
+      </button>
+    </div>
+  </div>
+
+  <!-- Education -->
+  <div class="edu-section">
+    <h2>SEO、GEO、AEO 是什麼？</h2>
+    <div class="edu-grid">
+      <div class="edu-card">
+        <div class="edu-emoji">🔍</div>
+        <div class="edu-title">SEO — 搜尋引擎優化</div>
+        <div class="edu-desc">讓網頁在 Google、Bing 的自然排名出現。涵蓋技術 SEO（速度、canonical）、On-page（title、meta）、Core Web Vitals 等指標。</div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-emoji">🤖</div>
+        <div class="edu-title">GEO — AI 引擎優化</div>
+        <div class="edu-desc">讓 ChatGPT、Claude、Perplexity、Gemini 回答問題時優先引用你的內容。核心訊號：Schema 結構化資料、E-E-A-T、自包含段落、開放 AI 爬蟲。</div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-emoji">💬</div>
+        <div class="edu-title">AEO — 答案引擎優化</div>
+        <div class="edu-desc">讓 Google 精選摘要（Featured Snippet）和「大家也問」抓到你的回答。關鍵：FAQPage schema、問句式 H2/H3 標題、40-120 字短答段落。</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  AI 網站健檢工具 · 純前端，不儲存任何資料 · 使用 Google PageSpeed Insights API
+</footer>
+
+<script>
+// ══════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════
+const PAGESPEED_API = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
+const CORS_PROXY = url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+const CIRCUMFERENCE = 2 * Math.PI * 38; // r=38
+
+// ══════════════════════════════════════════════════
+// MAIN ANALYSIS ENTRY POINT
+// ══════════════════════════════════════════════════
+async function startAnalysis() {
+  const input = document.getElementById('urlInput');
+  const brandName = document.getElementById('brandInput').value.trim();
+  let url = input.value.trim();
+
+  if (!url) { showNotice('請輸入要分析的網址', 'warn'); return; }
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+  try { new URL(url); } catch {
+    showNotice('網址格式有誤，請確認是否完整（例如 https://example.com）', 'error');
+    return;
+  }
+
+  hideNotice();
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('analyzeBtn').textContent = '分析中…';
+  resetSteps();
+
+  try {
+    // Step 1: Fetch HTML
+    setStep(1, 'active');
+    let html = '', doc = null, corsOk = true;
+    try {
+      html = await fetchHTML(url);
+      doc = new DOMParser().parseFromString(html, 'text/html');
+      setStep(1, 'done');
+    } catch (e) {
+      corsOk = false;
+      setStep(1, 'error');
+      showNotice('⚠️ 無法抓取網站 HTML（可能有 CORS 防護）。SEO 數據仍可從 PageSpeed 取得，GEO / AEO 部分指標以「未知」計入。', 'warn');
+    }
+
+    // Step 2: Robots.txt
+    setStep(2, 'active');
+    let robotsTxt = '';
+    try {
+      const origin = new URL(url).origin;
+      robotsTxt = await fetchHTML(origin + '/robots.txt');
+      setStep(2, 'done');
+    } catch {
+      setStep(2, 'error');
+    }
+
+    // Step 3: PageSpeed
+    setStep(3, 'active');
+    let ps = null;
+    try {
+      ps = await fetchPageSpeed(url);
+      setStep(3, 'done');
+    } catch {
+      setStep(3, 'error');
+      if (!corsOk) {
+        showNotice('❌ 無法取得 PageSpeed 資料，且網頁 HTML 抓取也失敗。請確認網址是否正確。', 'error');
+        return;
+      }
+    }
+
+    // Step 4: Score
+    setStep(4, 'active');
+    const scores = calculateScores(doc, html, robotsTxt, ps, brandName);
+    setStep(4, 'done');
+
+    renderResults(url, scores, brandName);
+  } catch (e) {
+    showNotice('分析失敗：' + e.message, 'error');
+  } finally {
+    document.getElementById('analyzeBtn').disabled = false;
+    document.getElementById('analyzeBtn').textContent = '開始分析';
+  }
+}
+
+// ══════════════════════════════════════════════════
+// FETCH HELPERS
+// ══════════════════════════════════════════════════
+async function fetchHTML(url) {
+  const proxyUrl = CORS_PROXY(url);
+  const resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+  if (!resp.ok) throw new Error('proxy 回傳錯誤');
+  const data = await resp.json();
+  if (!data.contents) throw new Error('空回應');
+  if (data.contents.length < 500 && (
+    data.contents.includes('Attention Required') ||
+    data.contents.includes('cf-error') ||
+    data.contents.includes('Access Denied')
+  )) throw new Error('BLOCKED');
+  return data.contents;
+}
+
+async function fetchPageSpeed(url) {
+  const apiUrl = `${PAGESPEED_API}?url=${encodeURIComponent(url)}&category=performance&category=seo&strategy=mobile`;
+  const resp = await fetch(apiUrl, { signal: AbortSignal.timeout(30000) });
+  if (!resp.ok) throw new Error('PageSpeed API 錯誤');
+  return resp.json();
+}
+
+// ══════════════════════════════════════════════════
+// SCORING ENGINE
+// ══════════════════════════════════════════════════
+function calculateScores(doc, html, robotsTxt, ps, brandName) {
+  return {
+    seo: scoreSEO(doc, html, ps),
+    geo: scoreGEO(doc, html, robotsTxt),
+    aeo: scoreAEO(doc, html),
+    adv: scoreAdvertorial(doc, html, brandName),
+  };
+}
+
+// ── SEO Scoring (100 pts) ──────────────────────────
+function scoreSEO(doc, html, ps) {
+  const indicators = [];
+  let total = 0;
+
+  // 1. PageSpeed Performance (20 pts)
+  const perfScore = ps?.lighthouseResult?.categories?.performance?.score;
+  if (perfScore != null) {
+    const pts = Math.round(perfScore * 20);
+    total += pts;
+    const lcp = ps.lighthouseResult.audits?.['largest-contentful-paint']?.displayValue || '—';
+    const cls = ps.lighthouseResult.audits?.['cumulative-layout-shift']?.displayValue || '—';
+    indicators.push({
+      name: '頁面速度（Core Web Vitals）',
+      detail: `PageSpeed 效能分：${Math.round(perfScore * 100)} / LCP: ${lcp} / CLS: ${cls}`,
+      pts, max: 20,
+      pass: pts >= 14,
+    });
+  } else {
+    indicators.push({ name: '頁面速度（Core Web Vitals）', detail: '無法取得 PageSpeed 數據', pts: 0, max: 20, pass: null });
+  }
+
+  // 2. PageSpeed SEO category (25 pts)
+  const seoScore = ps?.lighthouseResult?.categories?.seo?.score;
+  if (seoScore != null) {
+    const pts = Math.round(seoScore * 25);
+    total += pts;
+    indicators.push({
+      name: 'Google SEO 基礎評分',
+      detail: `PageSpeed SEO 分：${Math.round(seoScore * 100)} / 100（含連結、可爬取性、可索引性）`,
+      pts, max: 25,
+      pass: pts >= 18,
+    });
+  } else {
+    indicators.push({ name: 'Google SEO 基礎評分', detail: '無法取得 PageSpeed 數據', pts: 0, max: 25, pass: null });
+  }
+
+  if (doc) {
+    // 3. Title tag (20 pts)
+    const title = doc.querySelector('title')?.textContent?.trim() || '';
+    const titleLen = title.length;
+    let titlePts = 0;
+    if (title) { titlePts += 12; if (titleLen >= 10 && titleLen <= 60) titlePts += 8; }
+    total += titlePts;
+    indicators.push({
+      name: '網頁標題（<title>）',
+      detail: title ? `「${title.slice(0,50)}${title.length>50?'…':''}」（${titleLen} 字）${titleLen<10||titleLen>60?' ⚠️ 建議 10-60 字':''}` : '❌ 未設定 title 標籤',
+      pts: titlePts, max: 20,
+      pass: titlePts >= 15,
+    });
+
+    // 4. Meta description (20 pts)
+    const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '';
+    const descLen = metaDesc.length;
+    let descPts = 0;
+    if (metaDesc) { descPts += 12; if (descLen >= 80 && descLen <= 160) descPts += 8; }
+    total += descPts;
+    indicators.push({
+      name: 'Meta Description',
+      detail: metaDesc ? `${metaDesc.slice(0,60)}…（${descLen} 字）${descLen<80||descLen>160?' ⚠️ 建議 80-160 字':''}` : '❌ 未設定 meta description',
+      pts: descPts, max: 20,
+      pass: descPts >= 15,
+    });
+
+    // 5. Canonical URL (10 pts)
+    const canonical = doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || '';
+    const canonicalPts = canonical ? 10 : 0;
+    total += canonicalPts;
+    indicators.push({
+      name: 'Canonical URL',
+      detail: canonical ? `✅ ${canonical.slice(0,60)}` : '❌ 未設定 canonical 標籤（可能導致重複內容問題）',
+      pts: canonicalPts, max: 10,
+      pass: !!canonical,
+    });
+
+    // 6. HTTPS + Robots meta (5 pts)
+    const isHttps = html.includes('https://') || true; // we validated URL
+    const robotsMeta = doc.querySelector('meta[name="robots"]')?.getAttribute('content') || '';
+    const isNoindex = /noindex/i.test(robotsMeta);
+    const httpsPts = isNoindex ? 0 : 5;
+    total += httpsPts;
+    indicators.push({
+      name: 'HTTPS + 可索引性',
+      detail: isNoindex ? '⚠️ robots meta 包含 noindex，Google 不會索引此頁' : '✅ HTTPS 正常，頁面可被索引',
+      pts: httpsPts, max: 5,
+      pass: !isNoindex,
+    });
+  }
+
+  return { score: Math.min(100, total), indicators };
+}
+
+// ── GEO Scoring (100 pts) ─────────────────────────
+function scoreGEO(doc, html, robotsTxt) {
+  const indicators = [];
+  let total = 0;
+
+  if (doc) {
+    // 1. JSON-LD Schema.org (30 pts)
+    const jsonLds = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'));
+    let schemaTypes = [];
+    jsonLds.forEach(el => {
+      try {
+        const obj = JSON.parse(el.textContent);
+        const type = obj['@type'] || (Array.isArray(obj['@graph']) ? obj['@graph'].map(n=>n['@type']).join(',') : '');
+        if (type) schemaTypes.push(type);
+      } catch {}
+    });
+    const hasSchema = jsonLds.length > 0;
+    const qualityTypes = ['Article','BlogPosting','NewsArticle','Product','Organization','WebSite','Person','FAQPage','HowTo'];
+    const hasQuality = schemaTypes.some(t => qualityTypes.some(q => t.includes(q)));
+    const schemaPts = hasSchema ? (hasQuality ? 30 : 18) : 0;
+    total += schemaPts;
+    indicators.push({
+      name: 'Schema.org JSON-LD 結構化資料',
+      detail: hasSchema ? `✅ 找到 ${jsonLds.length} 個 JSON-LD：${schemaTypes.join(', ').slice(0,60)}` : '❌ 未找到 JSON-LD 結構化資料（AI 無法理解頁面類型）',
+      pts: schemaPts, max: 30,
+      pass: schemaPts >= 18,
+    });
+
+    // 2. Open Graph (20 pts)
+    const ogTitle = doc.querySelector('meta[property="og:title"]')?.getAttribute('content');
+    const ogDesc = doc.querySelector('meta[property="og:description"]')?.getAttribute('content');
+    const ogImage = doc.querySelector('meta[property="og:image"]')?.getAttribute('content');
+    const ogType = doc.querySelector('meta[property="og:type"]')?.getAttribute('content');
+    const ogPts = (ogTitle?5:0) + (ogDesc?5:0) + (ogImage?5:0) + (ogType?5:0);
+    total += ogPts;
+    const missing = [!ogTitle&&'og:title', !ogDesc&&'og:description', !ogImage&&'og:image', !ogType&&'og:type'].filter(Boolean);
+    indicators.push({
+      name: 'Open Graph 社群分享標籤',
+      detail: ogPts === 20 ? '✅ og:title、og:description、og:image、og:type 完整' : `⚠️ 缺少：${missing.join('、')}`,
+      pts: ogPts, max: 20,
+      pass: ogPts >= 15,
+    });
+
+    // 3. Content density (20 pts)
+    const paragraphs = Array.from(doc.querySelectorAll('p, article p, main p'));
+    const selfContained = paragraphs.filter(p => {
+      const words = p.textContent.trim().split(/\s+/).length;
+      return words >= 60 && words <= 300;
+    });
+    const contentPts = Math.min(20, selfContained.length * 4);
+    total += contentPts;
+    indicators.push({
+      name: '自包含段落（AI 可引用性）',
+      detail: selfContained.length > 0
+        ? `✅ 找到 ${selfContained.length} 個 60-300 字段落（AI 容易摘取引用）`
+        : '❌ 缺少完整的資訊段落，建議每段寫 100-200 字並以結論句開頭',
+      pts: contentPts, max: 20,
+      pass: contentPts >= 12,
+    });
+
+    // 4. Author + Date signals (15 pts)
+    const authorEl = doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]');
+    const dateEl = doc.querySelector('[datetime], [itemprop="datePublished"], time, .date, [class*="date"]');
+    const authorPts = authorEl ? 8 : 0;
+    const datePts = dateEl ? 7 : 0;
+    total += authorPts + datePts;
+    indicators.push({
+      name: 'E-E-A-T：作者 & 日期',
+      detail: (authorEl && dateEl) ? '✅ 找到作者與發布日期（提升 AI 信任度）'
+        : `⚠️ ${!authorEl?'未找到作者資訊 ':''}${!dateEl?'未找到日期資訊':''}`,
+      pts: authorPts + datePts, max: 15,
+      pass: (authorPts + datePts) >= 10,
+    });
+  } else {
+    indicators.push({ name: 'Schema.org / Open Graph', detail: '⚠️ 無法取得 HTML，略過', pts: 0, max: 50, pass: null });
+    indicators.push({ name: '內容結構', detail: '⚠️ 無法取得 HTML，略過', pts: 0, max: 35, pass: null });
+  }
+
+  // 5. AI Crawlers in robots.txt (15 pts)
+  const crawlers = checkAICrawlers(robotsTxt);
+  const crawlerPts = (crawlers.GPTBot?5:0) + (crawlers.ClaudeBot?5:0) + (crawlers.PerplexityBot?5:0);
+  total += crawlerPts;
+  const blocked = Object.entries(crawlers).filter(([,v])=>!v).map(([k])=>k);
+  indicators.push({
+    name: 'AI 爬蟲 robots.txt 開放度',
+    detail: crawlerPts === 15
+      ? '✅ GPTBot、ClaudeBot、PerplexityBot 皆允許爬取'
+      : !robotsTxt
+        ? '⚠️ 無法取得 robots.txt（預設允許，但建議明確設定）'
+        : `⚠️ 封鎖中：${blocked.join('、')}（這些 AI 將無法引用你的內容）`,
+    pts: crawlerPts, max: 15,
+    pass: crawlerPts >= 10,
+  });
+
+  return { score: Math.min(100, total), indicators };
+}
+
+// ── AEO Scoring (100 pts) ─────────────────────────
+function scoreAEO(doc, html) {
+  const indicators = [];
+  let total = 0;
+
+  if (!doc) {
+    return { score: 0, indicators: [
+      { name: '所有 AEO 指標', detail: '⚠️ 無法取得 HTML，略過', pts: 0, max: 100, pass: null }
+    ]};
+  }
+
+  // 1. FAQPage Schema (30 pts)
+  let hasFaq = false;
+  doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
+    try {
+      const obj = JSON.parse(el.textContent);
+      if (JSON.stringify(obj).includes('FAQPage')) hasFaq = true;
+    } catch {}
+  });
+  const faqPts = hasFaq ? 30 : 0;
+  total += faqPts;
+  indicators.push({
+    name: 'FAQPage 結構化資料',
+    detail: hasFaq ? '✅ 找到 FAQPage JSON-LD（Google 精選摘要加分項）' : '❌ 未設定 FAQPage schema（加入後可搶佔精選摘要位置）',
+    pts: faqPts, max: 30,
+    pass: hasFaq,
+  });
+
+  // 2. Question headings (25 pts)
+  const headings = Array.from(doc.querySelectorAll('h2, h3'));
+  const questionHeadings = headings.filter(h => h.textContent.trim().endsWith('?') || h.textContent.trim().endsWith('？'));
+  const qhPts = Math.min(25, questionHeadings.length * 5);
+  total += qhPts;
+  indicators.push({
+    name: '問句式標題（H2/H3）',
+    detail: questionHeadings.length > 0
+      ? `✅ 找到 ${questionHeadings.length} 個問句標題（如：「${questionHeadings[0].textContent.trim().slice(0,30)}…」）`
+      : '❌ 建議加入以問句結尾的 H2/H3 標題（提高「大家也問」命中率）',
+    pts: qhPts, max: 25,
+    pass: qhPts >= 10,
+  });
+
+  // 3. Short answer paragraphs (20 pts)
+  const allParas = Array.from(doc.querySelectorAll('p'));
+  const shortAnswers = allParas.filter(p => {
+    const words = p.textContent.trim().split(/\s+/).length;
+    return words >= 20 && words <= 80;
+  });
+  const saPts = Math.min(20, shortAnswers.length * 4);
+  total += saPts;
+  indicators.push({
+    name: '短答段落（40-120 字）',
+    detail: shortAnswers.length > 0
+      ? `✅ 找到 ${shortAnswers.length} 個適合被摘取的短答段落`
+      : '❌ 建議在問句標題後加 40-120 字的直接回答（第一句就給結論）',
+    pts: saPts, max: 20,
+    pass: saPts >= 12,
+  });
+
+  // 4. HowTo Schema (15 pts)
+  let hasHowTo = false;
+  doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
+    try {
+      const obj = JSON.parse(el.textContent);
+      if (JSON.stringify(obj).includes('HowTo')) hasHowTo = true;
+    } catch {}
+  });
+  const howToPts = hasHowTo ? 15 : 0;
+  total += howToPts;
+  indicators.push({
+    name: 'HowTo 結構化資料',
+    detail: hasHowTo ? '✅ 找到 HowTo JSON-LD（步驟型內容的精選摘要利器）' : '— 未設定 HowTo schema（有步驟型內容的頁面建議加入）',
+    pts: howToPts, max: 15,
+    pass: howToPts >= 10,
+  });
+
+  // 5. List structure (10 pts)
+  const lists = doc.querySelectorAll('ul, ol');
+  const listPts = Math.min(10, lists.length * 2);
+  total += listPts;
+  indicators.push({
+    name: '列表結構（ul/ol）',
+    detail: lists.length > 0
+      ? `✅ 找到 ${lists.length} 個列表（結構化清單有助於摘要框抓取）`
+      : '— 建議在重要段落後加入條列式清單',
+    pts: listPts, max: 10,
+    pass: listPts >= 6,
+  });
+
+  return { score: Math.min(100, total), indicators };
+}
+
+// ── robots.txt parser ──────────────────────────────
+function checkAICrawlers(txt) {
+  const result = { GPTBot: null, ClaudeBot: null, PerplexityBot: null };
+  if (!txt) return result;
+
+  const lines = txt.split('\n').map(l => l.trim());
+  let currentAgents = [];
+
+  for (const line of lines) {
+    if (!line || line.startsWith('#')) { currentAgents = []; continue; }
+    if (/^user-agent:/i.test(line)) {
+      currentAgents = [line.replace(/^user-agent:\s*/i, '').trim()];
+    } else if (/^disallow:/i.test(line)) {
+      const path = line.replace(/^disallow:\s*/i, '').trim();
+      for (const agent of currentAgents) {
+        if (agent === '*') {
+          if (path === '/' || path === '/*') {
+            Object.keys(result).forEach(k => { if (result[k] === null) result[k] = false; });
+          } else if (path === '') {
+            Object.keys(result).forEach(k => { if (result[k] === null) result[k] = true; });
+          }
+        } else if (result.hasOwnProperty(agent)) {
+          result[agent] = (path === '/' || path === '/*') ? false : true;
+        }
+      }
+    } else if (/^allow:/i.test(line)) {
+      for (const agent of currentAgents) {
+        if (result.hasOwnProperty(agent)) result[agent] = true;
+        if (agent === '*') Object.keys(result).forEach(k => { if (result[k] === null) result[k] = true; });
+      }
+    }
+  }
+
+  Object.keys(result).forEach(k => { if (result[k] === null) result[k] = true; });
+  return result;
+}
+
+// ── Advertorial Scoring ───────────────────────────
+function scoreAdvertorial(doc, html, brandName) {
+  if (!doc) return null;
+  const result = { score: 0, metrics: {}, tips: [] };
+
+  // 1. AI 引用潛力（用 GEO 相關指標）
+  const hasSchema = doc.querySelectorAll('script[type="application/ld+json"]').length > 0;
+  const hasAuthor = !!doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]');
+  const hasDate = !!doc.querySelector('[datetime], [itemprop="datePublished"], time');
+  result.metrics.aiVisibility = hasSchema && hasAuthor ? '高' : hasSchema || hasAuthor ? '中' : '低';
+  result.score += hasSchema ? 25 : 0;
+  result.score += hasAuthor ? 15 : 0;
+  result.score += hasDate ? 10 : 0;
+
+  // 2. 外部連結（連回客戶網站）
+  const links = Array.from(doc.querySelectorAll('a[href]'));
+  const pageHost = ''; // can't know without URL, skip same-domain check
+  const extLinks = links.filter(a => {
+    const href = a.getAttribute('href') || '';
+    return href.startsWith('http') && !href.includes(window.location?.hostname);
+  });
+  result.metrics.extLinks = extLinks.length;
+  result.score += Math.min(20, extLinks.length * 5);
+  if (extLinks.length === 0) result.tips.push('文章沒有外部連結——廣編通常應包含指向客戶官網的連結，這是對客戶的核心價值之一。');
+
+  // 3. 品牌名稱出現次數
+  if (brandName) {
+    const bodyText = doc.body?.textContent || '';
+    const count = (bodyText.match(new RegExp(brandName, 'g')) || []).length;
+    result.metrics.brandMentions = count;
+    result.score += count >= 3 ? 20 : count >= 1 ? 10 : 0;
+    if (count === 0) result.tips.push(`「${brandName}」未出現在文章中——廣編應自然提及品牌名稱至少 3 次。`);
+    else if (count < 3) result.tips.push(`「${brandName}」只出現 ${count} 次，建議增加到 3-5 次，並確保至少一次出現在前三段。`);
+    else result.tips.push(`「${brandName}」出現 ${count} 次，密度良好。`);
+  } else {
+    result.metrics.brandMentions = '未填入品牌';
+    result.score += 10; // neutral
+  }
+
+  // 4. 答案前置結構（第一段是否有結論）
+  const paras = Array.from(doc.querySelectorAll('p, article p, main p'));
+  const firstPara = paras.find(p => p.textContent.trim().length > 30);
+  const firstText = firstPara?.textContent?.trim() || '';
+  const hasAnswerFirst = firstText.length > 0 && firstText.length < 200;
+  result.metrics.answerFirst = hasAnswerFirst ? '良好' : '待改善';
+  result.score += hasAnswerFirst ? 10 : 0;
+  if (!hasAnswerFirst) result.tips.push('文章開頭段落太長或太短——建議第一段 50-150 字，第一句就給出核心觀點，AI 才容易摘取引用。');
+
+  // General tips if few
+  if (!hasAuthor) result.tips.push('文章缺少記者署名——加上姓名與職稱，AI 評估 E-E-A-T 可信度時這是基本門票。');
+  if (!hasDate) result.tips.push('未找到發布日期——時效性是 AI 引用的重要訊號，建議標示發布與更新日期。');
+  if (!hasSchema) result.tips.push('缺少 NewsArticle / Article 結構化標記——請轉告技術部門加入，讓 AI 能正確識別這是一篇報導而非廣告。');
+
+  result.score = Math.min(100, result.score);
+  return result;
+}
+
+// ══════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════
+function renderResults(url, scores, brandName) {
+  document.getElementById('progressWrap').classList.remove('show');
+  document.getElementById('resultsWrap').classList.add('show');
+
+  const urlEl = document.getElementById('resultUrl');
+  urlEl.textContent = url;
+  urlEl.href = url;
+
+  ['seo', 'geo', 'aeo'].forEach(dim => {
+    const score = Math.round(scores[dim].score);
+    setRing(dim, score);
+    renderIndicators(dim, scores[dim].indicators);
+  });
+
+  renderSuggestions(scores);
+  renderAdvertorial(scores.adv, brandName);
+  window.scrollTo({ top: document.getElementById('resultsWrap').offsetTop - 20, behavior: 'smooth' });
+}
+
+function setRing(dim, score) {
+  const ringEl = document.getElementById('ring' + dim.charAt(0).toUpperCase() + dim.slice(1));
+  const numEl = document.getElementById('num' + dim.charAt(0).toUpperCase() + dim.slice(1));
+  const labelEl = document.getElementById('label' + dim.charAt(0).toUpperCase() + dim.slice(1));
+
+  const offset = CIRCUMFERENCE - (score / 100) * CIRCUMFERENCE;
+  ringEl.style.strokeDasharray = CIRCUMFERENCE;
+  ringEl.style.strokeDashoffset = CIRCUMFERENCE; // start at 0
+  numEl.textContent = score;
+
+  setTimeout(() => { ringEl.style.strokeDashoffset = offset; }, 100);
+
+  const { label, cls } = getScoreLabel(score);
+  labelEl.textContent = label;
+  labelEl.className = 'score-sublabel ' + cls;
+}
+
+function getScoreLabel(score) {
+  if (score >= 90) return { label: '優秀 ✦', cls: 'good' };
+  if (score >= 70) return { label: '良好', cls: 'good' };
+  if (score >= 50) return { label: '待優化', cls: 'ok' };
+  return { label: '需改善', cls: 'bad' };
+}
+
+function renderIndicators(dim, indicators) {
+  const grid = document.getElementById('grid' + dim.charAt(0).toUpperCase() + dim.slice(1));
+  grid.innerHTML = '';
+  indicators.forEach(ind => {
+    const pctClass = ind.pass === null ? 'warn' : ind.pass ? 'pass' : (ind.pts > 0 ? 'warn' : 'fail');
+    const emoji = ind.pass === null ? '⚠️' : ind.pass ? '✅' : (ind.pts > 0 ? '⚠️' : '❌');
+    const pct = ind.max > 0 ? Math.round((ind.pts / ind.max) * 100) : 0;
+    grid.innerHTML += `
+      <div class="indicator-card">
+        <div class="ind-icon ${pctClass}">${emoji}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="ind-name">${ind.name}</div>
+          <div class="ind-detail">${ind.detail}</div>
+        </div>
+        <div class="ind-pts ${pctClass}">${ind.pts}/${ind.max}</div>
+      </div>`;
+  });
+}
+
+function renderSuggestions(scores) {
+  const all = [];
+
+  const addSuggestions = (dim, indicators) => {
+    indicators.forEach(ind => {
+      if (ind.pass === false || (ind.pts < ind.max * 0.5 && ind.pts < ind.max)) {
+        const missing = ind.max - ind.pts;
+        all.push({ dim, name: ind.name, detail: ind.detail, missing });
+      }
+    });
+  };
+
+  addSuggestions('seo', scores.seo.indicators);
+  addSuggestions('geo', scores.geo.indicators);
+  addSuggestions('aeo', scores.aeo.indicators);
+  all.sort((a, b) => b.missing - a.missing);
+
+  // 記者白話版改稿建議
+  const ACTIONS = {
+    'Meta Description': { action: '請在後台補上文章摘要（120-160 字），說明這篇報導的核心內容與讀者收穫。Google 和 AI 都靠這段來判斷文章在講什麼。', priority: 'high' },
+    '網頁標題': { action: '標題建議控制在 30-60 字。最重要的關鍵字放最前面，避免以「廣編」「特輯」等字開頭。', priority: 'high' },
+    'Canonical URL': { action: '【請技術處理】加入 canonical 標籤，避免同一篇文章在不同網址重複出現而互相扣分。', priority: 'mid' },
+    'FAQPage': { action: '在文章末尾加一個 Q&A 區塊（3-5 個問答），並請技術部門加上 FAQPage 標記。Google 精選摘要會直接抓取這個區塊，是搶「零位排名」最有效的做法。', priority: 'high' },
+    'Schema.org': { action: '【請技術處理】加入 NewsArticle 或 BlogPosting 結構化標記，讓 ChatGPT、Google AI 能識別「這是一篇專業報導」而非一般網頁。', priority: 'high' },
+    'Open Graph': { action: '補齊社群分享預覽：標題、摘要文字、封面圖片。文章分享到 LINE / Facebook 時，有圖有摘要的點閱率高出 3 倍，AI 引用時也更容易找到文章。', priority: 'mid' },
+    'AI 爬蟲': { action: '【請技術處理】確認 robots.txt 未封鎖 ChatGPT（GPTBot）、Claude（ClaudeBot）、Perplexity（PerplexityBot）的爬蟲。封鎖等於主動把文章從 AI 的資料庫裡刪掉。', priority: 'high' },
+    '問句式標題': { action: '把文章的 H2 小標改成問句形式，例如「台積電 2024 年能維持高獲利嗎？」比「台積電 2024 年展望」更容易出現在 Google「大家也問」欄位。', priority: 'mid' },
+    '短答段落': { action: '每個小標題後的第一句，直接給出結論（例：「答案是肯定的——...」）。AI 和讀者都在找結論，把結論藏在第三句等於讓人放棄閱讀。', priority: 'mid' },
+    'E-E-A-T': { action: '文章要有記者全名 + 職稱，以及明確的發布日期。AI 評估一篇文章是否可信、值不值得引用，作者署名和時效性是最基本的判斷門票。', priority: 'high' },
+    '自包含段落': { action: '每個段落寫完整（建議 100-200 字）。AI 引用的單位是「段落」不是「全文」——一段話拿出來單獨看要能理解，才有機會被 AI 直接引用。', priority: 'mid' },
+    '頁面速度': { action: '【請技術處理】頁面載入太慢，圖片建議壓縮至 500KB 以下。Core Web Vitals 分數直接影響 Google 排名，也是讀者跳離的第一原因。', priority: 'mid' },
+  };
+
+  const list = document.getElementById('suggestionList');
+  if (all.length === 0) {
+    list.innerHTML = '<p style="color:var(--green);font-weight:600;padding:8px 0;">🎉 各維度表現良好，持續維持！</p>';
+    return;
+  }
+
+  list.innerHTML = all.slice(0, 8).map((item, i) => {
+    const key = Object.keys(ACTIONS).find(k => item.name.includes(k));
+    const action = ACTIONS[key] || { action: item.detail.replace(/[✅❌⚠️]/g, '').trim().slice(0, 80), priority: 'low' };
+    const priority = i < 3 ? 'high' : i < 6 ? 'mid' : 'low';
+    const priorityLabel = { high: '高', mid: '中', low: '低' }[priority];
+    return `
+      <div class="suggestion-item">
+        <div class="sug-priority ${priority}">${priorityLabel}</div>
+        <div class="sug-text">
+          <div class="sug-title">${item.name}</div>
+          <div class="sug-desc">${action.action}</div>
+          <span class="sug-tag ${item.dim}">${item.dim.toUpperCase()}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderAdvertorial(adv, brandName) {
+  const card = document.getElementById('advCard');
+  if (!adv || !brandName) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  document.getElementById('advScore').textContent = adv.score + ' 分';
+
+  const scoreColor = adv.score >= 70 ? 'var(--green)' : adv.score >= 45 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('advScore').style.color = scoreColor;
+
+  const m = adv.metrics;
+  const gridItems = [
+    { label: 'AI 引用潛力', value: m.aiVisibility },
+    { label: '外部連結數', value: m.extLinks + ' 個' },
+    { label: '品牌名稱出現', value: typeof m.brandMentions === 'number' ? m.brandMentions + ' 次' : m.brandMentions },
+    { label: '開篇結構', value: m.answerFirst },
+  ];
+  document.getElementById('advGrid').innerHTML = gridItems.map(item => `
+    <div class="adv-item">
+      <div class="adv-item-label">${item.label}</div>
+      <div class="adv-item-value">${item.value}</div>
+    </div>`).join('');
+
+  document.getElementById('advTips').innerHTML = adv.tips.map(t =>
+    `<li>💡 ${t}</li>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════
+function switchTab(dim) {
+  ['seo','geo','aeo'].forEach(d => {
+    document.getElementById('panel' + d.charAt(0).toUpperCase() + d.slice(1)).classList.remove('active');
+    document.getElementById('tab' + d.charAt(0).toUpperCase() + d.slice(1)).classList.remove('active');
+    document.getElementById('card' + d.charAt(0).toUpperCase() + d.slice(1)).classList.remove('active');
+  });
+  document.getElementById('panel' + dim.charAt(0).toUpperCase() + dim.slice(1)).classList.add('active');
+  document.getElementById('tab' + dim.charAt(0).toUpperCase() + dim.slice(1)).classList.add('active');
+  document.getElementById('card' + dim.charAt(0).toUpperCase() + dim.slice(1)).classList.add('active');
+}
+
+function setStep(n, status) {
+  const el = document.getElementById('step' + n);
+  el.className = 'step-item ' + status;
+  const icon = el.querySelector('.step-icon');
+  icon.textContent = status === 'done' ? '✓' : status === 'error' ? '!' : String(n);
+}
+
+function resetSteps() {
+  [1,2,3,4].forEach(n => setStep(n, ''));
+}
+
+function showNotice(msg, type) {
+  const el = document.getElementById('notice');
+  el.textContent = msg;
+  el.className = 'notice show' + (type === 'error' ? ' error' : '');
+}
+
+function hideNotice() {
+  document.getElementById('notice').className = 'notice';
+}
+
+// Enter key triggers analysis
+['urlInput', 'brandInput'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') startAnalysis();
+  });
+});
+</script>
+</body>
+</html>
