@@ -1209,7 +1209,7 @@ function scoreSEO(doc, html, ps, crux, sitemapOk) {
     if (title) { titlePts += 12; if (titleLen >= 10 && titleLen <= 60) titlePts += 8; }
     total += titlePts;
     indicators.push({
-      name: '網頁標題（<title>）',
+      name: '網頁標題（Title Tag）',
       detail: title ? `「${title.slice(0,50)}${title.length>50?'…':''}」（${titleLen} 字）${titleLen<10||titleLen>60?' ⚠️ 建議 10-60 字':''}` : '❌ 未設定 title 標籤',
       tip: '搜尋結果第一行顯示的文字，是 Google 判斷文章主題最重要的依據。最佳長度 30-60 字，核心關鍵字盡量放最前面。廣編文章建議格式：「[核心主題] — [媒體/品牌]」，避免用「廣告」「特輯」等字開頭。',
       pts: titlePts, max: 20,
@@ -1733,6 +1733,10 @@ function getScoreLabel(score) {
   return { label: '需改善', cls: 'bad' };
 }
 
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 function renderIndicators(dim, indicators) {
   const grid = document.getElementById('grid' + dim.charAt(0).toUpperCase() + dim.slice(1));
   grid.innerHTML = '';
@@ -1748,13 +1752,13 @@ function renderIndicators(dim, indicators) {
     grid.innerHTML += `
       <div class="indicator-card">
         <div class="ind-head">
-          <div class="ind-name">${ind.name} <span class="ind-scope ${scope}">${scopeLabel}</span></div>
+          <div class="ind-name">${esc(ind.name)} <span class="ind-scope ${scope}">${scopeLabel}</span></div>
           <div class="ind-score ${cls}">${noData ? '—' : score}</div>
         </div>
         <div class="ind-bar"><div class="ind-bar-fill ${cls}" style="width:${noData ? 0 : score}%"></div></div>
-        <div class="ind-detail">${ind.detail}　<span style="color:var(--text3)">（${ind.pts}/${ind.max} 分）</span></div>
+        <div class="ind-detail">${esc(ind.detail)}　<span style="color:var(--text3)">（${ind.pts}/${ind.max} 分）</span></div>
         ${ind.tip ? `<div><button class="ind-tip-toggle" onclick="toggleTip('${tipId}',this)">ℹ 什麼是這個</button></div>
-        <div class="ind-tip-body" id="${tipId}">${ind.tip}</div>` : ''}
+        <div class="ind-tip-body" id="${tipId}">${esc(ind.tip)}</div>` : ''}
       </div>`;
   });
 }
@@ -1820,8 +1824,8 @@ function renderSuggestions(scores) {
       <div class="suggestion-item">
         <div class="sug-priority ${priority}">${priorityLabel}</div>
         <div class="sug-text">
-          <div class="sug-title">${item.name}</div>
-          <div class="sug-desc">${action.action}</div>
+          <div class="sug-title">${esc(item.name)}</div>
+          <div class="sug-desc">${esc(action.action)}</div>
           <span class="sug-tag ${item.dim}">${item.dim.toUpperCase()}</span>
         </div>
       </div>`;
