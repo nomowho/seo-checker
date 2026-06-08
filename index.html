@@ -424,6 +424,44 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 .edu-emoji { font-size: 24px; margin-bottom: 10px; }
 .edu-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
 .edu-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.edu-scoring {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed #dde3ef;
+}
+.edu-scoring-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.edu-scoring-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.edu-scoring-list li {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.5;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+.edu-pts {
+  flex-shrink: 0;
+  background: #eef2fb;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
 
 /* ─── HISTORY ─── */
 .history-section {
@@ -797,16 +835,47 @@ footer {
         <div class="edu-emoji">🔍</div>
         <div class="edu-title">SEO — 搜尋引擎優化</div>
         <div class="edu-desc">讓網頁在 Google、Bing 的自然排名出現。涵蓋技術 SEO（速度、canonical）、On-page（title、meta）、Core Web Vitals 等指標。</div>
+        <div class="edu-scoring">
+          <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
+          <ul class="edu-scoring-list">
+            <li><span class="edu-pts">20 pts</span> 頁面速度 Core Web Vitals — Google PageSpeed API 實測效能分</li>
+            <li><span class="edu-pts">25 pts</span> Google SEO 基礎評分 — PageSpeed Lighthouse 可索引性、連結品質</li>
+            <li><span class="edu-pts">20 pts</span> 網頁標題（Title Tag）— 是否存在、長度 10–60 字</li>
+            <li><span class="edu-pts">15 pts</span> Meta Description — 是否存在、長度 50–160 字</li>
+            <li><span class="edu-pts">15 pts</span> Canonical 標籤 — 是否防止重複索引</li>
+            <li><span class="edu-pts">5 pts</span> 可索引性 — robots meta 是否含 noindex（含則扣分）</li>
+          </ul>
+        </div>
       </div>
       <div class="edu-card">
         <div class="edu-emoji">🤖</div>
         <div class="edu-title">GEO — AI 引擎優化</div>
         <div class="edu-desc">讓 ChatGPT、Claude、Perplexity、Gemini 回答問題時優先引用你的內容。核心訊號：Schema 結構化資料、E-E-A-T、自包含段落、開放 AI 爬蟲。</div>
+        <div class="edu-scoring">
+          <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
+          <ul class="edu-scoring-list">
+            <li><span class="edu-pts">30 pts</span> JSON-LD 結構化資料 — 偵測 NewsArticle、Article、BlogPosting 等 Schema.org 標記</li>
+            <li><span class="edu-pts">20 pts</span> Open Graph 標籤 — og:title、og:description、og:image 完整度</li>
+            <li><span class="edu-pts">20 pts</span> AI 爬蟲開放度 — robots.txt 是否封鎖 GPTBot、ClaudeBot、PerplexityBot</li>
+            <li><span class="edu-pts">15 pts</span> 內容密度 — 正文字數是否達 AI 可引用門檻（≥300 字）</li>
+            <li><span class="edu-pts">15 pts</span> E-E-A-T 訊號 — 作者資訊、發布日期、來源引用是否存在</li>
+          </ul>
+        </div>
       </div>
       <div class="edu-card">
         <div class="edu-emoji">💬</div>
         <div class="edu-title">AEO — 答案引擎優化</div>
         <div class="edu-desc">讓 Google 精選摘要（Featured Snippet）和「大家也問」抓到你的回答。關鍵：FAQPage schema、問句式 H2/H3 標題、40-120 字短答段落。</div>
+        <div class="edu-scoring">
+          <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
+          <ul class="edu-scoring-list">
+            <li><span class="edu-pts">35 pts</span> FAQPage Schema — 偵測 JSON-LD 中是否有問答結構化標記</li>
+            <li><span class="edu-pts">25 pts</span> 問句式標題 — H2/H3 中含「什麼」「如何」「為什麼」「怎麼」等疑問詞</li>
+            <li><span class="edu-pts">20 pts</span> 短答段落 — 是否有 40–120 字的自包含回答段落（精選摘要抓取目標）</li>
+            <li><span class="edu-pts">10 pts</span> HowTo Schema — 含步驟說明的結構化標記</li>
+            <li><span class="edu-pts">10 pts</span> 清單結構 — 是否使用 &lt;ul&gt;/&lt;ol&gt; 條列（利於摘要擷取）</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
