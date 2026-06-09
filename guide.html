@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>記者改稿 SOP — Nomo 文章健檢室</title>
+<meta name="description" content="一頁搞懂：怎麼寫文章才容易被 Google 搜尋到、被 ChatGPT／Perplexity／Gemini 引用。記者改稿 checklist。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAFAFA;--card:#FFFFFF;--border:#E6E6E6;--text:#0A0A0A;--text2:#5C5C5C;--text3:#A0A0A0;
+  --primary-bg:#F1F1F1;--mono:'Space Grotesk','Noto Sans TC',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;}
+header{background:var(--card);border-bottom:1px solid var(--border);padding:18px 28px;display:flex;align-items:center;gap:14px;}
+.logo{font-family:var(--mono);font-size:16px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.logo-badge{background:var(--text);color:var(--card);font-size:9px;font-family:var(--mono);font-weight:700;padding:3px 7px;border-radius:999px;letter-spacing:.12em;}
+.back{margin-left:auto;font-size:12px;color:var(--text2);text-decoration:none;letter-spacing:.03em;}
+.back:hover{color:var(--text);}
+main{max-width:880px;margin:0 auto;padding:48px 20px 80px;}
+.hero h1{font-family:var(--mono);font-size:clamp(26px,5vw,42px);font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-bottom:12px;}
+.hero p{font-size:14px;color:var(--text2);max-width:600px;margin-bottom:10px;}
+.toolbar{display:flex;gap:10px;margin:24px 0 36px;}
+.btn{font-family:var(--mono);font-size:13px;font-weight:500;padding:9px 18px;border-radius:999px;cursor:pointer;text-decoration:none;display:inline-block;letter-spacing:.03em;}
+.btn-dark{background:var(--text);color:var(--card);border:1px solid var(--text);}
+.btn-line{background:transparent;color:var(--text);border:1px solid var(--text);}
+.btn:hover{opacity:.82;}
+.sec{margin-bottom:40px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--text);padding-bottom:8px;margin-bottom:6px;}
+.sec-num{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;}
+.sec-title{font-size:18px;font-weight:700;}
+.sec-sub{font-size:12px;color:var(--text3);margin-left:auto;letter-spacing:.03em;text-transform:uppercase;}
+.item{border-bottom:1px solid var(--border);padding:16px 0;display:grid;grid-template-columns:26px 1fr auto;gap:14px;align-items:start;}
+.item:last-child{border-bottom:none;}
+.chk{width:18px;height:18px;border:1.5px solid var(--text);border-radius:4px;margin-top:3px;}
+.item-body .t{font-size:15px;font-weight:700;margin-bottom:3px;}
+.item-body .d{font-size:13px;color:var(--text2);}
+.item-body .eg{font-size:12.5px;color:var(--text);background:var(--primary-bg);border-radius:6px;padding:6px 10px;margin-top:7px;display:inline-block;}
+.tag{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;align-self:start;margin-top:3px;}
+.tag.geo{background:var(--text);color:var(--card);}
+.tag.aeo{background:var(--primary-bg);color:var(--text);border:1px solid var(--border);}
+.tag.seo{background:var(--card);color:var(--text);border:1px solid var(--text);}
+.creed{background:var(--text);color:var(--card);border-radius:14px;padding:28px 30px;margin-top:8px;}
+.creed .big{font-family:var(--mono);font-size:clamp(20px,3.5vw,28px);font-weight:700;line-height:1.25;margin-bottom:10px;}
+.creed p{font-size:13.5px;color:#CFCFCF;}
+footer{text-align:center;color:var(--text3);font-size:12px;padding:24px;border-top:1px solid var(--border);}
+@media print{
+  header,.toolbar,.back,footer{display:none;}
+  body{background:#fff;}
+  main{padding:0;max-width:100%;}
+  .sec{break-inside:avoid;}
+  .creed{background:#fff;color:#000;border:2px solid #000;}
+  .creed p{color:#333;}
+  .tag.geo{background:#000;}
+}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">NOMO 文章健檢室 <span class="logo-badge">SOP</span></span>
+  <a class="back" href="./index.html">← 回健檢工具</a>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>記者改稿 SOP</h1>
+    <p>一頁搞懂：怎麼寫，文章才容易被 <strong>Google 搜尋到</strong>、被 <strong>ChatGPT／Perplexity／Gemini 引用</strong>。</p>
+    <p style="color:var(--text3);font-size:12.5px;">每一條都對應健檢工具的評分項目（標註分數），照著做＝分數會上升＝真的更容易被搜尋與 AI 推薦。</p>
+  </div>
+
+  <div class="toolbar">
+    <a class="btn btn-dark" href="javascript:window.print()">🖨 列印 / 存 PDF</a>
+    <a class="btn btn-line" href="./index.html">開始健檢文章</a>
+  </div>
+
+  <!-- 1 -->
+  <section class="sec">
+    <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">寫稿時就做（記者自己，影響最大）</span><span class="sec-sub">Writing</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">答案前置：小標下第一段直接給結論</div>
+      <div class="d">每個小標題「正下方第一段」用 40–120 字直接回答，第一句就是結論，再展開細節。文章開頭第一段也一樣。這是精選摘要與 AI Overview 真正抓取的位置。</div>
+      <div class="eg">✗「在討論 X 之前，先了解背景…」　✓「X 的答案是三步驟：①…②…③…」</div>
+    </div><span class="tag aeo">AEO 22＋GEO</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">小標改成問句</div>
+      <div class="d">H2／H3 用問句，命中 Google「大家也問」。一篇 2000 字配 6–8 個問句小標。</div>
+      <div class="eg">✗「台積電 2024 展望」　✓「台積電 2024 年能維持高獲利嗎？」</div>
+    </div><span class="tag aeo">AEO 22</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">每段 100–200 字、自包含</div>
+      <div class="d">一段聚焦一個論點、拿出來單看也能懂、結論句開頭。AI 引用的單位是「段落」不是全文。太碎或超過 400 字都扣分。</div>
+    </div><span class="tag geo">GEO 16</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">用具體數字取代模糊形容詞</div>
+      <div class="d">AI 偏好可驗證的數據，帶數字的句子被引用機率高。</div>
+      <div class="eg">✗「成長很多、規模龐大」　✓「年增 23%、資產達 8 億」</div>
+    </div><span class="tag geo">GEO 10</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">關鍵論點旁放權威外連</div>
+      <div class="d">每篇放 1–2 個指向 .gov／.edu／Wikipedia／權威機構的連結，提升 AI 與 Google 的 E-E-A-T 信任度。</div>
+    </div><span class="tag geo">GEO 10</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">能列表就列表、能表格就表格</div>
+      <div class="d">步驟／種類／重點 → 用條列清單（真項目符號，至少 4 項）。「A vs B／方案比較」→ 用表格（表格式精選摘要競爭最低，最好搶）。</div>
+    </div><span class="tag aeo">AEO 24</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">長文開頭放章節目錄</div>
+      <div class="d">目錄用錨點連到各小標（標題加 id）。AI 靠章節結構精準引用某段，Google 也可顯示「跳到段落」子連結。</div>
+    </div><span class="tag geo">GEO 8</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">署名 + 日期</div>
+      <div class="d">記者全名＋職稱、發布／更新日期。沒署名 AI 無法判斷可信度。內容每季更新一次（時效性 6 個月內加分）。</div>
+    </div><span class="tag geo">GEO 15</span></div>
+  </section>
+
+  <!-- 2 -->
+  <section class="sec">
+    <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">交技術部門做（一次設定，全站受用）</span><span class="sec-sub">Tech</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">結構化資料 JSON-LD</div>
+      <div class="d">NewsArticle（作者／發布日／更新日）＋ FAQPage（含問答 mainEntity）＋ HowTo（含 step）。讓 AI 一眼看懂「這是專業報導、誰寫的、何時發」。</div>
+    </div><span class="tag geo">GEO 18</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">robots.txt 開放 AI 爬蟲</div>
+      <div class="d">允許 GPTBot、ClaudeBot、PerplexityBot、Google-Extended、CCBot。封鎖＝主動把文章從 AI 資料庫刪掉。特別注意 Google-Extended（Gemini）。</div>
+    </div><span class="tag geo">GEO 10</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">確認廣編「沒有」被設 noindex</div>
+      <div class="d">noindex＝Google 與 AI 完全不收錄這頁。部分媒體預設廣編為 noindex，務必確認。</div>
+    </div><span class="tag seo">SEO</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">基礎技術四件套</div>
+      <div class="d">sitemap.xml（網站地圖）、canonical（防重複）、viewport（行動友善）、壓縮圖片提升 Core Web Vitals（速度直接影響排名）。</div>
+    </div><span class="tag seo">SEO</span></div>
+  </section>
+
+  <!-- 3 -->
+  <section class="sec">
+    <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">一句話心法</span><span class="sec-sub">Creed</span></div>
+    <div class="creed">
+      <div class="big">「先給答案，再展開。」</div>
+      <p>把每個小標下的第一段，當成『如果讀者只看這一段』來寫。同一個寫法，同時討好 Google 精選摘要、ChatGPT、Perplexity、Gemini——一魚多吃。</p>
+    </div>
+  </section>
+</main>
+
+<footer>Nomo 文章健檢室 · 記者改稿 SOP · 對應 SEO／GEO／AEO 評分規則</footer>
+</body>
+</html>
