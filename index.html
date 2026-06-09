@@ -871,11 +871,12 @@ footer {
         <div class="edu-scoring">
           <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
           <ul class="edu-scoring-list">
-            <li><span class="edu-pts">18 pts</span> 頁面速度 Core Web Vitals — Google 真實用戶數據(CrUX) LCP／CLS／INP</li>
-            <li><span class="edu-pts">22 pts</span> Google SEO 基礎評分 — PageSpeed Lighthouse 可索引性、連結品質</li>
-            <li><span class="edu-pts">20 pts</span> 網頁標題（Title Tag）— 是否存在、長度 10–60 字</li>
-            <li><span class="edu-pts">15 pts</span> Meta Description — 是否存在、長度 50–160 字</li>
+            <li><span class="edu-pts">18 pts</span> 頁面速度 Core Web Vitals — Google 真實用戶數據(CrUX) LCP／CLS／INP／TTFB／FCP</li>
+            <li><span class="edu-pts">18 pts</span> Google SEO 基礎評分 — PageSpeed Lighthouse 可索引性、連結品質</li>
+            <li><span class="edu-pts">16 pts</span> 網頁標題（Title Tag）— 是否存在、長度 10–60 字</li>
+            <li><span class="edu-pts">15 pts</span> Meta Description — 是否存在、長度 80–160 字</li>
             <li><span class="edu-pts">10 pts</span> Canonical 標籤 — 是否防止重複索引</li>
+            <li><span class="edu-pts">8 pts</span> 圖片 alt 覆蓋率 — 內文圖片是否有替代文字（圖片搜尋＋無障礙）</li>
             <li><span class="edu-pts">8 pts</span> Mobile 行動友善 — viewport 響應式設定（行動優先索引）</li>
             <li><span class="edu-pts">7 pts</span> 可索引性 + Sitemap — robots meta 是否 noindex、是否有 sitemap.xml</li>
           </ul>
@@ -1475,9 +1476,10 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       detail: authLinks.length > 0
         ? `✅ 引用了 ${authLinks.length} 個高權威來源（.gov/.edu/Wikipedia 等）`
         : '— 未引用權威來源，建議在關鍵論點旁加 1-2 個 .gov/.edu/Wikipedia 連結',
-      tip: '段落內加 1-2 個指向高權威網域的外連，能直接提升 AI 與 Google 對你內容的 authority 評估（E-E-A-T 訊號）。優先級：.gov > .edu > Wikipedia > 知名媒體。注意要與內容相關，同段超過 3 個外連反而被視為 spam。',
+      why: '引用權威來源等於告訴 AI 與 Google「我的內容經得起查證」，直接提升 authority（E-E-A-T）評估與被引用機率。Princeton 論文也指出「引用權威來源＋統計數據」是提升 AI 引用率最有效的組合之一。',
+      fix: '在關鍵數據／論點旁加 1-2 個指向高權威網域的連結。優先級：.gov／.gov.tw ＞ .edu ＞ Wikipedia ＞ 國際權威機構（IEA、WHO…）。注意要與內容直接相關，同段超過 3 個外連反而像 spam。',
       pts: authPts, max: 10,
-      pass: authPts >= 5,
+      pass: authPts >= 5, scope: 'page',
     });
 
     // 5. E-E-A-T 作者/日期/新鮮度 (15 pts)
@@ -1510,7 +1512,8 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       detail: (authorEl && dateEl)
         ? `✅ 有作者與日期　|　${freshTxt}`
         : `⚠️ ${!authorEl?'未找到作者 ':''}${!dateEl?'未找到日期':''}`,
-      tip: 'E-E-A-T（經驗、專業、權威、可信）是 Google 與 AI 評估內容可信度的框架。作者全名+職稱、發布/更新日期是基本訊號。「內容新鮮度」在 2026 年特別關鍵——AI 在 retrieval 階段給新鮮內容加權，內容更新後 30 天內引用率平均 +18%。建議每季更新並維護 dateModified。',
+      why: 'E-E-A-T（經驗、專業、權威、可信）是 Google 與 AI 評估內容可信度的框架，醫療/金融類（YMYL）尤其關鍵——無作者署名幾乎進不了前 20。「新鮮度」在 2026 特別重要：AI 偏好 6 個月內更新的內容，過期逾 18 個月被引用機率下降約 60%。',
+      fix: '每篇有記者全名＋職稱（最好附 Person schema 與 sameAs 連 LinkedIn）；標明發布日與更新日，頁面可見處顯示「最後更新：YYYY-MM-DD」。每季回頭審舊文、補新數據並更新 dateModified。',
       pts: eeatPts, max: 15,
       pass: eeatPts >= 10, scope: 'page',
     });
@@ -1538,23 +1541,29 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     indicators.push({
       name: '品牌權威（Brand）',
       detail: brandPts > 0 ? `✅ ${brandBits.join('、')}` : '❌ 缺乏品牌權威訊號，建議加 Organization schema 與官方社群連結（sameAs）',
-      tip: 'AI 訓練資料大量來自 Reddit、Wikipedia、YouTube。一個品牌在這些平台被討論越多，越容易被 AI「認識」並引用。本工具從單頁可偵測的訊號：Organization/Person JSON-LD、sameAs 官方社群連結、Wikipedia 提及。長期策略：在相關 Reddit / Wikipedia 累積真誠的品牌提及。',
+      why: 'AI 訓練資料大量來自 Reddit、Wikipedia、YouTube。品牌在這些平台被討論越多，越容易被 AI「認識」並主動提及。這是 GEO 時代取代傳統網域權重的新指標。（註：真實「AI 提及率」需跨站查詢，本工具只能從單頁偵測代理訊號，故權重低。）',
+      fix: '單頁可做：加 Organization schema + sameAs 列出所有官方平台（FB/IG/LinkedIn/YouTube）。長期品牌工程（行銷/公關）：在相關 Reddit 真誠討論、爭取主流媒體報導後建立 Wikipedia 條目、上產業 podcast/KOL 訪談。',
       pts: brandPts, max: 6, pass: brandPts >= 3, scope: 'page',
     });
 
-    // 7. 平台優化 OG + Twitter Card (7 pts)
+    // 7. 平台優化 OG + Twitter Card + RSS (7 pts)
     const ogTitle = doc.querySelector('meta[property="og:title"]')?.getAttribute('content');
     const ogDesc = doc.querySelector('meta[property="og:description"]')?.getAttribute('content');
     const ogImage = doc.querySelector('meta[property="og:image"]')?.getAttribute('content');
     const ogType = doc.querySelector('meta[property="og:type"]')?.getAttribute('content');
+    const ogUrl = doc.querySelector('meta[property="og:url"]')?.getAttribute('content');
+    const ogSite = doc.querySelector('meta[property="og:site_name"]')?.getAttribute('content');
     const twCard = doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content');
-    const ogPts = (ogTitle?2:0) + (ogDesc?1:0) + (ogImage?2:0) + (ogType?1:0) + (twCard?1:0);
+    const hasRss = !!doc.querySelector('link[rel="alternate"][type="application/rss+xml"], link[rel="alternate"][type="application/atom+xml"]');
+    const ogCore = (ogTitle?1:0)+(ogDesc?1:0)+(ogImage?1:0)+(ogType?1:0)+(ogUrl||ogSite?1:0); // OG 五分
+    const ogPts = ogCore + (twCard?1:0) + (hasRss?1:0); // +Twitter +RSS = 7
     total += ogPts;
-    const missing = [!ogTitle&&'og:title', !ogDesc&&'og:description', !ogImage&&'og:image', !ogType&&'og:type', !twCard&&'twitter:card'].filter(Boolean);
+    const missing = [!ogTitle&&'og:title', !ogDesc&&'og:description', !ogImage&&'og:image', !ogType&&'og:type', !(ogUrl||ogSite)&&'og:url/site_name', !twCard&&'twitter:card', !hasRss&&'RSS feed'].filter(Boolean);
     indicators.push({
-      name: '平台優化（OG / Twitter Card）',
-      detail: ogPts === 7 ? '✅ Open Graph 與 Twitter Card 標籤完整' : `⚠️ 缺少：${missing.join('、')}`,
-      tip: '決定文章分享到 LINE、Facebook、Threads、X 時的預覽樣式（標題、說明、封面圖）。標籤完整的文章點擊率明顯較高，也是 Perplexity、Bing AI 比對品牌跨平台資訊一致性的來源之一。',
+      name: '平台優化（OG / Twitter / RSS）',
+      detail: ogPts >= 7 ? '✅ OG、Twitter Card、RSS feed 皆完整' : `⚠️ 缺少：${missing.join('、')}`,
+      why: '決定文章分享到 LINE/FB/Threads/X 時的預覽樣式，標籤完整點擊率明顯較高。RSS/Atom feed 則是 AI 爬蟲的「邀請函」——GPTBot、ClaudeBot 會讀 feed 發現新內容，沒有的話 AI 對你更新的感知會慢 7-14 天。',
+      fix: '【技術部門】補齊 og:title/description/image(1200×630)/url/type/site_name + twitter:card=summary_large_image；網站提供 RSS/Atom feed（保留最新 20 篇）。用 metatags.io 預覽各平台效果。',
       pts: ogPts, max: 7,
       pass: ogPts >= 5, scope: 'page',
     });
@@ -1562,9 +1571,9 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     indicators.push({ name: 'Schema / 內容結構 / E-E-A-T', detail: '⚠️ 無法取得 HTML，略過', pts: 0, max: 90, pass: null });
   }
 
-  // 8. AI Crawlers in robots.txt (10 pts) — 5 隻主流 AI 爬蟲
+  // 8. AI Crawlers in robots.txt (10 pts) — 9 隻主流 AI 爬蟲
   const crawlers = checkAICrawlers(robotsTxt);
-  const botList = ['GPTBot','ClaudeBot','PerplexityBot','Google-Extended','CCBot'];
+  const botList = ['GPTBot','ClaudeBot','anthropic-ai','PerplexityBot','Google-Extended','CCBot','Bytespider','Applebot-Extended','Amazonbot'];
   const allowedCount = botList.filter(b => crawlers[b]).length;
   const crawlerPts = Math.round((allowedCount / botList.length) * 10);
   total += crawlerPts;
@@ -1574,9 +1583,10 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     detail: !robotsTxt
       ? '⚠️ 無法取得 robots.txt（預設允許，但建議明確設定）'
       : blocked.length === 0
-        ? '✅ GPTBot、ClaudeBot、PerplexityBot、Google-Extended、CCBot 皆允許'
+        ? `✅ 9 隻主流 AI 爬蟲皆允許（GPTBot、ClaudeBot、PerplexityBot、Google-Extended、CCBot、Bytespider 等）`
         : `⚠️ 封鎖中：${blocked.join('、')}（這些 AI 將無法引用你的內容）`,
-    tip: 'GPTBot（ChatGPT）、ClaudeBot（Claude）、PerplexityBot（Perplexity）、Google-Extended（Gemini 訓練）、CCBot（Common Crawl，多數 LLM 的資料源）。封鎖 = 主動把文章從該 AI 的資料庫移除。特別注意 Google-Extended：若要被 Gemini 訓練引用，建議明確 Allow。',
+    why: 'AI 要引用你，前提是爬蟲抓得到。robots.txt 是「曝光資格賽」第一道閘門。封鎖某隻 = 主動把文章從該 AI 的資料庫移除。涵蓋 9 隻：GPTBot(ChatGPT)、ClaudeBot/anthropic-ai(Claude)、PerplexityBot、Google-Extended(Gemini)、CCBot(多數 LLM 資料源)、Bytespider(字節/豆包)、Applebot-Extended(Apple)、Amazonbot。',
+    fix: '【技術部門】robots.txt 對以上爬蟲明確 Allow: /（敏感路徑如 /admin/ 可個別 Disallow）。Google-Extended 雖預設「沒擋＝可用」，仍建議明確 Allow 以策安全。可在伺服器 log 過濾 User-Agent 確認爬蟲真的有來。',
     pts: crawlerPts, max: 10,
     pass: crawlerPts >= 7, scope: 'site',
   });
@@ -1614,24 +1624,29 @@ function scoreAEO(doc, html, isDoc) {
   indicators.push({
     name: 'FAQPage 結構化資料',
     detail: hasFaq ? `✅ 有效 FAQPage schema（${faqCount} 組問答）` : '❌ 未設定有效 FAQPage（需 @type=FAQPage 且含 mainEntity 問答陣列）',
-    tip: '在文章末尾加 3-5 個 Q&A，並標注 FAQPage JSON-LD（必須有 mainEntity 問答陣列才有效，光寫 @type 無內容不算）。Google 搜尋結果頁會直接展開這些問答，AI Overview 與 ChatGPT/Perplexity 也優先解析 FAQ 問答對作為引用單元。',
+    why: 'FAQPage schema 讓搜尋與 AI 引擎直接理解「問答對應關係」。Google 2023 雖縮減一般網站的 FAQ 富摘要顯示，但 ChatGPT、Perplexity、Claude、Bing Copilot 仍優先解析 FAQ 問答對當引用單元。沒 schema，AI 得自己猜「這段是不是問答」，猜不到就略過。',
+    fix: '【技術部門＋記者】文末加 5-8 題 Q&A，套 FAQPage JSON-LD（必須含 mainEntity 問答陣列）。問題用使用者真實搜尋語氣（「綠色債券怎麼買？」優於「綠色債券簡介」）；每個答案 50-150 字、直接答覆＋一個數據。schema 文字要與頁面可見內容一致。',
     pts: faqPts, max: 22,
     pass: hasFaq, scope: 'page',
   });
 
-  // 2. Question headings (25 pts)
+  // 2. Question headings (22 pts) — 問號滿分；含疑問詞但無問號給部分分
   const headings = Array.from(doc.querySelectorAll('h2, h3'));
-  const questionHeadings = headings.filter(h => h.textContent.trim().endsWith('?') || h.textContent.trim().endsWith('？'));
-  const qhPts = Math.min(22, questionHeadings.length * 5);
+  const qWord = /(為什麼|為何|如何|怎麼|怎樣|什麼是|是什麼|哪些|哪個|多少|該不該|要不要|是否|有沒有|嗎|呢|差別|差異|vs|比較)/i;
+  const fullQ = headings.filter(h => /[?？]\s*$/.test(h.textContent.trim()));
+  const wordQ = headings.filter(h => !/[?？]\s*$/.test(h.textContent.trim()) && qWord.test(h.textContent));
+  const qhPts = Math.min(22, fullQ.length * 5 + wordQ.length * 3);  // 問號5/疑問詞3
   total += qhPts;
+  const qhEx = (fullQ[0] || wordQ[0]);
   indicators.push({
     name: '問句式標題（H2/H3）',
-    detail: questionHeadings.length > 0
-      ? `✅ 找到 ${questionHeadings.length} 個問句標題（如：「${questionHeadings[0].textContent.trim().slice(0,30)}…」）`
-      : '❌ 建議加入以問句結尾的 H2/H3 標題（提高「大家也問」命中率）',
-    tip: '以「？」結尾的 H2/H3 標題，是搶佔 Google「大家也問（People Also Ask）」欄位的核心方法。問題式標題與使用者搜尋字串相似度更高，AI 生成回答時也可直接複製整個小節。例：「台積電 2024 年能維持高獲利嗎？」比「台積電 2024 年展望」更有效。一篇 2000 字文章理想上應有 6-8 個問句子標題。',
+    detail: (fullQ.length + wordQ.length) > 0
+      ? `✅ ${fullQ.length} 個問號標題 + ${wordQ.length} 個疑問詞標題${qhEx ? `（如：「${qhEx.textContent.trim().slice(0,26)}…」）` : ''}`
+      : '❌ 小標多為陳述句，建議改問句（提高「大家也問」命中率）',
+    why: '問句式標題與使用者真實搜尋字串相似度最高，是搶佔 Google「大家也問（PAA）」的核心；AI 生成回答時也會把問句標題視為 question、直接複製下方段落當 answer。研究顯示改問句後精選摘要觸發率提升 2-3 倍。',
+    fix: '把陳述小標改問句：「台積電 2024 展望」→「台積電 2024 年能維持高獲利嗎？」。四種模板：「為什麼…？」「如何…？」「什麼是…？」「A 跟 B 有什麼差別？」。記得加上問號（有問號分數最高）。一篇 2000 字配 6-8 個問句小標。',
     pts: qhPts, max: 22,
-    pass: qhPts >= 10,
+    pass: qhPts >= 10, scope: 'page',
   });
 
   // 3. 答案前置短段 (22 pts) — 量測「標題正下方的答案」這個精選摘要/AI Overview 真實抓取結構
@@ -1661,7 +1676,8 @@ function scoreAEO(doc, html, isDoc) {
       : looseShort > 0
         ? `⚠️ 有 ${looseShort} 個短段落，但都不在小標正下方——精選摘要抓的是「標題→答案」結構，位置不對抓不到`
         : '❌ 缺少答案前置段落：每個小標下第一段請用 40-120 字直接給結論',
-    tip: 'Google 精選摘要、PAA、AI Overview 抓的是「小標題 → 緊接著的第一段答案」。所以關鍵不只是「有短段落」，而是「短答案放在標題正下方」。寫法：問句式小標 →下一段第一句就給結論（40-120 字，定義+關鍵特性+一個數據），再展開細節。這個結構同時是 ChatGPT、Perplexity 抓引用的最愛——一魚多吃。',
+    why: 'Google 精選摘要、PAA、AI Overview 抓的是「小標題 → 緊接著的第一段答案」。所以關鍵不只是「有短段落」，而是「短答案放在標題正下方」。位置不對，再好的答案也抓不到。這個結構同時是 ChatGPT、Perplexity 抓引用的最愛——一魚多吃。',
+    fix: '每個問句小標的「正下方第一段」用 40-120 字直接給結論，結構「定義＋關鍵特性＋一個數據」，第一句就是答案、不要先鋪陳。後段再展開細節。文章開頭第一段也比照辦理。',
     pts: saPts, max: 22,
     pass: saPts >= 13, scope: 'page',
   });
@@ -1675,23 +1691,28 @@ function scoreAEO(doc, html, isDoc) {
     detail: tables.length > 0
       ? `✅ 找到 ${tables.length} 個 HTML 表格（表格式精選摘要・低競爭入口）`
       : '— 涉及「A vs B／方案比較／規格對比」時，建議用 HTML <table>（多數對手用圖片，你做表格就贏）',
-    tip: '表格式精選摘要是三大格式中競爭最低的入口——大部分網站用圖片或散文代替比較資訊，Google 抓不到結構化欄位只能放棄。只要文章有「比較、對照、vs」，務必用標準 <table>（含 thead/tbody），就有機會直接拿下第 0 位。',
+    why: '表格式精選摘要是三大格式中競爭最低的入口——大部分網站用圖片或散文代替比較資訊，Google 抓不到結構化欄位只能放棄。只要文章有「比較、對照、vs」，做了結構化表格就有機會直接拿下第 0 位。',
+    fix: '把比較型資訊（方案 A/B/C、規格對照、各年數據）改用標準 HTML <table>（含 thead/tbody），別用圖片或純文字排版。欄位 2-3 欄、列數 3-8 列，每格內容 10 字內。記者：用編輯器的「插入表格」功能即可。',
     pts: tablePts, max: 12,
-    pass: tablePts >= 1,
+    pass: tablePts >= 1, scope: 'page',
   });
 
-  // 5. List structure (12 pts)
-  const lists = doc.querySelectorAll('ul, ol');
-  const listPts = Math.min(12, lists.length * 3);
+  // 5. List structure (12 pts) — 只算「≥4 項」的真實列表（Snippet 門檻）
+  const allLists = Array.from(doc.querySelectorAll('ul, ol'));
+  const qualLists = allLists.filter(l => l.querySelectorAll(':scope > li').length >= 4);
+  const listPts = Math.min(12, qualLists.length * 6);
   total += listPts;
   indicators.push({
     name: '列表結構（ul/ol）',
-    detail: lists.length > 0
-      ? `✅ 找到 ${lists.length} 個列表（列表式精選摘要・需 ≥4 項真實 <ol>/<ul>）`
-      : '— 遇到「步驟／方法／種類」建議改用條列清單',
-    tip: '列表式精選摘要觸發於「How to／步驟／排名」查詢，但必須是真正的 <ol>/<ul> 標記（用「1. 2. 3.」純文字排版抓不到）。每項 5-15 字、動詞開頭、至少 4 項。是 Google 和 AI 都偏好的易擷取格式。',
+    detail: qualLists.length > 0
+      ? `✅ ${qualLists.length} 個 ≥4 項的列表（列表式精選摘要就緒）`
+      : allLists.length > 0
+        ? `⚠️ 有 ${allLists.length} 個列表但項目都 <4 項——Google 列表式 Snippet 要求至少 4 項才會抓`
+        : '— 遇到「步驟／方法／種類」建議改用條列清單（真實 <ul>/<ol>）',
+    why: '列表式精選摘要觸發於「How to／步驟／排名」查詢。Google 要求至少 4 項、且是真正的 <ol>/<ul> 標記（用「1. 2. 3.」純文字排版抓不到）。是 Google 與 AI 都偏好的易擷取格式。',
+    fix: '把「步驟、方法、種類、重點」改成條列清單（編輯器的項目符號/編號，不是手打數字），每個列表至少 4 項、每項 5-15 字、動詞開頭。',
     pts: listPts, max: 12,
-    pass: listPts >= 6,
+    pass: listPts >= 6, scope: 'page',
   });
 
   // 6. HowTo Schema (10 pts) — 驗 @type=HowTo 且含 step 步驟（非字串比對）
@@ -1711,8 +1732,9 @@ function scoreAEO(doc, html, isDoc) {
   total += howToPts;
   indicators.push({
     name: 'HowTo 結構化資料',
-    detail: hasHowTo ? `✅ 有效 HowTo schema（${stepCount} 個步驟）` : '— 未設定有效 HowTo（需 @type=HowTo 且含 step 步驟；有步驟型內容才需要）',
-    tip: '適用於有「步驟」的文章：如「5 步驟申辦綠色債券」「如何評估 ESG 評級」。HowTo JSON-LD 必須含 step 步驟陣列才有效。加入後 Google 搜尋結果會直接展示步驟清單，佔據更多版面。',
+    detail: hasHowTo ? `✅ 有效 HowTo schema（${stepCount} 個步驟）` : '— 未設定有效 HowTo（步驟型文章才需要；非教學文可忽略）',
+    why: '步驟型內容（「如何申辦綠色債券」「怎麼評估 ESG 評級」）加 HowTo schema，AI 與 Google 才能逐步拆解、進入 AI Overview 步驟列表與語音助理朗讀順序。Google 2023 雖移除桌面富摘要，但手機端仍顯示、機器可讀性價值反而更高。',
+    fix: '【僅步驟型文章需要】H2 用「步驟 N：動詞＋受詞」，加 HowTo JSON-LD（含 step 陣列，每步有 name/text）。敘事型財經/ESG 報導不是教學文，可忽略此項、不影響分數判讀。',
     pts: howToPts, max: 10,
     pass: howToPts >= 1, scope: 'page',
   });
@@ -1724,7 +1746,7 @@ function scoreAEO(doc, html, isDoc) {
 // ── robots.txt parser ──────────────────────────────
 // 偵測 5 隻主流 AI 爬蟲是否被封鎖。回傳 true=允許 / false=封鎖。
 function checkAICrawlers(txt) {
-  const bots = ['GPTBot','ClaudeBot','PerplexityBot','Google-Extended','CCBot'];
+  const bots = ['GPTBot','ClaudeBot','anthropic-ai','PerplexityBot','Google-Extended','CCBot','Bytespider','Applebot-Extended','Amazonbot'];
   const result = {}; bots.forEach(b => result[b] = null);
   if (!txt) return result;
 
