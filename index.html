@@ -387,6 +387,9 @@ main { max-width: 1060px; margin: 0 auto; padding: 40px 24px 72px; }
   line-height: 1.65;
 }
 .ind-tip-body.open { display: block; }
+.tip-sec { margin-bottom: 10px; }
+.tip-sec:last-child { margin-bottom: 0; }
+.tip-lab { display: block; font-weight: 700; color: var(--text); font-size: 11.5px; letter-spacing: .02em; margin-bottom: 3px; }
 .ind-pts {
   margin-left: auto;
   font-size: 13px;
@@ -777,6 +780,9 @@ footer {
       🚨 <strong>重大警告：此頁面設有 noindex！</strong><br>
       <span style="font-weight:400;">robots meta 標籤設定了 <code style="background:rgba(255,255,255,0.2);padding:1px 5px;border-radius:3px;">noindex</code>，Google 與所有 AI 爬蟲（ChatGPT、Claude、Perplexity）都<strong>不會收錄這篇文章</strong>。廣編曝光效益幾乎歸零，建議立即請技術部門確認並移除 noindex 設定。</span>
     </div>
+    <div id="jsShellBanner" style="display:none; background:#FFF7E6; border:1px solid #F0D58A; border-left:3px solid #B7791F; border-radius:8px; padding:12px 16px; margin-bottom:18px; font-size:13px; line-height:1.6; color:#7a5a13;">
+      ⚠️ <strong>偵測到 JS 動態渲染（內容可信度提醒）</strong>：這個網址的初始 HTML 幾乎沒有內文，內容是靠 JavaScript 載入後才出現。<strong>Googlebot 第一波抓取與本工具都可能讀不到完整內文</strong>，因此「內容類」分數（自包含段落、答案前置等）可能偏低失真。建議技術部門確認有做 SSR／SSG，讓初始 HTML 就含完整內容。
+    </div>
     <div id="docBanner" style="display:none; background:var(--primary-bg); border:1px solid var(--border); border-left:3px solid var(--text); border-radius:8px; padding:12px 16px; margin-bottom:18px; font-size:13px; line-height:1.6; color:var(--text2);">
       📄 <strong style="color:var(--text)">Word 草稿模式</strong>：只評「內容寫作結構」（記者能控制的部分）。PageSpeed、Schema、robots、meta 等<strong>發布後才能檢測的技術項標為「不適用」、不計分</strong>，分數只用適用項目換算。發布上線後再貼網址做完整健檢。
     </div>
@@ -1106,12 +1112,22 @@ function calculateScores(doc, html, robotsTxt, ps, crux, sitemapOk, isDoc) {
     aeo: scoreAEO(doc, html, isDoc),
     noindex: isNoindex,
     isDoc: !!isDoc,
+    jsShell: !isDoc && detectJsShell(doc, html),
   };
+}
+
+// JS 渲染陷阱偵測：初始 HTML 內文極少、卻有大量 script → 內容靠 JS 注入，
+// Googlebot 第一波與本工具都可能抓不到完整內容
+function detectJsShell(doc, html) {
+  if (!doc || !html) return false;
+  const bodyText = (doc.body?.textContent || '').replace(/\s+/g, '');
+  const scriptCount = doc.querySelectorAll('script').length;
+  return textLen(bodyText) < 250 && scriptCount >= 3 && html.length > 1000;
 }
 
 // Word 稿模式：把「發布後才能檢測」的網頁技術項標為不適用（max:0 不計分）
 const WEB_ONLY = ['頁面速度', 'Google SEO 基礎評分', 'Canonical', '可索引性', 'Mobile',
-  '網頁標題', 'Meta Description', '結構化資料', '品牌權威', '平台優化', 'AI 爬蟲',
+  '網頁標題', 'Meta Description', '圖片 alt', '結構化資料', '品牌權威', '平台優化', 'AI 爬蟲',
   'FAQPage', 'HowTo', 'E-E-A-T'];
 function neutralizeWebOnly(indicators, isDoc) {
   if (!isDoc) return indicators;
@@ -1148,9 +1164,14 @@ function scoreCWV(crux) {
   const gI = grade(inp, 200, 500, 5);
   const pts = gL.p + gC.p + gI.p;
   const fmt = (v, unit) => isNaN(v) ? '—' : (unit === 'ms' ? Math.round(v) + 'ms' : v.toFixed(2));
+  // 補充診斷：TTFB（伺服器回應）、FCP（首次繪製）——CrUX 已含，協助判斷瓶頸
+  const ttfb = parseFloat(p75('experimental_time_to_first_byte'));
+  const fcp = parseFloat(p75('first_contentful_paint'));
+  const extra = (!isNaN(ttfb) || !isNaN(fcp))
+    ? `　·　TTFB ${fmt(ttfb,'ms')}（伺服器）/ FCP ${fmt(fcp,'ms')}（首次繪製）` : '';
   return {
     pts,
-    detail: `LCP ${fmt(lcp,'ms')} ${gL.label}　CLS ${fmt(cls,'')} ${gC.label}　INP ${fmt(inp,'ms')} ${gI.label}`,
+    detail: `LCP ${fmt(lcp,'ms')} ${gL.label}　CLS ${fmt(cls,'')} ${gC.label}　INP ${fmt(inp,'ms')} ${gI.label}${extra}`,
     scope: crux.scope,
   };
 }
@@ -1185,7 +1206,8 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     indicators.push({
       name: '頁面速度（Core Web Vitals）',
       detail: `${cwv.detail}　〔來源：Google 真實用戶數據・${scopeLabel}〕`,
-      tip: 'Core Web Vitals 是 Google 用真實使用者體驗（CrUX）評估的速度指標，直接影響搜尋排名。LCP（最大內容繪製）應 < 2.5 秒、CLS（版面位移）< 0.1、INP（互動回應）< 200 毫秒。常見問題：圖片太大未壓縮、廣告版位載入時跳動、第三方追蹤腳本過多。單篇文章若流量不足，會以「整站平均」數據呈現。',
+      why: 'Google 自 2021 年把 Core Web Vitals 列為排名因子，2024 年再把互動指標換成更嚴的 INP。它用真實使用者數據（CrUX 28 天）評估速度，直接影響排名與跳出率——LCP 從 1 秒拉到 3 秒，行動端跳出率上升 32%。LCP（最大內容繪製）應 < 2.5 秒、CLS（版面位移）< 0.1、INP（互動回應）< 200 毫秒。',
+      fix: '【請技術部門處理】LCP：首圖加 fetchpriority="high"、預載關鍵資源、改用 CDN 降 TTFB。INP：切割過長的 JS 工作、第三方腳本改 async/defer。CLS：所有圖片標 width/height、廣告版位預留固定高度、字體用 font-display。可看明細的 TTFB（伺服器慢）vs FCP（渲染慢）判斷瓶頸在哪。',
       pts: cwv.pts, max: 18,
       pass: cwv.pts >= 13,
       scope: cwv.scope === 'url' ? 'page' : 'site',
@@ -1202,17 +1224,18 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
   // 2. PageSpeed SEO category (22 pts)
   const seoScore = ps?.lighthouseResult?.categories?.seo?.score;
   if (seoScore != null) {
-    const pts = Math.round(seoScore * 22);
+    const pts = Math.round(seoScore * 18);
     total += pts;
     indicators.push({
       name: 'Google SEO 基礎評分',
       detail: `PageSpeed SEO 分：${Math.round(seoScore * 100)} / 100（含連結、可爬取性、可索引性）`,
-      tip: 'Google Lighthouse 的 SEO 審查，涵蓋 10+ 項基礎技術檢查：連結可爬取性、文字大小可讀性、meta 完整性、robots 設定等。分數 < 80 代表有明顯技術問題需修正，即使內容再好也難被 Google 收錄。',
-      pts, max: 22,
-      pass: pts >= 16,
+      why: 'Google Lighthouse 的 SEO 審查，是搜尋引擎「能不能順利讀懂這頁」的綜合健檢，涵蓋 10+ 項技術檢查：連結可爬取性、文字大小可讀性、圖片 alt、meta 完整性、robots 設定等。分數 < 80 代表有明顯技術問題，即使內容再好也難被 Google 收錄。',
+      fix: '【多數需技術部門】到 PageSpeed Insights 看紅字項目逐一修：補圖片 alt、確認連結文字有描述、文字對比度足夠、行動裝置字級不要太小。記者層面能做的是把連結文字寫清楚（避免「點此」）。',
+      pts, max: 18,
+      pass: pts >= 13,
     });
   } else {
-    indicators.push({ name: 'Google SEO 基礎評分', detail: '無法取得 PageSpeed 數據', pts: 0, max: 22, pass: null });
+    indicators.push({ name: 'Google SEO 基礎評分', detail: '無法取得 PageSpeed 數據', pts: 0, max: 18, pass: null });
   }
 
   if (doc) {
@@ -1220,14 +1243,15 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     const title = doc.querySelector('title')?.textContent?.trim() || '';
     const titleLen = title.length;
     let titlePts = 0;
-    if (title) { titlePts += 12; if (titleLen >= 10 && titleLen <= 60) titlePts += 8; }
+    if (title) { titlePts += 10; if (titleLen >= 10 && titleLen <= 60) titlePts += 6; }
     total += titlePts;
     indicators.push({
       name: '網頁標題（Title Tag）',
       detail: title ? `「${title.slice(0,50)}${title.length>50?'…':''}」（${titleLen} 字）${titleLen<10||titleLen>60?' ⚠️ 建議 10-60 字':''}` : '❌ 未設定 title 標籤',
-      tip: '搜尋結果第一行顯示的文字，是 Google 判斷文章主題最重要的依據。最佳長度 30-60 字，核心關鍵字盡量放最前面。廣編文章建議格式：「[核心主題] — [媒體/品牌]」，避免用「廣告」「特輯」等字開頭。',
-      pts: titlePts, max: 20,
-      pass: titlePts >= 15,
+      why: '搜尋結果第一行的藍色大字，是 Google 判斷文章主題最重要的依據，也決定使用者點不點。研究顯示含數字與情緒詞的標題，點擊率比平均高 30% 以上，而點擊率本身又是排名前 10 的關鍵因子。',
+      fix: '長度控制在中文 25-30 字（約 50-60 字元），核心關鍵字放最前面，後綴品牌名，例：「綠色債券怎麼買？2026 完整指南｜遠見」。避免用「廣告」「特輯」開頭。一頁只能一個 title。',
+      pts: titlePts, max: 16,
+      pass: titlePts >= 12,
     });
 
     // 4. Meta description (15 pts)
@@ -1239,7 +1263,8 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     indicators.push({
       name: 'Meta Description',
       detail: metaDesc ? `${metaDesc.slice(0,60)}…（${descLen} 字）${descLen<80||descLen>160?' ⚠️ 建議 80-160 字':''}` : '❌ 未設定 meta description',
-      tip: '搜尋結果標題下方的說明文字。雖然不直接影響排名，但好的摘要可提升點閱率 20-30%。建議 80-160 字，說明文章核心內容與讀者能獲得什麼。AI 引擎也用這段來快速理解文章是否與查詢相關。',
+      why: '搜尋結果標題下方的說明文字。雖不直接影響排名，但決定點閱率（好的摘要可提升 20-30%）。沒設定的話 Google 會自己亂抓一段，常常抓到不相關的內容。AI 引擎也用這段快速判斷文章跟查詢相不相關。',
+      fix: '寫中文 75-80 字（約 150-160 字元），包含關鍵字＋價值主張＋一句行動誘因，例：「本文用 8 分鐘帶你看懂綠色債券怎麼買、3 大風險與 5 檔台灣標的」。每篇都要有、且每篇不同。',
       pts: descPts, max: 15,
       pass: descPts >= 11,
     });
@@ -1251,7 +1276,8 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     indicators.push({
       name: 'Canonical URL',
       detail: canonical ? `✅ ${canonical.slice(0,60)}` : '❌ 未設定 canonical 標籤（可能導致重複內容問題）',
-      tip: '告訴 Google「這篇文章的正規網址是這個」，防止同一內容出現在多個 URL（如有無 www、http/https 差異）時相互稀釋排名。廣編文章常見於多個頻道轉載，canonical 特別重要。',
+      why: '告訴 Google「這篇文章的正規網址是哪一個」，防止同一內容出現在多個網址（有無 www、http/https、帶參數）時互相稀釋排名。廣編常在多頻道轉載，沒 canonical 會讓各版本分食流量、甚至被判重複內容降權。',
+      fix: '【技術部門】每頁 <head> 加 <link rel="canonical" href="本頁標準網址">，指向自己的正式 URL。轉載版本則 canonical 指向原始那篇。',
       pts: canonicalPts, max: 10,
       pass: !!canonical,
     });
@@ -1264,7 +1290,8 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     indicators.push({
       name: '可索引性 + Sitemap',
       detail: `${isNoindex ? '⚠️ robots meta 含 noindex，Google 不收錄此頁' : '✅ 頁面可被索引'}　|　${sitemapOk ? '✅ 找到 sitemap.xml' : '— 未找到 sitemap.xml'}`,
-      tip: 'robots meta 設 noindex 時 Google 與 AI 爬蟲都不收錄這頁——部分媒體預設廣編為 noindex，若要被搜尋到必須確認。sitemap.xml 則是給搜尋引擎的「網站地圖」，讓爬蟲更快、更完整地發現所有頁面，是基本的可爬取性訊號。',
+      why: 'noindex 是「請 Google 不要收錄這頁」的指令——一旦設了，內容再好也不會出現在搜尋與 AI。部分媒體預設廣編為 noindex，務必確認。sitemap.xml 是給搜尋引擎的「網站地圖」，讓爬蟲更快更完整發現所有頁面，是基本可爬取性訊號。',
+      fix: '【技術部門】上線前確認廣編頁「沒有」<meta name="robots" content="noindex">；確認網站根目錄有 sitemap.xml 且 robots.txt 末行有 Sitemap: 指令。可在 Search Console「網址檢查」確認該頁是否被允許收錄。',
       pts: indexPts, max: 7,
       pass: !isNoindex, scope: 'site',
     });
@@ -1280,8 +1307,26 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
       detail: !vp ? '❌ 未設定 viewport，行動裝置會以桌面版縮小顯示'
         : hasDeviceWidth ? (blocksZoom ? '⚠️ 有 viewport 但禁止縮放（影響無障礙）' : '✅ 已設定響應式 viewport（width=device-width）')
         : '⚠️ viewport 未使用 device-width',
-      tip: '行動友善是 Google「行動優先索引」的基礎。viewport meta 設 width=device-width 才能正確 RWD 響應式縮放。超過 60% 讀者用手機看新聞，未做行動優化會被降排名、跳出率也高。另避免 user-scalable=no（禁止縮放會傷害無障礙與 SEO）。',
+      why: 'Google 自 2024 年 7 月全面改用「行動優先索引」——一律以手機版內容評分排名。超過 65% 新聞流量來自手機，行動體驗差會直接被降排名、跳出率也高。',
+      fix: '【技術部門】<head> 加 <meta name="viewport" content="width=device-width, initial-scale=1">；內文字級 ≥16px、按鈕點擊區 ≥48px、避免水平捲動。切勿用 user-scalable=no（禁止縮放會傷害無障礙與 SEO）。',
       pts: mobilePts, max: 8, pass: mobilePts >= 8, scope: 'page',
+    });
+
+    // 8. 圖片 alt 覆蓋率 (8 pts)
+    const imgs = Array.from(doc.querySelectorAll('img'));
+    const realImgs = imgs.filter(im => !/^data:/.test(im.getAttribute('src') || '') && (im.getAttribute('src') || '').length > 1);
+    const withAlt = realImgs.filter(im => (im.getAttribute('alt') || '').trim().length > 0);
+    let altPts;
+    if (realImgs.length === 0) altPts = 8; // 無圖不扣分
+    else { const cov = withAlt.length / realImgs.length; altPts = cov >= 0.9 ? 8 : cov >= 0.6 ? 5 : cov >= 0.3 ? 3 : 0; }
+    total += altPts;
+    indicators.push({
+      name: '圖片 alt 覆蓋率',
+      detail: realImgs.length === 0 ? '— 本頁未偵測到內文圖片'
+        : `${withAlt.length}/${realImgs.length} 張圖有 alt 文字（覆蓋率 ${Math.round(withAlt.length/realImgs.length*100)}%）`,
+      why: 'alt 是「給看不到圖的人與機器的圖片說明」，是 Google 圖片搜尋排名的主要訊號，也是無障礙（WCAG）法規要求。AI 也靠 alt 理解圖片在講什麼。缺 alt 等於放棄圖片搜尋這個流量入口。',
+      fix: '每張內文圖片都加具體 alt（「黃金獵犬在草地奔跑」而非「狗」或空白）。裝飾性圖片用 alt=""。記者上稿時在圖片欄位填圖說即可，多數 CMS 會帶入 alt。',
+      pts: altPts, max: 8, pass: altPts >= 5, scope: 'page',
     });
   }
 
@@ -1298,40 +1343,55 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     // 解析所有 JSON-LD（供 Schema / E-E-A-T / 新鮮度共用）
     const jsonLds = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'));
     let schemaTypes = [], jsonLdHasAuthor = false, jsonLdDate = null, jsonLdModified = null;
+    let articleNode = null;
     jsonLds.forEach(el => {
       try {
         const obj = JSON.parse(el.textContent);
         const nodes = Array.isArray(obj) ? obj : (obj['@graph'] ? obj['@graph'] : [obj]);
         nodes.forEach(o => {
           if (!o) return;
-          if (o['@type']) schemaTypes.push([].concat(o['@type']).join(','));
+          const t = [].concat(o['@type'] || '').join(',');
+          if (o['@type']) schemaTypes.push(t);
           if (o.author) jsonLdHasAuthor = true;
           if (o.datePublished) jsonLdDate = o.datePublished;
           if (o.dateModified) jsonLdModified = o.dateModified;
+          if (/Article|BlogPosting/.test(t) && !articleNode) articleNode = o;
         });
       } catch {}
     });
 
-    // 1. 結構化資料 (18 pts) — JSON-LD 優先，亦支援 Microdata
+    // 1. 結構化資料 (18 pts) — JSON-LD 優先，並驗 Article 必要欄位完整性
     const hasSchema = jsonLds.length > 0;
     const microNodes = doc.querySelectorAll('[itemscope][itemtype]');
     const hasMicrodata = microNodes.length > 0;
     const qualityTypes = ['Article','BlogPosting','NewsArticle','Product','Organization','WebSite','Person','FAQPage','HowTo'];
     const hasQuality = schemaTypes.some(t => qualityTypes.some(q => t.includes(q)));
-    // JSON-LD 含優質類型 18；只有 JSON-LD 13；只有 Microdata 10；都無 0
-    const schemaPts = hasSchema ? (hasQuality ? 18 : 13) : (hasMicrodata ? 10 : 0);
+    // Article 必要欄位：author / datePublished / image / publisher
+    let schemaPts, schemaDetail;
+    if (articleNode) {
+      const need = { author: !!articleNode.author, datePublished: !!articleNode.datePublished, image: !!articleNode.image, publisher: !!articleNode.publisher };
+      const got = Object.values(need).filter(Boolean).length;
+      const missing = Object.keys(need).filter(k => !need[k]);
+      schemaPts = got === 4 ? 18 : got >= 2 ? 13 : 9; // 完整18 / 半殘13 / 殘缺9
+      schemaDetail = got === 4
+        ? `✅ Article schema 完整（含 author/date/image/publisher）`
+        : `⚠️ 有 Article schema 但缺欄位：${missing.join('、')}（半殘 schema 降低 AI 信任）`;
+    } else {
+      schemaPts = hasSchema ? (hasQuality ? 16 : 12) : (hasMicrodata ? 9 : 0);
+      schemaDetail = hasSchema
+        ? `✅ 找到 ${jsonLds.length} 個 JSON-LD：${schemaTypes.join(', ').slice(0,50)}（建議含 NewsArticle）`
+        : hasMicrodata
+          ? `⚠️ 僅 Microdata（${microNodes.length} 項），建議改用 JSON-LD`
+          : '❌ 未找到結構化資料（AI 無法理解頁面類型）';
+    }
     total += schemaPts;
-    const schemaDetail = hasSchema
-      ? `✅ 找到 ${jsonLds.length} 個 JSON-LD：${schemaTypes.join(', ').slice(0,55)}${hasMicrodata ? '（另有 Microdata）' : ''}`
-      : hasMicrodata
-        ? `⚠️ 僅找到 Microdata（${microNodes.length} 項），建議改用 JSON-LD（AI 較易解析）`
-        : '❌ 未找到結構化資料（JSON-LD / Microdata 皆無，AI 無法理解頁面類型）';
     indicators.push({
       name: '結構化資料（JSON-LD / Microdata）',
       detail: schemaDetail,
-      tip: '藏在原始碼裡「給機器看的說明書」，不影響讀者版面。首選 JSON-LD（Google 與各 AI 最推薦、最易解析）；Microdata（itemscope/itemtype）是舊式寫法，可被識別但建議升級。NewsArticle 類型讓 ChatGPT/Gemini 知道「這是媒體報導、作者、發布日期」，大幅提升被引用信任度。需請技術部門在 CMS 模板加入。',
+      why: 'JSON-LD 是藏在原始碼裡「給機器看的說明書」，是 AI 與 Google 理解內容類型最直接的方式，也是觸發 Rich Result 與 AI Overview 的必要條件。但「有 @type 卻缺欄位」反而傷信任——只寫 {"@type":"Article"} 等於說「這是文章但不告訴你誰寫、何時寫」。',
+      fix: '【技術部門】每篇用 NewsArticle JSON-LD，必填 headline、author（用 Person 物件）、datePublished、dateModified、image（≥1200×630）、publisher（Organization 含 logo）。用 Google Rich Results Test 驗證。',
       pts: schemaPts, max: 18,
-      pass: schemaPts >= 10, scope: 'page',
+      pass: schemaPts >= 13, scope: 'page',
     });
 
     // 2. 自包含段落 citability (16 pts) — 中文計字 100-200 字 + 首段答案前置加分
@@ -1353,7 +1413,8 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       detail: golden.length > 0
         ? `✅ ${golden.length} 個 80-250 字自包含段落${leadGood ? '；首段答案前置 ✅' : '；⚠️ 首段建議改答案前置'}`
         : '❌ 缺少 100-200 字的自包含段落，建議拆段、每段以結論句開頭',
-      tip: 'Princeton 2024 論文實證：100-200 字（134-167 字最佳）、結論句開頭、自包含的段落，被 AI 引用機率比長段落高 40%。AI 引用單位是「段落」不是全文。特別是「首段」——AI 生成摘要最愛抓文章開頭，所以第一段就要答案前置（首句直接給結論，不要先鋪陳背景歷史）。',
+      why: 'AI 引用的單位是「段落」不是全文。Princeton 2024 論文實證：100-200 字（134-167 字最佳）、結論句開頭、能獨立讀懂的段落，被 AI 引用機率比長段落高 40%。尤其「首段」——AI 生成摘要最愛抓文章開頭。',
+      fix: '把 500 字以上的長段拆成數個 100-200 字小段，每段聚焦一個論點、第一句就給結論（不要先鋪陳背景歷史）。文章第一段就要「答案前置」：用一句話講清楚這篇在回答什麼。',
       pts: contentPts, max: 16,
       pass: contentPts >= 10, scope: 'page',
     });
@@ -1364,21 +1425,27 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     const h2c = doc.querySelectorAll('h2').length;
     const h3c = doc.querySelectorAll('h3').length;
     const headingsWithId = doc.querySelectorAll('h2[id], h3[id], h2 a[id], section[id]').length;
+    // 子標題密度：每 250 字應有一個 H2/H3（長文若小標太少，passage indexing 切不開）
+    const totalChars = paragraphs.reduce((a, p) => a + textLen(p.textContent), 0);
+    const expectHeadings = Math.max(1, Math.round(totalChars / 250));
+    const headingDensityOk = (h2c + h3c) >= Math.min(expectHeadings, 4);
     let structPts = 0;
-    if (anchorLinks.length >= 3) structPts += 4; else if (anchorLinks.length >= 1) structPts += 2;
+    if (anchorLinks.length >= 3) structPts += 3; else if (anchorLinks.length >= 1) structPts += 2;
     if (h2c >= 3) structPts += 2; else if (h2c >= 1) structPts += 1;
-    if (headingsWithId >= 1) structPts += 2;
+    if (headingsWithId >= 1) structPts += 1;
+    if (headingDensityOk) structPts += 2;   // 子標題密度足夠
     structPts = Math.min(8, structPts);
     total += structPts;
     const structBits = [
-      anchorLinks.length > 0 ? `${anchorLinks.length} 個頁內錨點連結` : '無目錄錨點',
+      anchorLinks.length > 0 ? `${anchorLinks.length} 個目錄錨點` : '無目錄錨點',
       `H2×${h2c}／H3×${h3c}`,
-      headingsWithId > 0 ? '標題可錨定' : '標題無 id',
+      headingDensityOk ? '小標密度足夠' : '小標偏少（長文建議每 250 字一個）',
     ];
     indicators.push({
       name: '文章結構（目錄錨點）',
       detail: (structPts >= 5 ? '✅ ' : structPts > 0 ? '⚠️ ' : '❌ ') + structBits.join('、'),
-      tip: '錨點目錄（Table of Contents）是強 GEO/AEO 訊號：AI 靠章節結構理解長文、精準引用某一段；Google 也可顯示「跳到段落」子連結。做法：文章開頭放目錄，用 <a href="#段落id"> 連到各 H2/H3（標題加 id）。標題層級清楚（H2 主段、H3 子段）也讓 AI 更容易切分內容單元。',
+      why: '清楚的章節結構是強 GEO/AEO 訊號：AI 靠它理解長文、精準引用某一段；Google 也用它做 passage indexing（把長文切成段落分別參與排名），並可能顯示「跳到段落」子連結。小標太少，整篇被當一大塊、抓不出重點。',
+      fix: '長文每 200-300 字放一個 H2/H3 小標（2000 字約 6-8 個），標題用問句更佳。文章開頭放「章節目錄」，用 <a href="#段落id"> 連到各小標（標題加 id）。記者層面：把長段落用小標分章節即可。',
       pts: structPts, max: 8, pass: structPts >= 5, scope: 'page',
     });
 
@@ -1391,9 +1458,10 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       detail: dataParas.length > 0
         ? `✅ ${dataParas.length} 個段落含具體數字（AI 偏好可驗證的數據）`
         : '❌ 內容缺少具體數字，建議把「很多、大幅」換成「+23%、12,000 名」等明確數據',
-      tip: 'AI 引用時優先選帶數字的句子，因為它們是明確的事實主張、不易產生幻覺。把模糊形容詞換成具體數字：「很多用戶」→「12,000+ 月活」、「提升效率」→「速度提升 40%」。具體數字也讓 AI 能直接拼接進回答。',
+      why: 'AI 引用時優先選帶數字的句子，因為它們是明確的事實主張（claim）、不易產生幻覺，AI 可以直接拼接進回答。一篇全是形容詞、沒有數字的文章，AI 寧可去引用別人有數據的內容。',
+      fix: '把模糊形容詞換成具體數字：「成長很多」→「年增 23%」、「規模龐大」→「資產達 8 億」、「許多用戶」→「12,000 名」。每個關鍵論點盡量配一個數字、年份或比例。',
       pts: dataPts, max: 10,
-      pass: dataPts >= 6,
+      pass: dataPts >= 6, scope: 'page',
     });
 
     // 4. 權威外連 citability / E-E-A-T (10 pts) — .gov/.edu/wikipedia 等高權威網域
@@ -1776,6 +1844,9 @@ function renderResults(url, scores) {
   // Word 模式提示橫幅
   const docBanner = document.getElementById('docBanner');
   if (docBanner) docBanner.style.display = scores.isDoc ? 'block' : 'none';
+  // JS 渲染陷阱橫幅
+  const jsb = document.getElementById('jsShellBanner');
+  if (jsb) jsb.style.display = scores.jsShell ? 'block' : 'none';
 
   ['seo', 'geo', 'aeo'].forEach(dim => {
     setRing(dim, scores[dim].score);
@@ -1845,8 +1916,12 @@ function renderIndicators(dim, indicators) {
         </div>
         <div class="ind-bar"><div class="ind-bar-fill ${cls}" style="width:${score || 0}%"></div></div>
         <div class="ind-detail">${esc(ind.detail)}${ptsLabel}</div>
-        ${ind.tip && !na ? `<div><button class="ind-tip-toggle" onclick="toggleTip('${tipId}',this)">ℹ 什麼是這個</button></div>
-        <div class="ind-tip-body" id="${tipId}">${esc(ind.tip)}</div>` : ''}
+        ${(ind.why || ind.fix || ind.tip) && !na ? `<div><button class="ind-tip-toggle" onclick="toggleTip('${tipId}',this)">📖 看詳細說明</button></div>
+        <div class="ind-tip-body" id="${tipId}">
+          ${ind.why ? `<div class="tip-sec"><span class="tip-lab">💡 為什麼重要</span>${esc(ind.why)}</div>` : ''}
+          ${ind.fix ? `<div class="tip-sec"><span class="tip-lab">🔧 怎麼改善</span>${esc(ind.fix)}</div>` : ''}
+          ${(!ind.why && !ind.fix && ind.tip) ? esc(ind.tip) : ''}
+        </div>` : ''}
       </div>`;
   });
 }
@@ -1854,7 +1929,7 @@ function renderIndicators(dim, indicators) {
 function toggleTip(id, btn) {
   const el = document.getElementById(id);
   const open = el.classList.toggle('open');
-  btn.textContent = open ? '✕ 收起' : 'ℹ 什麼是這個';
+  btn.textContent = open ? '✕ 收起' : '📖 看詳細說明';
 }
 
 function renderSuggestions(scores) {
