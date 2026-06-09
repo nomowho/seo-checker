@@ -164,7 +164,7 @@ header {
 #analyzeBtn:disabled { background: var(--text3); cursor: not-allowed; }
 
 /* ─── MAIN CONTENT ─── */
-main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
+main { max-width: 1060px; margin: 0 auto; padding: 40px 24px 72px; }
 
 /* ─── ERROR / NOTICE ─── */
 .notice {
@@ -238,63 +238,72 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 .score-overview {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 24px;
+  gap: 18px;
+  margin-bottom: 36px;
 }
 .score-card {
   background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 24px 16px;
-  text-align: center;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 26px 26px 24px;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: border-color .2s;
+  transition: border-color .2s, box-shadow .2s, transform .15s;
 }
-.score-card:hover { border-color: var(--border); }
-.score-card.active { border-color: var(--primary); border-top: 3px solid var(--gvm-red); }
+.score-card:hover { border-color: var(--text3); transform: translateY(-2px); }
+.score-card.active { border-color: var(--text); box-shadow: 0 0 0 1px var(--text); }
 .score-label {
-  font-size: 12px;
+  font-family: var(--mono);
+  font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .8px;
-  color: var(--text3);
+  letter-spacing: .06em;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+.score-card.active .score-label { color: var(--text); }
+.score-big {
+  font-family: var(--mono);
+  font-size: clamp(52px, 8vw, 76px);
+  font-weight: 700;
+  line-height: .9;
+  letter-spacing: -.02em;
   margin-bottom: 14px;
 }
-.ring-wrap {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 12px;
+.score-big .unit { font-size: 22px; color: var(--text3); font-weight: 500; }
+.score-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--primary-bg);
+  overflow: hidden;
+  margin-bottom: 12px;
 }
-.ring-wrap svg { transform: rotate(-90deg); }
-.ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
-.ring-fg { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset .8s ease; }
-.ring-num {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: var(--mono);
-  font-size: 26px;
-  font-weight: 700;
-  line-height: 1;
+.score-bar-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: var(--text);
+  transition: width .9s cubic-bezier(.22,1,.36,1);
 }
 .score-sublabel {
   font-size: 13px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.score-sublabel.good { color: var(--green); }
-.score-sublabel.ok { color: var(--yellow); }
-.score-sublabel.bad { color: var(--red); }
+.score-sublabel::after { content: '查看細項 →'; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--text3); }
+.score-card.active .score-sublabel::after { content: '✓ 顯示中'; color: var(--text); }
+.score-sublabel.good { color: var(--text); }
+.score-sublabel.ok { color: var(--text2); }
+.score-sublabel.bad { color: var(--text3); }
 
 /* ─── TABS ─── */
 .tabs {
   background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  border-radius: 14px;
+  border: 1px solid var(--border);
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 32px;
 }
 .tab-nav {
   display: flex;
@@ -302,10 +311,10 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 }
 .tab-btn {
   flex: 1;
-  padding: 14px 8px;
+  padding: 16px 8px;
   border: none;
   background: transparent;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text3);
   cursor: pointer;
@@ -313,24 +322,24 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
 }
-.tab-btn:hover { color: var(--text); }
-.tab-btn.active { color: var(--primary); border-bottom-color: var(--gvm-red); }
-.tab-panel { display: none; padding: 20px; }
+.tab-btn:hover { color: var(--text); background: var(--bg); }
+.tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+.tab-panel { display: none; padding: 24px; }
 .tab-panel.active { display: block; }
 
 /* ─── INDICATOR GRID ─── */
 .indicator-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
 }
 .indicator-card {
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
+  border-radius: 12px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 11px;
 }
 .ind-head { display: flex; align-items: center; gap: 8px; }
 .ind-name { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
@@ -390,24 +399,26 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 /* ─── SUGGESTIONS ─── */
 .suggestions {
   background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 20px;
-  margin-bottom: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 28px 28px 20px;
+  margin-top: 44px;
+  margin-bottom: 24px;
 }
-.suggestions h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.suggestions h3 { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+.suggestions .sug-intro { font-size: 13px; color: var(--text3); margin-bottom: 18px; }
 .suggestion-item {
   display: flex;
-  gap: 12px;
-  padding: 10px 0;
+  gap: 14px;
+  padding: 16px 0;
   border-bottom: 1px solid var(--border);
 }
 .suggestion-item:last-child { border-bottom: none; }
 .sug-priority {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  font-size: 11px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -418,9 +429,9 @@ main { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
 .sug-priority.high { background: #0A0A0A; color: #fff; }
 .sug-priority.mid { background: #E2E2E2; color: #333; }
 .sug-priority.low { background: #F1F1F1; color: #888; }
-.sug-text { font-size: 14px; }
-.sug-title { font-weight: 600; margin-bottom: 2px; }
-.sug-desc { font-size: 12px; color: var(--text2); }
+.sug-text { font-size: 15px; }
+.sug-title { font-weight: 700; margin-bottom: 3px; }
+.sug-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
 .sug-tag {
   display: inline-block;
   padding: 2px 7px;
@@ -621,11 +632,13 @@ footer {
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 600px) {
-  .score-overview { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .score-card { padding: 16px 8px; }
-  .ring-wrap { width: 70px; height: 70px; }
-  .ring-num { font-size: 20px; }
-  .tagline { display: none; }
+  .score-overview { grid-template-columns: 1fr; gap: 12px; }
+  .score-card { padding: 20px 22px; display: grid; grid-template-columns: auto 1fr; grid-template-areas: 'label num' 'bar bar' 'sub sub'; align-items: center; gap: 4px 14px; }
+  .score-label { grid-area: label; margin-bottom: 0; }
+  .score-big { grid-area: num; text-align: right; font-size: 48px; margin-bottom: 0; }
+  .score-bar { grid-area: bar; margin-top: 8px; }
+  .score-sublabel { grid-area: sub; }
+  .tagline { font-size: 11px; padding: 5px 10px; }
 }
 
 /* ─── BRAND ROW ─── */
@@ -768,36 +781,21 @@ footer {
     <!-- Score overview -->
     <div class="score-overview">
       <div class="score-card active" onclick="switchTab('seo')" id="cardSeo">
-        <div class="score-label">SEO</div>
-        <div class="ring-wrap">
-          <svg viewBox="0 0 90 90" width="90" height="90">
-            <circle class="ring-bg" cx="45" cy="45" r="38"/>
-            <circle class="ring-fg" id="ringSeo" cx="45" cy="45" r="38" stroke="#0A0A0A"/>
-          </svg>
-          <div class="ring-num" id="numSeo">—</div>
-        </div>
+        <div class="score-label">SEO · Google 排名</div>
+        <div class="score-big"><span id="numSeo">—</span><span class="unit"> /100</span></div>
+        <div class="score-bar"><div class="score-bar-fill" id="ringSeo"></div></div>
         <div class="score-sublabel" id="labelSeo">—</div>
       </div>
       <div class="score-card" onclick="switchTab('geo')" id="cardGeo">
-        <div class="score-label">GEO</div>
-        <div class="ring-wrap">
-          <svg viewBox="0 0 90 90" width="90" height="90">
-            <circle class="ring-bg" cx="45" cy="45" r="38"/>
-            <circle class="ring-fg" id="ringGeo" cx="45" cy="45" r="38" stroke="#0A0A0A"/>
-          </svg>
-          <div class="ring-num" id="numGeo">—</div>
-        </div>
+        <div class="score-label">GEO · AI 引用</div>
+        <div class="score-big"><span id="numGeo">—</span><span class="unit"> /100</span></div>
+        <div class="score-bar"><div class="score-bar-fill" id="ringGeo"></div></div>
         <div class="score-sublabel" id="labelGeo">—</div>
       </div>
       <div class="score-card" onclick="switchTab('aeo')" id="cardAeo">
-        <div class="score-label">AEO</div>
-        <div class="ring-wrap">
-          <svg viewBox="0 0 90 90" width="90" height="90">
-            <circle class="ring-bg" cx="45" cy="45" r="38"/>
-            <circle class="ring-fg" id="ringAeo" cx="45" cy="45" r="38" stroke="#0A0A0A"/>
-          </svg>
-          <div class="ring-num" id="numAeo">—</div>
-        </div>
+        <div class="score-label">AEO · 精選摘要</div>
+        <div class="score-big"><span id="numAeo">—</span><span class="unit"> /100</span></div>
+        <div class="score-bar"><div class="score-bar-fill" id="ringAeo"></div></div>
         <div class="score-sublabel" id="labelAeo">—</div>
       </div>
     </div>
@@ -832,7 +830,8 @@ footer {
 
     <!-- Suggestions -->
     <div class="suggestions">
-      <h3>🎯 記者改稿建議（依重要性排列）</h3>
+      <h3>🎯 記者改稿建議</h3>
+      <div class="sug-intro">依影響程度排序，從最該優先處理的開始。每條都對應上方某個失分指標。</div>
       <div id="suggestionList"></div>
     </div>
 
@@ -1771,16 +1770,17 @@ function renderResults(url, scores, brandName) {
 }
 
 function setRing(dim, score) {
-  const ringEl = document.getElementById('ring' + dim.charAt(0).toUpperCase() + dim.slice(1));
-  const numEl = document.getElementById('num' + dim.charAt(0).toUpperCase() + dim.slice(1));
-  const labelEl = document.getElementById('label' + dim.charAt(0).toUpperCase() + dim.slice(1));
+  const Cap = dim.charAt(0).toUpperCase() + dim.slice(1);
+  const fillEl = document.getElementById('ring' + Cap);
+  const numEl = document.getElementById('num' + Cap);
+  const labelEl = document.getElementById('label' + Cap);
 
-  const offset = CIRCUMFERENCE - (score / 100) * CIRCUMFERENCE;
-  ringEl.style.strokeDasharray = CIRCUMFERENCE;
-  ringEl.style.strokeDashoffset = CIRCUMFERENCE; // start at 0
   numEl.textContent = score;
-
-  setTimeout(() => { ringEl.style.strokeDashoffset = offset; }, 100);
+  // 單色強弱：高=黑、中=灰、低=淺灰
+  const shade = score >= 70 ? '#0A0A0A' : score >= 40 ? '#8E8E8E' : '#C4C4C4';
+  fillEl.style.background = shade;
+  fillEl.style.width = '0%';
+  setTimeout(() => { fillEl.style.width = score + '%'; }, 100);
 
   const { label, cls } = getScoreLabel(score);
   labelEl.textContent = label;
