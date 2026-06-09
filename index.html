@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <style>
 :root {
   /* 灰黑白單色系・科技感 */
@@ -641,36 +642,32 @@ footer {
   .tagline { font-size: 11px; padding: 5px 10px; }
 }
 
-/* ─── BRAND ROW ─── */
-.brand-row {
+/* ─── UPLOAD ROW ─── */
+.upload-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  background: var(--bg);
-  border: 1px solid var(--border);
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.upload-or { font-size: 12px; color: var(--text3); letter-spacing: .05em; }
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--card);
+  border: 1px dashed var(--text3);
   border-radius: 999px;
   padding: 9px 18px;
-  max-width: 640px;
-  margin-left: auto;
-  margin-right: auto;
+  cursor: pointer;
+  transition: all .2s;
 }
-.brand-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text2);
-  white-space: nowrap;
-  letter-spacing: .03em;
-}
-.brand-row input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 14px;
-  color: var(--text);
-}
-.brand-row input::placeholder { color: var(--text3); }
+.upload-btn:hover { border-color: var(--text); background: var(--primary-bg); }
+.upload-hint { font-size: 12px; color: var(--text2); }
 
 /* ─── ADVERTORIAL ─── */
 .adv-card {
@@ -724,7 +721,7 @@ footer {
 
 <div class="hero">
   <h1>這篇文章，<em>AI 看得到嗎</em>？</h1>
-  <p>貼上任何文章或網頁網址，90 秒告訴你 Google 排名潛力、AI 引用率、精選摘要能見度</p>
+  <p>貼上網址、或上傳 Word 草稿，告訴你 Google 排名潛力、AI 引用率、精選摘要能見度</p>
   <div class="badge-row">
     <span class="badge badge-seo">🔍 SEO Google 排名</span>
     <span class="badge badge-geo">🤖 GEO AI 引用</span>
@@ -735,9 +732,13 @@ footer {
       <input type="url" id="urlInput" placeholder="https://your-website.com" autocomplete="off" />
       <button id="analyzeBtn" onclick="startAnalysis()">開始分析</button>
     </div>
-    <div class="brand-row">
-      <span class="brand-label">廣編模式（選填）</span>
-      <input type="text" id="brandInput" placeholder="輸入客戶品牌名稱，如：國泰金控" autocomplete="off" />
+    <div class="upload-row">
+      <span class="upload-or">或</span>
+      <label class="upload-btn">
+        📄 上傳 Word 草稿（.docx）發稿前自檢
+        <input type="file" id="docInput" accept=".docx" onchange="analyzeDocx(this.files[0])" hidden />
+      </label>
+      <span class="upload-hint" id="docHint"></span>
     </div>
   </div>
 </div>
@@ -775,6 +776,9 @@ footer {
     <div id="noindexBanner" style="display:none; background:#0A0A0A; color:#fff; border-radius:12px; padding:14px 18px; margin-bottom:18px; font-size:14px; line-height:1.6; font-weight:600;">
       🚨 <strong>重大警告：此頁面設有 noindex！</strong><br>
       <span style="font-weight:400;">robots meta 標籤設定了 <code style="background:rgba(255,255,255,0.2);padding:1px 5px;border-radius:3px;">noindex</code>，Google 與所有 AI 爬蟲（ChatGPT、Claude、Perplexity）都<strong>不會收錄這篇文章</strong>。廣編曝光效益幾乎歸零，建議立即請技術部門確認並移除 noindex 設定。</span>
+    </div>
+    <div id="docBanner" style="display:none; background:var(--primary-bg); border:1px solid var(--border); border-left:3px solid var(--text); border-radius:8px; padding:12px 16px; margin-bottom:18px; font-size:13px; line-height:1.6; color:var(--text2);">
+      📄 <strong style="color:var(--text)">Word 草稿模式</strong>：只評「內容寫作結構」（記者能控制的部分）。PageSpeed、Schema、robots、meta 等<strong>發布後才能檢測的技術項標為「不適用」、不計分</strong>，分數只用適用項目換算。發布上線後再貼網址做完整健檢。
     </div>
     <p class="result-url">分析網址：<a id="resultUrl" href="#" target="_blank"></a></p>
 
@@ -816,16 +820,6 @@ footer {
       <div class="tab-panel" id="panelAeo">
         <div class="indicator-grid" id="gridAeo"></div>
       </div>
-    </div>
-
-    <!-- Advertorial -->
-    <div class="adv-card" id="advCard" style="display:none;">
-      <div class="adv-header">
-        <div class="adv-title">📰 廣編效益評估</div>
-        <div class="adv-score" id="advScore">—</div>
-      </div>
-      <div class="adv-grid" id="advGrid"></div>
-      <ul class="adv-tips" id="advTips"></ul>
     </div>
 
     <!-- Suggestions -->
@@ -938,7 +932,6 @@ const CIRCUMFERENCE = 2 * Math.PI * 38; // r=38
 // ══════════════════════════════════════════════════
 async function startAnalysis() {
   const input = document.getElementById('urlInput');
-  const brandName = document.getElementById('brandInput').value.trim();
   let url = input.value.trim();
 
   if (!url) { showNotice('請輸入要分析的網址', 'warn'); return; }
@@ -1010,10 +1003,10 @@ async function startAnalysis() {
 
     // Step 4: Score
     setStep(4, 'active');
-    const scores = calculateScores(doc, html, robotsTxt, ps, crux, sitemapOk, brandName);
+    const scores = calculateScores(doc, html, robotsTxt, ps, crux, sitemapOk, false);
     setStep(4, 'done');
 
-    renderResults(url, scores, brandName);
+    renderResults(url, scores);
   } catch (e) {
     showNotice('分析失敗：' + e.message, 'error');
   } finally {
@@ -1104,16 +1097,37 @@ async function fetchCrux(url) {
 // ══════════════════════════════════════════════════
 // SCORING ENGINE
 // ══════════════════════════════════════════════════
-function calculateScores(doc, html, robotsTxt, ps, crux, sitemapOk, brandName) {
+function calculateScores(doc, html, robotsTxt, ps, crux, sitemapOk, isDoc) {
   const robotsMeta = doc ? (doc.querySelector('meta[name="robots"]')?.getAttribute('content') || '') : '';
   const isNoindex = /noindex/i.test(robotsMeta);
   return {
-    seo: scoreSEO(doc, html, ps, crux, sitemapOk),
-    geo: scoreGEO(doc, html, robotsTxt),
-    aeo: scoreAEO(doc, html),
-    adv: scoreAdvertorial(doc, html, brandName),
+    seo: scoreSEO(doc, html, ps, crux, sitemapOk, isDoc),
+    geo: scoreGEO(doc, html, robotsTxt, isDoc),
+    aeo: scoreAEO(doc, html, isDoc),
     noindex: isNoindex,
+    isDoc: !!isDoc,
   };
+}
+
+// Word 稿模式：把「發布後才能檢測」的網頁技術項標為不適用（max:0 不計分）
+const WEB_ONLY = ['頁面速度', 'Google SEO 基礎評分', 'Canonical', '可索引性', 'Mobile',
+  '網頁標題', 'Meta Description', '結構化資料', '品牌權威', '平台優化', 'AI 爬蟲',
+  'FAQPage', 'HowTo', 'E-E-A-T'];
+function neutralizeWebOnly(indicators, isDoc) {
+  if (!isDoc) return indicators;
+  indicators.forEach(i => {
+    if (WEB_ONLY.some(w => i.name.includes(w))) {
+      i.pts = 0; i.max = 0; i.pass = null;
+      i.detail = '— 此為發布後才能檢測的網頁技術項，Word 草稿不適用';
+    }
+  });
+  return indicators;
+}
+// 依「適用項目」加總換算分數（Word 模式自動只算內容項）；全不適用回傳 null
+function finalScore(indicators) {
+  const max = indicators.reduce((a, i) => a + (i.max || 0), 0);
+  const got = indicators.reduce((a, i) => a + (i.pts || 0), 0);
+  return max ? Math.round(got / max * 100) : null;
 }
 
 // CrUX Core Web Vitals 評分輔助：依 Google 官方門檻，三項共 20 分
@@ -1159,7 +1173,7 @@ function hasNumber(s) {
 }
 
 // ── SEO Scoring (100 pts) ──────────────────────────
-function scoreSEO(doc, html, ps, crux, sitemapOk) {
+function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
   const indicators = [];
   let total = 0;
 
@@ -1271,11 +1285,12 @@ function scoreSEO(doc, html, ps, crux, sitemapOk) {
     });
   }
 
-  return { score: Math.min(100, total), indicators };
+  neutralizeWebOnly(indicators, isDoc);
+  return { score: finalScore(indicators), indicators };
 }
 
 // ── GEO Scoring (100 pts) ─────────────────────────
-function scoreGEO(doc, html, robotsTxt) {
+function scoreGEO(doc, html, robotsTxt, isDoc) {
   const indicators = [];
   let total = 0;
 
@@ -1498,11 +1513,12 @@ function scoreGEO(doc, html, robotsTxt) {
     pass: crawlerPts >= 7, scope: 'site',
   });
 
-  return { score: Math.min(100, total), indicators };
+  neutralizeWebOnly(indicators, isDoc);
+  return { score: finalScore(indicators), indicators };
 }
 
 // ── AEO Scoring (100 pts) ─────────────────────────
-function scoreAEO(doc, html) {
+function scoreAEO(doc, html, isDoc) {
   const indicators = [];
   let total = 0;
 
@@ -1633,7 +1649,8 @@ function scoreAEO(doc, html) {
     pass: howToPts >= 1, scope: 'page',
   });
 
-  return { score: Math.min(100, total), indicators };
+  neutralizeWebOnly(indicators, isDoc);
+  return { score: finalScore(indicators), indicators };
 }
 
 // ── robots.txt parser ──────────────────────────────
@@ -1741,31 +1758,32 @@ function scoreAdvertorial(doc, html, brandName) {
 // ══════════════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════════════
-function renderResults(url, scores, brandName) {
+function renderResults(url, scores) {
   document.getElementById('progressWrap').classList.remove('show');
   document.getElementById('resultsWrap').classList.add('show');
 
   const urlEl = document.getElementById('resultUrl');
-  urlEl.textContent = url;
-  urlEl.href = url;
-
-  // noindex 警告橫幅
-  const noindexBanner = document.getElementById('noindexBanner');
-  if (scores.noindex) {
-    noindexBanner.style.display = 'block';
+  if (scores.isDoc) {
+    urlEl.textContent = '📄 ' + url + '（Word 草稿・內容寫作評分）';
+    urlEl.removeAttribute('href');
   } else {
-    noindexBanner.style.display = 'none';
+    urlEl.textContent = url;
+    urlEl.href = url;
   }
 
+  // noindex 警告橫幅（Word 模式不顯示）
+  document.getElementById('noindexBanner').style.display = (scores.noindex && !scores.isDoc) ? 'block' : 'none';
+  // Word 模式提示橫幅
+  const docBanner = document.getElementById('docBanner');
+  if (docBanner) docBanner.style.display = scores.isDoc ? 'block' : 'none';
+
   ['seo', 'geo', 'aeo'].forEach(dim => {
-    const score = Math.round(scores[dim].score);
-    setRing(dim, score);
+    setRing(dim, scores[dim].score);
     renderIndicators(dim, scores[dim].indicators);
   });
 
   renderSuggestions(scores);
-  renderAdvertorial(scores.adv, brandName);
-  saveHistory(url, brandName, scores);
+  saveHistory(url, scores);
   window.scrollTo({ top: document.getElementById('resultsWrap').offsetTop - 20, behavior: 'smooth' });
 }
 
@@ -1775,6 +1793,13 @@ function setRing(dim, score) {
   const numEl = document.getElementById('num' + Cap);
   const labelEl = document.getElementById('label' + Cap);
 
+  if (score === null || score === undefined) { // 不適用（Word 模式的純技術維度）
+    numEl.textContent = '—';
+    fillEl.style.width = '0%';
+    labelEl.textContent = '發布後檢測';
+    labelEl.className = 'score-sublabel ok';
+    return;
+  }
   numEl.textContent = score;
   // 單色強弱：高=黑、中=灰、低=淺灰
   const shade = score >= 70 ? '#0A0A0A' : score >= 40 ? '#8E8E8E' : '#C4C4C4';
@@ -1802,23 +1827,25 @@ function renderIndicators(dim, indicators) {
   const grid = document.getElementById('grid' + dim.charAt(0).toUpperCase() + dim.slice(1));
   grid.innerHTML = '';
   indicators.forEach((ind, i) => {
+    const na = !ind.max;                 // max:0 = 不適用（Word 模式技術項）
     const noData = ind.pass === null;
     // 0-100 正規化分數
-    const score = noData ? null : Math.round((ind.pts / ind.max) * 100);
-    const cls = noData ? 'na' : score >= 70 ? 'pass' : score >= 40 ? 'warn' : 'fail';
+    const score = (noData || na) ? null : Math.round((ind.pts / ind.max) * 100);
+    const cls = (noData || na) ? 'na' : score >= 70 ? 'pass' : score >= 40 ? 'warn' : 'fail';
     // 單頁 / 全站 範圍：明確指定優先，否則依名稱推斷（爬蟲、sitemap 為全站）
     const scope = ind.scope || (/AI 爬蟲|Sitemap/.test(ind.name) ? 'site' : 'page');
-    const scopeLabel = scope === 'site' ? '🌐 全站' : '📄 單頁';
+    const scopeLabel = na ? '⊘ 不適用' : scope === 'site' ? '🌐 全站' : '📄 單頁';
+    const ptsLabel = na ? '' : `　<span style="color:var(--text3)">（${ind.pts}/${ind.max} 分）</span>`;
     const tipId = `tip-${dim}-${i}`;
     grid.innerHTML += `
-      <div class="indicator-card">
+      <div class="indicator-card"${na ? ' style="opacity:.6"' : ''}>
         <div class="ind-head">
-          <div class="ind-name">${esc(ind.name)} <span class="ind-scope ${scope}">${scopeLabel}</span></div>
-          <div class="ind-score ${cls}">${noData ? '—' : score}</div>
+          <div class="ind-name">${esc(ind.name)} <span class="ind-scope ${na ? 'page' : scope}">${scopeLabel}</span></div>
+          <div class="ind-score ${cls}">${(noData || na) ? '—' : score}</div>
         </div>
-        <div class="ind-bar"><div class="ind-bar-fill ${cls}" style="width:${noData ? 0 : score}%"></div></div>
-        <div class="ind-detail">${esc(ind.detail)}　<span style="color:var(--text3)">（${ind.pts}/${ind.max} 分）</span></div>
-        ${ind.tip ? `<div><button class="ind-tip-toggle" onclick="toggleTip('${tipId}',this)">ℹ 什麼是這個</button></div>
+        <div class="ind-bar"><div class="ind-bar-fill ${cls}" style="width:${score || 0}%"></div></div>
+        <div class="ind-detail">${esc(ind.detail)}${ptsLabel}</div>
+        ${ind.tip && !na ? `<div><button class="ind-tip-toggle" onclick="toggleTip('${tipId}',this)">ℹ 什麼是這個</button></div>
         <div class="ind-tip-body" id="${tipId}">${esc(ind.tip)}</div>` : ''}
       </div>`;
   });
@@ -1928,15 +1955,15 @@ function renderAdvertorial(adv, brandName) {
 const HISTORY_KEY = 'gvm-seo-checker-history';
 let currentSortKey = 'date';
 
-function saveHistory(url, brandName, scores) {
+function saveHistory(url, scores) {
   const history = loadHistory();
   const entry = {
     id: Date.now(),
     url,
-    brand: brandName || '',
-    seo: Math.round(scores.seo.score),
-    geo: Math.round(scores.geo.score),
-    aeo: Math.round(scores.aeo.score),
+    isDoc: !!scores.isDoc,
+    seo: scores.seo.score == null ? '—' : Math.round(scores.seo.score),
+    geo: scores.geo.score == null ? '—' : Math.round(scores.geo.score),
+    aeo: scores.aeo.score == null ? '—' : Math.round(scores.aeo.score),
     date: new Date().toISOString(),
   };
   // remove duplicate URL
@@ -2003,8 +2030,7 @@ function renderHistory() {
       const shortUrl = h.url.replace(/^https?:\/\/(www\.)?/, '').slice(0, 40);
       return `<div class="history-row">
         <div>
-          <div class="hist-url" onclick="reuseHistory('${encodeURIComponent(h.url)}','${encodeURIComponent(h.brand)}')" title="${h.url}">${shortUrl}</div>
-          ${h.brand ? `<div class="hist-brand">🏷 ${h.brand}</div>` : ''}
+          <div class="hist-url" onclick="reuseHistory('${encodeURIComponent(h.url)}')" title="${h.url}">${h.isDoc ? '📄 ' : ''}${shortUrl}</div>
         </div>
         <div class="hist-score seo">${h.seo}</div>
         <div class="hist-score geo">${h.geo}</div>
@@ -2016,9 +2042,10 @@ function renderHistory() {
   </div>`;
 }
 
-function reuseHistory(encodedUrl, encodedBrand) {
-  document.getElementById('urlInput').value = decodeURIComponent(encodedUrl);
-  document.getElementById('brandInput').value = decodeURIComponent(encodedBrand);
+function reuseHistory(encodedUrl) {
+  const u = decodeURIComponent(encodedUrl);
+  if (u.endsWith('.docx')) { showNotice('Word 草稿請重新上傳檔案分析', 'warn'); window.scrollTo({top:0,behavior:'smooth'}); return; }
+  document.getElementById('urlInput').value = u;
   window.scrollTo({ top: 0, behavior: 'smooth' });
   setTimeout(() => startAnalysis(), 300);
 }
@@ -2062,11 +2089,35 @@ function hideNotice() {
 }
 
 // Enter key triggers analysis
-['urlInput', 'brandInput'].forEach(id => {
-  document.getElementById(id).addEventListener('keydown', e => {
-    if (e.key === 'Enter') startAnalysis();
-  });
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startAnalysis();
 });
+
+// ── Word 草稿評分 ──
+async function analyzeDocx(file) {
+  if (!file) return;
+  const hint = document.getElementById('docHint');
+  if (!/\.docx$/i.test(file.name)) { showNotice('請上傳 .docx 檔（舊版 .doc 請先另存為 .docx）', 'error'); return; }
+  if (typeof mammoth === 'undefined') { showNotice('文件解析元件載入中，請稍候再試一次', 'error'); return; }
+  hideNotice();
+  hint.textContent = '解析中…';
+  try {
+    const buf = await file.arrayBuffer();
+    const result = await mammoth.convertToHtml({ arrayBuffer: buf });
+    const html = result.value || '';
+    if (textLen(html.replace(/<[^>]+>/g, '')) < 50) {
+      showNotice('這份文件內容太少或無法解析，請確認 Word 檔有實際內文', 'warn');
+      hint.textContent = ''; return;
+    }
+    const doc = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html');
+    const scores = calculateScores(doc, html, '', null, null, false, true); // isDoc=true
+    hint.textContent = '✅ ' + file.name;
+    renderResults(file.name, scores);
+  } catch (e) {
+    showNotice('Word 檔解析失敗：' + (e.message || e), 'error');
+    hint.textContent = '';
+  }
+}
 </script>
 </body>
 </html>
