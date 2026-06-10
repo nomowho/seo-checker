@@ -1867,7 +1867,7 @@ function scoreAEO(doc, html, isDoc) {
   // 1. FAQPage JSON-LD — 加分項（bonus）：只有明確的結構化標記才給分。
   //    可見 Q&A 格式不給分（避免與「問句式標題」「答案前置短段」重複計分），
   //    但偵測到時在 detail 給建議。完全沒有則 max:0 不計入分母。
-  let hasJsonLdFaq = false, jsonLdFaqCount = 0;
+  let hasJsonLdFaq = false, jsonLdFaqCount = 0, faqItems = [];
   doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
     try {
       const j = JSON.parse(el.textContent);
@@ -1877,7 +1877,12 @@ function scoreAEO(doc, html, isDoc) {
         const t = [].concat(o['@type'] || '').join(',');
         if (/FAQPage/.test(t) && o.mainEntity) {
           hasJsonLdFaq = true;
-          jsonLdFaqCount = [].concat(o.mainEntity).length;
+          const pairs = [].concat(o.mainEntity);
+          jsonLdFaqCount = pairs.length;
+          faqItems = pairs.map(q => ({
+            question: q.name || '',
+            answer: (q.acceptedAnswer?.text || q.acceptedAnswer?.['@value'] || '').replace(/<[^>]+>/g, '').trim()
+          }));
         }
       });
     } catch {}
@@ -1919,6 +1924,7 @@ function scoreAEO(doc, html, isDoc) {
     fix: '【技術部門＋記者】文末加 5-8 題 Q&A，套 FAQPage JSON-LD（必須含 mainEntity 問答陣列）。問題用使用者真實搜尋語氣（「綠色債券怎麼買？」優於「綠色債券簡介」）；每個答案 50-150 字、直接答覆＋一個數據。',
     pts: faqPts, max: faqMax,
     pass: faqPass, scope: 'page',
+    faqItems: faqItems.length ? faqItems : null,
   });
 
   // 2. Question headings (22 pts) — 問號滿分；含疑問詞但無問號給部分分
@@ -2290,6 +2296,10 @@ function renderIndicators(dim, indicators) {
           ${ind.why ? `<div class="tip-sec"><span class="tip-lab">💡 為什麼重要</span>${esc(ind.why)}</div>` : ''}
           ${ind.fix ? `<div class="tip-sec"><span class="tip-lab">🔧 怎麼改善</span>${esc(ind.fix)}</div>` : ''}
           ${(!ind.why && !ind.fix && ind.tip) ? esc(ind.tip) : ''}
+        </div>` : ''}
+        ${ind.faqItems ? `<div><button class="ind-tip-toggle" onclick="toggleTip('${tipId}-faq',this)">🗂 查看 FAQ 內容（${ind.faqItems.length} 組）</button></div>
+        <div class="ind-tip-body" id="${tipId}-faq">
+          ${ind.faqItems.map((q, qi) => `<div class="tip-sec" style="margin-bottom:10px"><span class="tip-lab">Q${qi+1}　${esc(q.question)}</span><div style="margin-top:4px;color:var(--text2);font-size:13px;line-height:1.6">${esc(q.answer) || '<em style="color:var(--text3)">（答案未填）</em>'}</div></div>`).join('')}
         </div>` : ''}
       </div>`;
   });
