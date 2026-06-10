@@ -1448,22 +1448,21 @@ function textLen(s) {
 
 // 偵測段落是否含具體數字（年份、百分比、金額、統計數據等）→ citability 訊號
 function hasNumber(s) {
-  // 收緊：必須有具體統計單位（%、金額、倍數、人/件/筆等量化單位），或四位數以上大數字。
-  // 純年/月/日/個（時間或常見量詞）不算「數據」訊號，避免「2024 年」這類灌水。
+  // 必須有具體統計單位（%、金額、倍數、人/件/筆等量化單位），或五位數以上大數字。
+  // 排除純年份（19xx/20xx）與純頁碼，避免「2024年」「第1章」這類虛胖。
   s = s || '';
+  if (/^(19|20)\d{2}[年\s]*$/.test(s.trim())) return false;
   return /\d[\d,]*(\.\d+)?\s*(%|％|倍|億|萬|千萬|百萬|美元|台幣|新台幣|元|名|人|位|筆|件|家|起|公噸|億元|萬元)/.test(s)
-      || /\d{4,}/.test(s);
+      || /\d{5,}/.test(s);
 }
 
 // ── SEO Scoring (100 pts) ──────────────────────────
 function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
   const indicators = [];
-  let total = 0;
 
   // 1. Core Web Vitals — 改用 CrUX 真實用戶數據 (20 pts)
   if (crux && crux.metrics) {
     const cwv = scoreCWV(crux);
-    total += cwv.pts;
     const scopeLabel = cwv.scope === 'url' ? '本篇文章' : '整站平均';
     indicators.push({
       name: '頁面速度（Core Web Vitals）',
@@ -1488,7 +1487,6 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
   const seoScore = ps?.lighthouseResult?.categories?.seo?.score;
   if (seoScore != null) {
     const pts = Math.round(seoScore * 16);
-    total += pts;
     indicators.push({
       name: 'Google SEO 基礎評分',
       detail: `PageSpeed SEO 分：${Math.round(seoScore * 100)} / 100（含連結、可爬取性、可索引性）`,
@@ -1508,7 +1506,6 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     const titleLen = title.length;
     let titlePts = 0;
     if (title) { titlePts += 9; if (titleLen >= 10 && titleLen <= 60) titlePts += 5; }
-    total += titlePts;
     indicators.push({
       name: '網頁標題（Title Tag）',
       detail: title ? `「${title.slice(0,50)}${title.length>50?'…':''}」（${titleLen} 字）${titleLen<10||titleLen>60?' ⚠️ 建議 10-60 字':''}` : '❌ 未設定 title 標籤',
@@ -1523,7 +1520,6 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     const descLen = metaDesc.length;
     let descPts = 0;
     if (metaDesc) { descPts += 8; if (descLen >= 80 && descLen <= 160) descPts += 5; }
-    total += descPts;
     indicators.push({
       name: 'Meta Description',
       detail: metaDesc ? `${metaDesc.slice(0,60)}…（${descLen} 字）${descLen<80||descLen>160?' ⚠️ 建議 80-160 字':''}` : '❌ 未設定 meta description',
@@ -1536,7 +1532,6 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     // 5. Canonical URL (8 pts)
     const canonical = doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || '';
     const canonicalPts = canonical ? 8 : 0;
-    total += canonicalPts;
     indicators.push({
       name: 'Canonical URL',
       detail: canonical ? `✅ ${canonical.slice(0,60)}` : '❌ 未設定 canonical 標籤（可能導致重複內容問題）',
@@ -1550,7 +1545,6 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     const robotsMeta = doc.querySelector('meta[name="robots"]')?.getAttribute('content') || '';
     const isNoindex = /noindex/i.test(robotsMeta);
     const indexPts = (isNoindex ? 0 : 4) + (sitemapOk ? 3 : 0);
-    total += indexPts;
     indicators.push({
       name: '可索引性 + Sitemap',
       detail: `${isNoindex ? '⚠️ robots meta 含 noindex，Google 不收錄此頁' : '✅ 頁面可被索引'}　|　${sitemapOk ? '✅ 找到 sitemap.xml' : '— 未找到 sitemap.xml'}`,
@@ -1565,7 +1559,6 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     const hasDeviceWidth = /width\s*=\s*device-width/i.test(vp);
     const blocksZoom = /user-scalable\s*=\s*(no|0)|maximum-scale\s*=\s*1(\D|$)/i.test(vp);
     const mobilePts = hasDeviceWidth ? (blocksZoom ? 4 : 7) : 0;
-    total += mobilePts;
     indicators.push({
       name: 'Mobile 行動友善',
       detail: !vp ? '❌ 未設定 viewport，行動裝置會以桌面版縮小顯示'
@@ -1584,7 +1577,6 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     if (realImgs.length === 0) altPts = 0; // 無圖：標為不適用（下方 max 改 0）
     else { const cov = withAlt.length / realImgs.length; altPts = cov >= 0.9 ? 7 : cov >= 0.6 ? 5 : cov >= 0.3 ? 3 : 0; }
     const altMax = realImgs.length === 0 ? 0 : 7; // 無圖不計入分母（避免「沒圖就送 7 分」灌水）
-    total += altPts;
     indicators.push({
       name: '圖片 alt 覆蓋率',
       detail: realImgs.length === 0 ? '— 本頁未偵測到內文圖片，本項不計分'
@@ -1606,7 +1598,6 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     const twImage = doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content');
     const ogCore = (ogTitle?2:0)+(ogDesc?2:0)+(ogImage?2:0)+(ogType?1:0)+((ogUrl||ogSite)?1:0); // OG 八分
     const ogPts = Math.min(12, ogCore + (twCard?2:0) + ((twCard&&twImage)?2:0));
-    total += ogPts;
     const ogMissing = [!ogTitle&&'og:title', !ogDesc&&'og:description', !ogImage&&'og:image', !ogType&&'og:type', !(ogUrl||ogSite)&&'og:url/site_name', !twCard&&'twitter:card'].filter(Boolean);
     indicators.push({
       name: '社群分享預覽（OG / Twitter Card）',
@@ -1626,7 +1617,6 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
 // ── GEO Scoring (100 pts) ─────────────────────────
 function scoreGEO(doc, html, robotsTxt, isDoc) {
   const indicators = [];
-  let total = 0;
 
   if (doc) {
     // 解析所有 JSON-LD（供 Schema / E-E-A-T / 新鮮度共用）
@@ -1675,7 +1665,8 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
           ? `⚠️ 僅 Microdata（${microNodes.length} 項），建議改用 JSON-LD`
           : '❌ 未找到結構化資料（AI 無法理解頁面類型）';
     }
-    // 品牌權威（8 pts）：Organization/Person schema、sameAs、社群連結、Wikipedia
+    // 品牌權威（8 pts）：Organization/Person schema(2) + JSON-LD sameAs≥2(4) + Wikipedia引用(2)
+    // 注意：改用 JSON-LD sameAs 計算，不計 HTML 裡的社群連結（footer連結對所有大媒體免費，無鑑別力）
     let sameAsCount = 0, hasOrgPerson = false;
     jsonLds.forEach(el => {
       try {
@@ -1689,13 +1680,11 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
         });
       } catch {}
     });
-    const socialLinks = doc.querySelectorAll('a[href*="facebook.com"], a[href*="twitter.com"], a[href*="//x.com"], a[href*="linkedin.com"], a[href*="instagram.com"], a[href*="youtube.com"], a[href*="threads.net"]').length;
     const wikiLink = doc.querySelector('a[href*="wikipedia.org"]') ? 1 : 0;
-    let brandPts = (hasOrgPerson ? 2 : 0) + ((sameAsCount >= 2 || socialLinks >= 2) ? 2 : 0) + wikiLink * 4;
+    let brandPts = (hasOrgPerson ? 2 : 0) + (sameAsCount >= 2 ? 4 : sameAsCount === 1 ? 2 : 0) + wikiLink * 2;
     brandPts = Math.min(8, brandPts);
-    const brandBits = [hasOrgPerson && 'Organization/Person schema', (sameAsCount>=2||socialLinks>=2) && '社群檔案連結', wikiLink && 'Wikipedia 提及'].filter(Boolean);
+    const brandBits = [hasOrgPerson && 'Organization/Person schema', sameAsCount >= 1 && `sameAs(${sameAsCount}個)`, wikiLink && 'Wikipedia 引用'].filter(Boolean);
     const combinedPts = schemaPts + brandPts;
-    total += combinedPts;
     indicators.push({
       name: '結構化資料 + 品牌權威',
       detail: schemaDetail + (brandBits.length ? `；品牌訊號：${brandBits.join('、')}` : '；無品牌訊號（可加 Organization schema 與 sameAs）'),
@@ -1721,7 +1710,6 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       leadGood = n >= 60 && n <= 250 && textLen(firstSentence) <= 80;
     }
     const contentPts = Math.min(18, golden.length * 3 + (leadGood ? 3 : 0));
-    total += contentPts;
     indicators.push({
       name: '自包含段落（AI 可引用性）',
       detail: golden.length > 0
@@ -1749,7 +1737,6 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     if (headingsWithId >= 1) structPts += 1;
     if (headingDensityOk) structPts += 2;
     structPts = Math.min(10, structPts);
-    total += structPts;
     const structBits = [
       anchorLinks.length > 0 ? `${anchorLinks.length} 個目錄錨點` : '無目錄錨點',
       `H2×${h2c}／H3×${h3c}`,
@@ -1766,7 +1753,6 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     // 3. 數據密度 citability (10 pts) — 含具體數字的段落
     const dataParas = paragraphs.filter(p => textLen(p.textContent) >= 30 && hasNumber(p.textContent));
     const dataPts = Math.min(10, dataParas.length * 2);
-    total += dataPts;
     indicators.push({
       name: '數據密度（可驗證事實）',
       detail: dataParas.length > 0
@@ -1783,7 +1769,6 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     const authDomains = /(\.gov|\.edu|wikipedia\.org|\.gov\.tw|\.edu\.tw|who\.int|nature\.com|sciencedirect\.com)/i;
     const authLinks = links.filter(a => authDomains.test(a.getAttribute('href') || ''));
     const authPts = Math.min(10, authLinks.length * 5);
-    total += authPts;
     indicators.push({
       name: '權威來源外連（authority 背書）',
       detail: authLinks.length > 0
@@ -1818,7 +1803,6 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     const datePts = dateEl ? 5 : 0;
     const freshPts = fresh === true ? 4 : (fresh === false ? 1 : 2); // 6個月內+4；過期+1；未知+2
     const eeatPts = authorPts + datePts + freshPts;
-    total += eeatPts;
     const freshTxt = fresh === true ? '✅ 內容新鮮（6 個月內更新）' : fresh === false ? '⚠️ 內容較舊（逾 6 個月未更新）' : '日期格式無法判斷新鮮度';
     indicators.push({
       name: 'E-E-A-T：作者・日期・新鮮度',
@@ -1835,7 +1819,6 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     // OG / Twitter Card 已搬到 SEO（社群分享預覽），這裡只留真正屬於 AI 引用訊號的 RSS。
     const hasRss = !!doc.querySelector('link[rel="alternate"][type="application/rss+xml"], link[rel="alternate"][type="application/atom+xml"]');
     const rssPts = hasRss ? 5 : 0;
-    total += rssPts;
     indicators.push({
       name: 'RSS / Atom feed',
       detail: hasRss ? '✅ 提供 RSS/Atom feed（AI 爬蟲發現新內容的快速管道）' : '❌ 未提供 RSS/Atom feed（AI 對新文章感知延遲 7-14 天）',
@@ -1853,7 +1836,6 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
   const botList = ['GPTBot','ClaudeBot','anthropic-ai','PerplexityBot','Google-Extended','CCBot','Bytespider','Applebot-Extended','Amazonbot'];
   const allowedCount = botList.filter(b => crawlers[b]).length;
   const crawlerPts = Math.round((allowedCount / botList.length) * 10);
-  total += crawlerPts;
   const blocked = botList.filter(b => crawlers[b] === false);
   indicators.push({
     name: 'AI 爬蟲 robots.txt 開放度',
@@ -1875,7 +1857,6 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
 // ── AEO Scoring (100 pts) ─────────────────────────
 function scoreAEO(doc, html, isDoc) {
   const indicators = [];
-  let total = 0;
 
   if (!doc) {
     return { score: 0, indicators: [
@@ -1920,7 +1901,6 @@ function scoreAEO(doc, html, isDoc) {
 
   const faqPts = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 10 : 0);
   const faqMax = (hasJsonLdFaq || hasVisibleFaq) ? 22 : 0;
-  total += faqPts;
   let faqDetail, faqPass;
   if (hasJsonLdFaq) {
     faqDetail = `✅ FAQPage JSON-LD 結構化標記（${jsonLdFaqCount} 組問答）+22 分 — 可觸發 Google FAQ 富文本展開`;
@@ -1949,7 +1929,6 @@ function scoreAEO(doc, html, isDoc) {
   const fullQ = headings.filter(h => /[?？]\s*$/.test(h.textContent.trim()));
   const wordQ = headings.filter(h => !/[?？]\s*$/.test(h.textContent.trim()) && qWord.test(h.textContent));
   const qhPts = Math.min(22, fullQ.length * 5 + wordQ.length * 3);  // 問號5/疑問詞3
-  total += qhPts;
   const qhEx = (fullQ[0] || wordQ[0]);
   indicators.push({
     name: '問句式標題（H2/H3）',
@@ -1981,7 +1960,6 @@ function scoreAEO(doc, html, isDoc) {
   const looseShort = allParas.filter(isShort).length;
   // 答案前置段落每個 6 分（真實機制）；零散短段落最多補 4 分
   const saPts = Math.min(22, answerFirst * 6 + Math.min(4, looseShort));
-  total += saPts;
   indicators.push({
     name: '答案前置短段（精選摘要就緒）',
     detail: answerFirst > 0
@@ -2001,7 +1979,6 @@ function scoreAEO(doc, html, isDoc) {
   const tables = Array.from(doc.querySelectorAll('table')).filter(t => t.querySelector('td, th'));
   const tablePts = tables.length > 0 ? 12 : 0;
   const tableMax = tables.length > 0 ? 12 : 0;
-  total += tablePts;
   indicators.push({
     name: '比較表格（table）',
     detail: tables.length > 0
@@ -2017,7 +1994,6 @@ function scoreAEO(doc, html, isDoc) {
   const allLists = Array.from(doc.querySelectorAll('ul, ol'));
   const qualLists = allLists.filter(l => l.querySelectorAll(':scope > li').length >= 4);
   const listPts = Math.min(12, qualLists.length * 6);
-  total += listPts;
   indicators.push({
     name: '列表結構（ul/ol）',
     detail: qualLists.length > 0
@@ -2047,7 +2023,6 @@ function scoreAEO(doc, html, isDoc) {
   // Bonus 邏輯：有 HowTo schema 才加分；沒有則 max:0 不計入分母
   const howToPts = hasHowTo ? 10 : 0;
   const howToMax = hasHowTo ? 10 : 0;
-  total += howToPts;
   indicators.push({
     name: 'HowTo 結構化資料',
     detail: hasHowTo
