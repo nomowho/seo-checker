@@ -1910,8 +1910,11 @@ function scoreAEO(doc, html, isDoc) {
   }
   if (!hasJsonLdFaq && !hasVisibleFaq) {
     const qaPattern = /^[QqAaＱＡ][1-9１-９]?[\s：:\.]/;
-    const allP = Array.from(doc.querySelectorAll('p, li, div'));
-    const qaPairs = allP.filter(el => el.children.length === 0 && qaPattern.test(el.textContent.trim())).length;
+    const allP = Array.from(doc.querySelectorAll('p, li, div, strong, b, dt'));
+    const qaPairs = allP.filter(el => {
+      const txt = el.textContent.trim();
+      return txt.length < 400 && qaPattern.test(txt);
+    }).length;
     if (qaPairs >= 4) { hasVisibleFaq = true; visibleFaqCount = Math.floor(qaPairs / 2); }
   }
 
