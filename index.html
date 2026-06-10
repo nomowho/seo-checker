@@ -1878,9 +1878,9 @@ function scoreAEO(doc, html, isDoc) {
     ]};
   }
 
-  // 1. FAQPage — 兩層加分：JSON-LD = 22 pts（機器+人都能讀，觸發 Rich Result）；
-  //    僅可見 Q&A 格式 = 10 pts（AI 引擎可讀取，但無法觸發 Google FAQ 富文本）；
-  //    完全沒有 = max:0 不計入分母（敘事文體不應被扣分）。
+  // 1. FAQPage JSON-LD — 加分項（bonus）：只有明確的結構化標記才給分。
+  //    可見 Q&A 格式不給分（避免與「問句式標題」「答案前置短段」重複計分），
+  //    但偵測到時在 detail 給建議。完全沒有則 max:0 不計入分母。
   let hasJsonLdFaq = false, jsonLdFaqCount = 0;
   doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
     try {
@@ -1897,7 +1897,7 @@ function scoreAEO(doc, html, isDoc) {
     } catch {}
   });
 
-  // 偵測可見 Q&A 格式（class*faq / Q1:/Q2: 問答段落）
+  // 偵測可見 Q&A 格式（僅用於建議訊息，不計分）
   let hasVisibleFaq = false, visibleFaqCount = 0;
   if (!hasJsonLdFaq) {
     const faqEls = doc.querySelectorAll('[class*="faq"], [class*="FAQ"], [class*="qa"], [class*="QA"]');
@@ -1910,17 +1910,16 @@ function scoreAEO(doc, html, isDoc) {
     if (qaPairs >= 4) { hasVisibleFaq = true; visibleFaqCount = Math.floor(qaPairs / 2); }
   }
 
-  // 計分
-  const faqPts = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 10 : 0);
-  const faqMax = (hasJsonLdFaq || hasVisibleFaq) ? 22 : 0; // 完全沒有則不計入分母
+  const faqPts = hasJsonLdFaq ? 22 : 0;
+  const faqMax = hasJsonLdFaq ? 22 : 0;
   total += faqPts;
   let faqDetail, faqPass;
   if (hasJsonLdFaq) {
     faqDetail = `✅ FAQPage JSON-LD 結構化標記（${jsonLdFaqCount} 組問答）+22 分 — 可觸發 Google FAQ 富文本展開`;
     faqPass = true;
   } else if (hasVisibleFaq) {
-    faqDetail = `⚠️ 偵測到可見 Q&A 格式（${visibleFaqCount} 組）+10 分 — AI 引擎可讀取，但缺少 FAQPage JSON-LD，無法觸發 Google 搜尋展開問答（補上可再得 +12）`;
-    faqPass = false;
+    faqDetail = `— 偵測到可見 Q&A 格式（${visibleFaqCount} 組），但缺少 FAQPage JSON-LD 不計分 → 補上結構化標記即可觸發 Google 搜尋展開問答（+22 加分機會）`;
+    faqPass = null;
   } else {
     faqDetail = '— 未偵測到 FAQ 結構（非 Q&A 文體可忽略；問答型文章加 5-8 組 Q&A + FAQPage JSON-LD 可拿加分）';
     faqPass = null;
@@ -1928,7 +1927,7 @@ function scoreAEO(doc, html, isDoc) {
   indicators.push({
     name: 'FAQPage 結構化資料',
     detail: faqDetail,
-    why: 'FAQ 有兩層價值：①可見 Q&A 格式讓 ChatGPT、Perplexity 等 AI 引擎能讀懂問答對應關係並直接引用；②加上 FAQPage JSON-LD 後，Google 搜尋結果會展開問答富文本（FAQ Rich Result），點擊率大幅提升。',
+    why: 'FAQPage JSON-LD 讓 Google 在搜尋結果直接展開問答（FAQ Rich Result），也讓 ChatGPT、Perplexity、Bing Copilot 能精確解析問答對應關係並引用。光有可見 Q&A 格式，AI 引擎得自行猜測問答邊界，引用準確度較低。',
     fix: '【技術部門＋記者】文末加 5-8 題 Q&A，套 FAQPage JSON-LD（必須含 mainEntity 問答陣列）。問題用使用者真實搜尋語氣（「綠色債券怎麼買？」優於「綠色債券簡介」）；每個答案 50-150 字、直接答覆＋一個數據。',
     pts: faqPts, max: faqMax,
     pass: faqPass, scope: 'page',
