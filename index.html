@@ -1072,7 +1072,7 @@ footer {
         <div class="edu-scoring">
           <div class="edu-scoring-title">📊 本工具評分機制（分數換算為 100 分制）</div>
           <ul class="edu-scoring-list">
-            <li><span class="edu-pts">22 pts</span> 問句式標題 — 以「？」結尾的 H2/H3（搶「大家也問」），疑問詞標題各 3 分</li>
+            <li><span class="edu-pts">12 pts</span> 問句式標題 — 以「？」結尾的 H2/H3（搶「大家也問」），疑問詞標題各 3 分</li>
             <li><span class="edu-pts">22 pts</span> 答案前置短段 — 小標正下方 40–120 字直接答案（精選摘要真實抓取位置）</li>
             <li><span class="edu-pts">12 pts</span> 列表結構 — 真實 &lt;ul&gt;/&lt;ol&gt; ≥4 項（列表式摘要觸發門檻）</li>
             <li><span class="edu-pts">22 pts</span> FAQPage Schema — 偵測 JSON-LD 中是否有問答結構化標記</li>
@@ -1964,7 +1964,7 @@ function scoreAEO(doc, html, isDoc) {
   }
 
   const faqPts = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 10 : 0);
-  const faqMax = (hasJsonLdFaq || hasVisibleFaq) ? 22 : 0;
+  const faqMax = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 10 : 4);
   let faqDetail, faqPass;
   if (hasJsonLdFaq) {
     faqDetail = `✅ FAQPage JSON-LD 結構化標記（${jsonLdFaqCount} 組問答）+22 分 — 可觸發 Google FAQ 富文本展開`;
@@ -1973,8 +1973,8 @@ function scoreAEO(doc, html, isDoc) {
     faqDetail = `⚠️ 偵測到可見 Q&A 格式（${visibleFaqCount} 組）+10/22 分 — AI 引擎可讀取；補上 FAQPage JSON-LD 可再得 +12 並觸發 Google 搜尋展開問答`;
     faqPass = false;
   } else {
-    faqDetail = '— 未偵測到 FAQ 結構（非 Q&A 文體可忽略；問答型文章加 5-8 組 Q&A + FAQPage JSON-LD 可拿加分）';
-    faqPass = null;
+    faqDetail = '⚠️ 未偵測到 FAQ 結構（問答型文章建議加 5-8 組 Q&A + FAQPage JSON-LD，可顯著提升 AI 引用率）';
+    faqPass = false;
   }
   indicators.push({
     name: 'FAQPage 結構化資料',
@@ -1993,7 +1993,7 @@ function scoreAEO(doc, html, isDoc) {
   const qWord = /(為什麼|為何|如何|怎麼|怎樣|什麼是|是什麼|哪些|哪個|多少|該不該|要不要|是否|有沒有|嗎|呢)/i;
   const fullQ = headings.filter(h => /[?？]\s*$/.test(h.textContent.trim()));
   const wordQ = headings.filter(h => !/[?？]\s*$/.test(h.textContent.trim()) && qWord.test(h.textContent));
-  const qhPts = Math.min(22, fullQ.length * 5 + wordQ.length * 3);  // 問號5/疑問詞3
+  const qhPts = Math.min(12, fullQ.length * 5 + wordQ.length * 3);  // 問號5/疑問詞3，上限降為12
   const qhEx = (fullQ[0] || wordQ[0]);
   indicators.push({
     name: '問句式標題（H2/H3）',
@@ -2002,8 +2002,8 @@ function scoreAEO(doc, html, isDoc) {
       : '❌ 小標多為陳述句，建議改問句（提高「大家也問」命中率）',
     why: '問句式標題與使用者真實搜尋字串相似度最高，是搶佔 Google「大家也問（PAA）」的核心；AI 生成回答時也會把問句標題視為 question、直接複製下方段落當 answer。研究顯示改問句後精選摘要觸發率提升 2-3 倍。',
     fix: '把陳述小標改問句：「台積電 2024 展望」→「台積電 2024 年能維持高獲利嗎？」。四種模板：「為什麼…？」「如何…？」「什麼是…？」「A 跟 B 有什麼差別？」。記得加上問號（有問號分數最高）。一篇 2000 字配 6-8 個問句小標。',
-    pts: qhPts, max: 22,
-    pass: qhPts >= 10, scope: 'page',
+    pts: qhPts, max: 12,
+    pass: qhPts >= 6, scope: 'page',
   });
 
   // 3. 答案前置短段 (22 pts) — 量測「標題正下方的答案」這個精選摘要/AI Overview 真實抓取結構
@@ -2043,16 +2043,16 @@ function scoreAEO(doc, html, isDoc) {
   // Bonus 邏輯：有比較表格才加分；沒有則 max:0 不計入分母
   const tables = Array.from(doc.querySelectorAll('table')).filter(t => t.querySelector('td, th'));
   const tablePts = tables.length > 0 ? 12 : 0;
-  const tableMax = tables.length > 0 ? 12 : 0;
+  const tableMax = tables.length > 0 ? 12 : 3;
   indicators.push({
     name: '比較表格（table）',
     detail: tables.length > 0
       ? `✅ 找到 ${tables.length} 個 HTML 表格（表格式精選摘要・低競爭入口）加分 +12`
-      : '— 未偵測到 HTML 表格（非比較型文章可忽略；涉及「A vs B／規格對比」時加上可拿低競爭精選摘要）',
+      : '⚠️ 未偵測到 HTML 表格（涉及比較、規格對照、各年數據時加 &lt;table&gt; 可拿低競爭精選摘要）',
     why: '表格式精選摘要是三大格式中競爭最低的入口——大部分網站用圖片或散文代替比較資訊，Google 抓不到結構化欄位只能放棄。只要文章有「比較、對照、vs」，做了結構化表格就有機會直接拿下第 0 位。',
     fix: '把比較型資訊（方案 A/B/C、規格對照、各年數據）改用標準 HTML <table>（含 thead/tbody），別用圖片或純文字排版。欄位 2-3 欄、列數 3-8 列，每格內容 10 字內。記者：用編輯器的「插入表格」功能即可。',
     pts: tablePts, max: tableMax,
-    pass: tables.length > 0 ? true : null, scope: 'page',
+    pass: tables.length > 0 ? true : false, scope: 'page',
   });
 
   // 5. List structure (12 pts) — 只算「≥4 項」的真實列表（Snippet 門檻）
@@ -2087,16 +2087,16 @@ function scoreAEO(doc, html, isDoc) {
   });
   // Bonus 邏輯：有 HowTo schema 才加分；沒有則 max:0 不計入分母
   const howToPts = hasHowTo ? 10 : 0;
-  const howToMax = hasHowTo ? 10 : 0;
+  const howToMax = hasHowTo ? 10 : 3;
   indicators.push({
     name: 'HowTo 結構化資料',
     detail: hasHowTo
       ? `✅ 有效 HowTo schema（${stepCount} 個步驟）加分 +10`
-      : '— 未偵測到 HowTo schema（非步驟型文章可忽略；教學型文章加上可進入 AI Overview 步驟列表）',
+      : '⚠️ 未偵測到 HowTo schema（教學步驟型文章加上可進入 AI Overview 步驟列表）',
     why: '步驟型內容（「如何申辦綠色債券」「怎麼評估 ESG 評級」）加 HowTo schema，AI 與 Google 才能逐步拆解、進入 AI Overview 步驟列表與語音助理朗讀順序。',
     fix: '【僅步驟型文章需要】H2 用「步驟 N：動詞＋受詞」，加 HowTo JSON-LD（含 step 陣列，每步有 name/text）。敘事型財經/ESG 報導不是教學文，可跳過。',
     pts: howToPts, max: howToMax,
-    pass: hasHowTo ? true : null, scope: 'page',
+    pass: hasHowTo ? true : false, scope: 'page',
   });
 
   neutralizeWebOnly(indicators, isDoc);
