@@ -1057,6 +1057,9 @@ footer {
             <li><span class="edu-pts">10 pts</span> 文章結構 — 目錄錨點、H2/H3 層級、標題密度</li>
             <li><span class="edu-pts">10 pts</span> 數據密度 — 段落含具體數字（%／金額／倍數等統計單位）</li>
             <li><span class="edu-pts">10 pts</span> 權威外連 — 引用 .gov／.edu／Wikipedia 等高權威來源</li>
+            <li><span class="edu-pts">10 pts</span> 文章字數 — 800-2,500 字最佳；過短 AI 略過，過長需強化結構</li>
+            <li><span class="edu-pts">8 pts</span> 內部連結 — 文中加 3-5 個站內延伸閱讀連結（技術項，Word 稿不適用）</li>
+            <li><span class="edu-pts">8 pts*</span> 具名引述 — 「」＋引述動詞，有採訪有據加分；無則不計入分母</li>
             <li><span class="edu-pts">10 pts</span> AI 爬蟲開放度 — GPTBot／ClaudeBot／PerplexityBot 等 9 隻主流爬蟲</li>
             <li><span class="edu-pts">5 pts</span> RSS / Atom feed — AI 爬蟲發現新文章的訂閱管道</li>
           </ul>
@@ -1384,7 +1387,7 @@ const WEB_ONLY = [
   '頁面速度', 'Google SEO 基礎評分', 'Canonical', '可索引性', 'Mobile',
   '網頁標題', 'Meta Description', '圖片 alt', '社群分享預覽',
   // GEO 技術項
-  '結構化資料', 'RSS', 'AI 爬蟲', 'E-E-A-T',
+  '結構化資料', 'RSS', 'AI 爬蟲', 'E-E-A-T', '內部連結',
   // AEO Schema 項（FAQPage/HowTo 已改為正式計分項，不在此排除）
 ];
 function neutralizeWebOnly(indicators, isDoc) {
@@ -1829,6 +1832,62 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
   } else {
     // 無法取得 HTML → 本區內所有 page-level 項目標為不適用，不計分（避免「拿不到 HTML 就被扣 90 分」）
     indicators.push({ name: 'Schema / 內容結構 / E-E-A-T', detail: '— 無法取得 HTML（CORS 防護或網站需登入），本區項目自動排除、不計分', pts: 0, max: 0, pass: null });
+  }
+
+  // 7b. 字數門檻 (10 pts) — 編輯可控，AI 引用偏好 800-2500 字
+  if (doc) {
+    const articleRoot = doc.querySelector('article, main, [class*="article-content"], [class*="article-body"], [class*="post-content"], [class*="entry-content"]') || doc.body;
+    const wcClone = articleRoot.cloneNode(true);
+    wcClone.querySelectorAll('nav, footer, header, aside, script, style, [class*="nav"], [class*="footer"], [class*="header"], [class*="sidebar"], [class*="menu"], [class*="recommend"], [class*="related"]').forEach(n => n.remove());
+    const wc = textLen(wcClone.textContent);
+    const wcPts = wc < 500 ? 0 : wc < 800 ? 3 : wc < 1500 ? 7 : wc <= 2500 ? 10 : wc <= 4000 ? 8 : 6;
+    indicators.push({
+      name: '文章字數',
+      detail: wc < 500 ? `❌ 字數過少（${wc} 字）— AI 引擎傾向略過覆蓋不完整的短文`
+        : wc < 800 ? `⚠️ 字數偏少（${wc} 字）— 建議補充至 800 字以上`
+        : wc <= 2500 ? `✅ 字數理想（${wc} 字）— 1,000-2,500 字是 AI 引用最佳區間`
+        : wc <= 4000 ? `✅ 字數充足（${wc} 字）— 篇幅較長，確保每段有清楚主題句`
+        : `⚠️ 字數偏多（${wc} 字）— 超過 4,000 字建議加強目錄結構或拆分子主題`,
+      why: 'AI 引擎傾向引用 800-2,500 字的文章——字數太少代表主題覆蓋不完整；超過 4,000 字需要更好的結構才能讓 AI 精準截取片段。Google Passage Ranking 也偏好中等長度的獨立段落。',
+      fix: '目標 1,500-2,500 字：補充背景脈絡、數據佐證、案例說明。避免湊字數——每段必須有新資訊。超過 3,000 字時務必加目錄錨點方便 AI 定位段落。',
+      pts: wcPts, max: 10, pass: wcPts >= 7, scope: 'page',
+    });
+
+    // 7c. 內部連結 (8 pts) — 相對路徑連結，排除錨點
+    const internalLinks = Array.from(doc.querySelectorAll('a[href]')).filter(a => {
+      const href = a.getAttribute('href') || '';
+      return href.startsWith('/') && !href.startsWith('//') && href.length > 1;
+    });
+    const uniqueInternal = [...new Set(internalLinks.map(a => a.getAttribute('href')))].length;
+    const intPts = uniqueInternal >= 5 ? 8 : uniqueInternal >= 3 ? 6 : uniqueInternal >= 1 ? 3 : 0;
+    indicators.push({
+      name: '內部連結',
+      detail: uniqueInternal >= 3 ? `✅ ${uniqueInternal} 個內部連結（延伸閱讀・強化主題群）`
+        : uniqueInternal >= 1 ? `⚠️ 僅 ${uniqueInternal} 個內部連結，建議補至 3-5 個相關文章`
+        : '❌ 無內部連結 — 建議在文中加入 3-5 個延伸閱讀連結',
+      why: '內連結有兩個作用：①幫 Google 理解網站主題群（topic cluster），提升整站主題權威；②引導讀者繼續瀏覽，降低跳出率。AI 爬蟲也沿著連結爬取相關內容，有助建立主題關聯。',
+      fix: '上稿時在關鍵詞或主題上加超連結，指向站內相關文章（3-5 個最佳）。連結文字要有意義（「台積電 2024 財報分析」優於「點此閱讀」）。散布在正文中比全集中在文末效果更好。',
+      pts: intPts, max: 8, pass: intPts >= 6, scope: 'page',
+    });
+
+    // 7d. 具名引述（bonus）— 「」＋引述動詞 = 採訪有據的 E-E-A-T 訊號
+    const quoteVerbs = /(表示|指出|說明|強調|呼籲|認為|分析|建議|透露|補充|回應|坦言|解釋|預測|警告|提醒)/;
+    const quoteParas = Array.from(doc.querySelectorAll('p')).filter(p => {
+      const txt = p.textContent;
+      return /[「」""'']/.test(txt) && quoteVerbs.test(txt);
+    });
+    const quotePts = quoteParas.length >= 3 ? 8 : quoteParas.length >= 1 ? 4 : 0;
+    const quoteMax = quoteParas.length > 0 ? 8 : 0;
+    indicators.push({
+      name: '具名引述',
+      detail: quoteParas.length >= 3 ? `✅ 偵測到 ${quoteParas.length} 處具名引述（採訪有據・強 E-E-A-T 訊號）+${quotePts} 分`
+        : quoteParas.length >= 1 ? `⚠️ 偵測到 ${quoteParas.length} 處引述（+${quotePts} 分）— 建議補至 3 處以上`
+        : '— 未偵測到具名引述（純分析文可忽略；採訪報導建議保留官員或專家直接引言）',
+      why: '「某某表示…」這類具名引述是第一手採訪的證明，是 Google QRG（搜尋品質評估指南）與 AI 引擎評估內容可信度的重要訊號。有具名消息來源的文章被 AI 引用的機率明顯高於同主題的無來源整理文。',
+      fix: '採訪後把受訪者直接引言（用「」括起來）保留在文中，加上姓名＋職稱。若是分析型文章，可引述研究報告（「根據金管會 2024 年報告…」）。每篇建議 2-4 處。',
+      pts: quotePts, max: quoteMax,
+      pass: quoteParas.length > 0 ? quotePts >= 4 : null, scope: 'page',
+    });
   }
 
   // 8. AI Crawlers in robots.txt (10 pts) — 9 隻主流 AI 爬蟲
