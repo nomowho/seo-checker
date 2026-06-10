@@ -1878,9 +1878,10 @@ function scoreAEO(doc, html, isDoc) {
     ]};
   }
 
-  // 1. FAQPage Schema — 加分項（bonus）：有就加 22 分，無則 max:0 不計入分母。
-  // 理由：敘事報導本就不需要 Q&A 結構，硬設 max:22 等於對非 FAQ 文體永久扣分。
-  let hasFaq = false, faqCount = 0;
+  // 1. FAQPage — 兩層加分：JSON-LD = 22 pts（機器+人都能讀，觸發 Rich Result）；
+  //    僅可見 Q&A 格式 = 10 pts（AI 引擎可讀取，但無法觸發 Google FAQ 富文本）；
+  //    完全沒有 = max:0 不計入分母（敘事文體不應被扣分）。
+  let hasJsonLdFaq = false, jsonLdFaqCount = 0;
   doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
     try {
       const j = JSON.parse(el.textContent);
@@ -1888,40 +1889,49 @@ function scoreAEO(doc, html, isDoc) {
       nodes.forEach(o => {
         if (!o) return;
         const t = [].concat(o['@type'] || '').join(',');
-        if (/FAQPage/.test(t) && o.mainEntity) { hasFaq = true; faqCount = [].concat(o.mainEntity).length; }
+        if (/FAQPage/.test(t) && o.mainEntity) {
+          hasJsonLdFaq = true;
+          jsonLdFaqCount = [].concat(o.mainEntity).length;
+        }
       });
     } catch {}
   });
-  // 補偵測 HTML FAQ 區塊（class*="faq"，或 Q1:/Q2:/A: 問答格式）
-  if (!hasFaq && doc) {
+
+  // 偵測可見 Q&A 格式（class*faq / Q1:/Q2: 問答段落）
+  let hasVisibleFaq = false, visibleFaqCount = 0;
+  if (!hasJsonLdFaq) {
     const faqEls = doc.querySelectorAll('[class*="faq"], [class*="FAQ"], [class*="qa"], [class*="QA"]');
-    if (faqEls.length > 0) { hasFaq = true; faqCount = faqEls.length; }
+    if (faqEls.length > 0) { hasVisibleFaq = true; visibleFaqCount = faqEls.length; }
   }
-  if (!hasFaq && doc) {
-    // 偵測 Q1: / Q：/ A：格式的問答段落
+  if (!hasJsonLdFaq && !hasVisibleFaq) {
     const qaPattern = /^[QqAaＱＡ][1-9１-９]?[\s：:\.]/;
     const allP = Array.from(doc.querySelectorAll('p, li, div'));
     const qaPairs = allP.filter(el => el.children.length === 0 && qaPattern.test(el.textContent.trim())).length;
-    if (qaPairs >= 4) { hasFaq = true; faqCount = Math.floor(qaPairs / 2); }
+    if (qaPairs >= 4) { hasVisibleFaq = true; visibleFaqCount = Math.floor(qaPairs / 2); }
   }
 
-  // Bonus 邏輯：有 FAQ 內容才加分 22；沒有則 max:0 不計入分母（不扣分）
-  // 理由：敘事報導本就不需要 Q&A 結構，硬設 max:22 等於對非 FAQ 文體永久扣分
-  const faqPts = hasFaq ? 22 : 0;
-  const faqMax = hasFaq ? 22 : 0;
+  // 計分
+  const faqPts = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 10 : 0);
+  const faqMax = (hasJsonLdFaq || hasVisibleFaq) ? 22 : 0; // 完全沒有則不計入分母
   total += faqPts;
-  const hasSchema = hasFaq && faqCount > 0 && !doc?.querySelector('[class*="faq"],[class*="FAQ"]');
+  let faqDetail, faqPass;
+  if (hasJsonLdFaq) {
+    faqDetail = `✅ FAQPage JSON-LD 結構化標記（${jsonLdFaqCount} 組問答）+22 分 — 可觸發 Google FAQ 富文本展開`;
+    faqPass = true;
+  } else if (hasVisibleFaq) {
+    faqDetail = `⚠️ 偵測到可見 Q&A 格式（${visibleFaqCount} 組）+10 分 — AI 引擎可讀取，但缺少 FAQPage JSON-LD，無法觸發 Google 搜尋展開問答（補上可再得 +12）`;
+    faqPass = false;
+  } else {
+    faqDetail = '— 未偵測到 FAQ 結構（非 Q&A 文體可忽略；問答型文章加 5-8 組 Q&A + FAQPage JSON-LD 可拿加分）';
+    faqPass = null;
+  }
   indicators.push({
     name: 'FAQPage 結構化資料',
-    detail: hasFaq
-      ? (hasSchema
-        ? `✅ 有效 FAQPage JSON-LD schema（${faqCount} 組問答）加分 +22`
-        : `✅ 偵測到 HTML FAQ 區塊（${faqCount} 組）加分 +22 — 建議同步加 FAQPage JSON-LD 讓 AI 更容易解析`)
-      : '— 未偵測到 FAQ 結構（非 Q&A 文體可忽略；問答型文章加 5-8 組 Q&A + FAQPage JSON-LD 可拿加分）',
-    why: 'FAQPage schema 讓搜尋與 AI 引擎直接理解「問答對應關係」。ChatGPT、Perplexity、Claude、Bing Copilot 仍優先解析 FAQ 問答對當引用單元。沒 schema，AI 得自己猜「這段是不是問答」，猜不到就略過。',
+    detail: faqDetail,
+    why: 'FAQ 有兩層價值：①可見 Q&A 格式讓 ChatGPT、Perplexity 等 AI 引擎能讀懂問答對應關係並直接引用；②加上 FAQPage JSON-LD 後，Google 搜尋結果會展開問答富文本（FAQ Rich Result），點擊率大幅提升。',
     fix: '【技術部門＋記者】文末加 5-8 題 Q&A，套 FAQPage JSON-LD（必須含 mainEntity 問答陣列）。問題用使用者真實搜尋語氣（「綠色債券怎麼買？」優於「綠色債券簡介」）；每個答案 50-150 字、直接答覆＋一個數據。',
     pts: faqPts, max: faqMax,
-    pass: hasFaq ? true : null, scope: 'page',
+    pass: faqPass, scope: 'page',
   });
 
   // 2. Question headings (22 pts) — 問號滿分；含疑問詞但無問號給部分分
