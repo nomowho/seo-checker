@@ -871,13 +871,14 @@ footer {
         <div class="edu-scoring">
           <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
           <ul class="edu-scoring-list">
-            <li><span class="edu-pts">18 pts</span> 頁面速度 Core Web Vitals — Google 真實用戶數據(CrUX) LCP／CLS／INP／TTFB／FCP</li>
-            <li><span class="edu-pts">18 pts</span> Google SEO 基礎評分 — PageSpeed Lighthouse 可索引性、連結品質</li>
-            <li><span class="edu-pts">16 pts</span> 網頁標題（Title Tag）— 是否存在、長度 10–60 字</li>
-            <li><span class="edu-pts">15 pts</span> Meta Description — 是否存在、長度 80–160 字</li>
-            <li><span class="edu-pts">10 pts</span> Canonical 標籤 — 是否防止重複索引</li>
-            <li><span class="edu-pts">8 pts</span> 圖片 alt 覆蓋率 — 內文圖片是否有替代文字（圖片搜尋＋無障礙）</li>
-            <li><span class="edu-pts">8 pts</span> Mobile 行動友善 — viewport 響應式設定（行動優先索引）</li>
+            <li><span class="edu-pts">16 pts</span> 頁面速度 Core Web Vitals — CrUX 真實用戶數據 LCP／CLS／INP（無資料則自動排除不扣分）</li>
+            <li><span class="edu-pts">16 pts</span> Google SEO 基礎評分 — PageSpeed Lighthouse 可索引性、連結品質（API 失敗自動排除）</li>
+            <li><span class="edu-pts">14 pts</span> 網頁標題（Title Tag）— 是否存在、長度 10–60 字</li>
+            <li><span class="edu-pts">13 pts</span> Meta Description — 是否存在、長度 80–160 字</li>
+            <li><span class="edu-pts">12 pts</span> 社群分享預覽 — OG / Twitter Card 完整度（社群分享 CTR 訊號）</li>
+            <li><span class="edu-pts">8 pts</span> Canonical 標籤 — 是否防止重複索引</li>
+            <li><span class="edu-pts">7 pts</span> Mobile 行動友善 — viewport 響應式設定（行動優先索引）</li>
+            <li><span class="edu-pts">7 pts</span> 圖片 alt 覆蓋率 — 內文圖片替代文字（無圖頁面自動排除）</li>
             <li><span class="edu-pts">7 pts</span> 可索引性 + Sitemap — robots meta 是否 noindex、是否有 sitemap.xml</li>
           </ul>
         </div>
@@ -885,35 +886,34 @@ footer {
       <div class="edu-card">
         <div class="edu-emoji">🤖</div>
         <div class="edu-title">GEO — AI 引擎優化</div>
-        <div class="edu-desc">讓 ChatGPT、Claude、Perplexity、Gemini 回答問題時優先引用你的內容。核心訊號：Schema 結構化資料、E-E-A-T、自包含段落、開放 AI 爬蟲。</div>
+        <div class="edu-desc">讓 ChatGPT、Claude、Perplexity、Gemini 回答問題時優先引用你的內容。核心訊號：Schema 結構化資料＋品牌權威、E-E-A-T、自包含段落、開放 AI 爬蟲。</div>
         <div class="edu-scoring">
           <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
           <ul class="edu-scoring-list">
-            <li><span class="edu-pts">18 pts</span> 結構化資料 — JSON-LD（首選）或 Microdata，偵測 NewsArticle、FAQPage 等</li>
-            <li><span class="edu-pts">16 pts</span> 自包含段落 — 100-200 字、結論句開頭的可引用段落（中文計字）</li>
-            <li><span class="edu-pts">8 pts</span> 文章結構 — 目錄錨點(href=#)、標題 id、H2/H3 層級</li>
-            <li><span class="edu-pts">10 pts</span> 數據密度 — 段落是否含具體數字（AI 偏好可驗證事實）</li>
-            <li><span class="edu-pts">10 pts</span> 權威外連 — 是否引用 .gov／.edu／Wikipedia 等高權威來源</li>
-            <li><span class="edu-pts">15 pts</span> E-E-A-T — 作者、發布／更新日期、6 個月內新鮮度</li>
-            <li><span class="edu-pts">6 pts</span> 品牌權威 — Organization schema、sameAs 社群連結、Wikipedia 提及</li>
-            <li><span class="edu-pts">7 pts</span> 平台優化 — Open Graph + Twitter Card 完整度</li>
-            <li><span class="edu-pts">10 pts</span> AI 爬蟲開放度 — GPTBot／ClaudeBot／PerplexityBot／Google-Extended／CCBot</li>
+            <li><span class="edu-pts">22 pts</span> 結構化資料 + 品牌權威 — NewsArticle JSON-LD 完整度、Organization schema、sameAs</li>
+            <li><span class="edu-pts">18 pts</span> 自包含段落 — 80-250 字、結論句開頭的可引用段落（中文計字，排除導覽／頁尾）</li>
+            <li><span class="edu-pts">15 pts</span> E-E-A-T — 作者署名、發布／更新日期、6 個月內新鮮度</li>
+            <li><span class="edu-pts">10 pts</span> 文章結構 — 目錄錨點、H2/H3 層級、標題密度</li>
+            <li><span class="edu-pts">10 pts</span> 數據密度 — 段落含具體數字（%／金額／倍數等統計單位）</li>
+            <li><span class="edu-pts">10 pts</span> 權威外連 — 引用 .gov／.edu／Wikipedia 等高權威來源</li>
+            <li><span class="edu-pts">10 pts</span> AI 爬蟲開放度 — GPTBot／ClaudeBot／PerplexityBot 等 9 隻主流爬蟲</li>
+            <li><span class="edu-pts">5 pts</span> RSS / Atom feed — AI 爬蟲發現新文章的訂閱管道</li>
           </ul>
         </div>
       </div>
       <div class="edu-card">
         <div class="edu-emoji">💬</div>
         <div class="edu-title">AEO — 答案引擎優化</div>
-        <div class="edu-desc">讓 Google 精選摘要（Featured Snippet）和「大家也問」抓到你的回答。關鍵：FAQPage schema、問句式 H2/H3 標題、40-120 字短答段落。</div>
+        <div class="edu-desc">讓 Google 精選摘要（Featured Snippet）和「大家也問」抓到你的回答。核心：問句式 H2/H3 標題、小標下 40-120 字直接答案、列表結構。FAQ／表格／HowTo 為加分項。</div>
         <div class="edu-scoring">
-          <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
+          <div class="edu-scoring-title">📊 本工具評分機制（分數換算為 100 分制）</div>
           <ul class="edu-scoring-list">
-            <li><span class="edu-pts">22 pts</span> FAQPage Schema — 偵測 JSON-LD 中是否有問答結構化標記</li>
-            <li><span class="edu-pts">22 pts</span> 問句式標題 — 以「？」結尾的 H2/H3（搶「大家也問」）</li>
-            <li><span class="edu-pts">22 pts</span> 答案前置短段 — 小標正下方 40–120 字的直接答案（精選摘要真實抓取結構）</li>
-            <li><span class="edu-pts">12 pts</span> 比較表格 — HTML &lt;table&gt;（表格式精選摘要・低競爭入口）</li>
-            <li><span class="edu-pts">12 pts</span> 清單結構 — 真實 &lt;ul&gt;/&lt;ol&gt; ≥4 項（列表式摘要）</li>
-            <li><span class="edu-pts">10 pts</span> HowTo Schema — 含步驟說明的結構化標記</li>
+            <li><span class="edu-pts">22 pts</span> 問句式標題 — 以「？」結尾的 H2/H3（搶「大家也問」），疑問詞標題各 3 分</li>
+            <li><span class="edu-pts">22 pts</span> 答案前置短段 — 小標正下方 40–120 字直接答案（精選摘要真實抓取位置）</li>
+            <li><span class="edu-pts">12 pts</span> 列表結構 — 真實 &lt;ul&gt;/&lt;ol&gt; ≥4 項（列表式摘要觸發門檻）</li>
+            <li><span class="edu-pts">+22 加分</span> FAQPage Schema — 有問答 JSON-LD 則加分；無則不扣分（非 Q&A 文體可忽略）</li>
+            <li><span class="edu-pts">+12 加分</span> 比較表格 — 有 HTML &lt;table&gt; 則加分；無則不扣分（非比較型文章可忽略）</li>
+            <li><span class="edu-pts">+10 加分</span> HowTo Schema — 有步驟 JSON-LD 則加分；無則不扣分（非教學文可忽略）</li>
           </ul>
         </div>
       </div>
@@ -1127,9 +1127,15 @@ function detectJsShell(doc, html) {
 }
 
 // Word 稿模式：把「發布後才能檢測」的網頁技術項標為不適用（max:0 不計分）
-const WEB_ONLY = ['頁面速度', 'Google SEO 基礎評分', 'Canonical', '可索引性', 'Mobile',
-  '網頁標題', 'Meta Description', '圖片 alt', '結構化資料', '品牌權威', '平台優化', 'AI 爬蟲',
-  'FAQPage', 'HowTo', 'E-E-A-T'];
+const WEB_ONLY = [
+  // SEO 技術項
+  '頁面速度', 'Google SEO 基礎評分', 'Canonical', '可索引性', 'Mobile',
+  '網頁標題', 'Meta Description', '圖片 alt', '社群分享預覽',
+  // GEO 技術項
+  '結構化資料', 'RSS', 'AI 爬蟲', 'E-E-A-T',
+  // AEO Schema 項（bonus 項在 Word 模式已是 max:0，但仍列入確保一致）
+  'FAQPage', 'HowTo',
+];
 function neutralizeWebOnly(indicators, isDoc) {
   if (!isDoc) return indicators;
   indicators.forEach(i => {
@@ -1160,9 +1166,10 @@ function scoreCWV(crux) {
     : v <= good ? { p: full, label: '✅ 良好' }
     : v <= poor ? { p: Math.round(full * 0.5), label: '⚠️ 待改善' }
     : { p: 0, label: '❌ 差' };
-  const gL = grade(lcp, 2500, 4000, 8);
+  // 三項加總 16 分（配合 SEO 新權重）：LCP 7、CLS 5、INP 4
+  const gL = grade(lcp, 2500, 4000, 7);
   const gC = grade(cls, 0.1, 0.25, 5);
-  const gI = grade(inp, 200, 500, 5);
+  const gI = grade(inp, 200, 500, 4);
   const pts = gL.p + gC.p + gI.p;
   const fmt = (v, unit) => isNaN(v) ? '—' : (unit === 'ms' ? Math.round(v) + 'ms' : v.toFixed(2));
   // 補充診斷：TTFB（伺服器回應）、FCP（首次繪製）——CrUX 已含，協助判斷瓶頸
@@ -1190,8 +1197,11 @@ function textLen(s) {
 
 // 偵測段落是否含具體數字（年份、百分比、金額、統計數據等）→ citability 訊號
 function hasNumber(s) {
-  return /\d[\d,.]*\s*(%|％|億|萬|千|元|倍|名|個|年|月|日|分|秒|公里|kg|ms|MB|GB)?/.test(s || '') &&
-         /\d/.test(s || '');
+  // 收緊：必須有具體統計單位（%、金額、倍數、人/件/筆等量化單位），或四位數以上大數字。
+  // 純年/月/日/個（時間或常見量詞）不算「數據」訊號，避免「2024 年」這類灌水。
+  s = s || '';
+  return /\d[\d,]*(\.\d+)?\s*(%|％|倍|億|萬|千萬|百萬|美元|台幣|新台幣|元|名|人|位|筆|件|家|起|公噸|億元|萬元)/.test(s)
+      || /\d{4,}/.test(s);
 }
 
 // ── SEO Scoring (100 pts) ──────────────────────────
@@ -1209,77 +1219,79 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
       detail: `${cwv.detail}　〔來源：Google 真實用戶數據・${scopeLabel}〕`,
       why: 'Google 自 2021 年把 Core Web Vitals 列為排名因子，2024 年再把互動指標換成更嚴的 INP。它用真實使用者數據（CrUX 28 天）評估速度，直接影響排名與跳出率——LCP 從 1 秒拉到 3 秒，行動端跳出率上升 32%。LCP（最大內容繪製）應 < 2.5 秒、CLS（版面位移）< 0.1、INP（互動回應）< 200 毫秒。',
       fix: '【請技術部門處理】LCP：首圖加 fetchpriority="high"、預載關鍵資源、改用 CDN 降 TTFB。INP：切割過長的 JS 工作、第三方腳本改 async/defer。CLS：所有圖片標 width/height、廣告版位預留固定高度、字體用 font-display。可看明細的 TTFB（伺服器慢）vs FCP（渲染慢）判斷瓶頸在哪。',
-      pts: cwv.pts, max: 18,
-      pass: cwv.pts >= 13,
+      pts: cwv.pts, max: 16,
+      pass: cwv.pts >= 11,
       scope: cwv.scope === 'url' ? 'page' : 'site',
     });
   } else {
+    // 無 CrUX 資料 → 標為「不適用」，max:0 不計入分母，避免「沒數據就被扣 16 分」幻覺。
     indicators.push({
       name: '頁面速度（Core Web Vitals）',
-      detail: '此網址尚無 Google 真實用戶數據（流量不足，CrUX 無收錄）',
-      tip: 'Core Web Vitals 採用 Google 的真實使用者體驗報告（CrUX）。流量較低的網站或新頁面可能尚未被收錄，因此無法取得速度數據——這不代表頁面速度差，只是樣本不足。',
-      pts: 0, max: 18, pass: null,
+      detail: '— 此網址尚無 Google 真實用戶數據（流量不足，CrUX 未收錄）。本項自動排除、不計分',
+      tip: 'Core Web Vitals 採用 Google 真實使用者體驗報告（CrUX）。流量較低的網站或新頁面尚未被收錄——這不代表頁面速度差，只是樣本不足，故不應扣分。',
+      pts: 0, max: 0, pass: null,
     });
   }
 
-  // 2. PageSpeed SEO category (22 pts)
+  // 2. PageSpeed SEO category (16 pts)
   const seoScore = ps?.lighthouseResult?.categories?.seo?.score;
   if (seoScore != null) {
-    const pts = Math.round(seoScore * 18);
+    const pts = Math.round(seoScore * 16);
     total += pts;
     indicators.push({
       name: 'Google SEO 基礎評分',
       detail: `PageSpeed SEO 分：${Math.round(seoScore * 100)} / 100（含連結、可爬取性、可索引性）`,
       why: 'Google Lighthouse 的 SEO 審查，是搜尋引擎「能不能順利讀懂這頁」的綜合健檢，涵蓋 10+ 項技術檢查：連結可爬取性、文字大小可讀性、圖片 alt、meta 完整性、robots 設定等。分數 < 80 代表有明顯技術問題，即使內容再好也難被 Google 收錄。',
       fix: '【多數需技術部門】到 PageSpeed Insights 看紅字項目逐一修：補圖片 alt、確認連結文字有描述、文字對比度足夠、行動裝置字級不要太小。記者層面能做的是把連結文字寫清楚（避免「點此」）。',
-      pts, max: 18,
-      pass: pts >= 13,
+      pts, max: 16,
+      pass: pts >= 11,
     });
   } else {
-    indicators.push({ name: 'Google SEO 基礎評分', detail: '無法取得 PageSpeed 數據', pts: 0, max: 18, pass: null });
+    // 無 PageSpeed 資料 → 不計入分母（API 逾時/限流不應扣分）
+    indicators.push({ name: 'Google SEO 基礎評分', detail: '— 無法取得 PageSpeed 數據（API 逾時或限流），本項自動排除、不計分', pts: 0, max: 0, pass: null });
   }
 
   if (doc) {
-    // 3. Title tag (20 pts)
+    // 3. Title tag (14 pts)
     const title = doc.querySelector('title')?.textContent?.trim() || '';
     const titleLen = title.length;
     let titlePts = 0;
-    if (title) { titlePts += 10; if (titleLen >= 10 && titleLen <= 60) titlePts += 6; }
+    if (title) { titlePts += 9; if (titleLen >= 10 && titleLen <= 60) titlePts += 5; }
     total += titlePts;
     indicators.push({
       name: '網頁標題（Title Tag）',
       detail: title ? `「${title.slice(0,50)}${title.length>50?'…':''}」（${titleLen} 字）${titleLen<10||titleLen>60?' ⚠️ 建議 10-60 字':''}` : '❌ 未設定 title 標籤',
       why: '搜尋結果第一行的藍色大字，是 Google 判斷文章主題最重要的依據，也決定使用者點不點。研究顯示含數字與情緒詞的標題，點擊率比平均高 30% 以上，而點擊率本身又是排名前 10 的關鍵因子。',
       fix: '長度控制在中文 25-30 字（約 50-60 字元），核心關鍵字放最前面，後綴品牌名，例：「綠色債券怎麼買？2026 完整指南｜遠見」。避免用「廣告」「特輯」開頭。一頁只能一個 title。',
-      pts: titlePts, max: 16,
-      pass: titlePts >= 12,
+      pts: titlePts, max: 14,
+      pass: titlePts >= 10,
     });
 
-    // 4. Meta description (15 pts)
+    // 4. Meta description (13 pts)
     const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '';
     const descLen = metaDesc.length;
     let descPts = 0;
-    if (metaDesc) { descPts += 9; if (descLen >= 80 && descLen <= 160) descPts += 6; }
+    if (metaDesc) { descPts += 8; if (descLen >= 80 && descLen <= 160) descPts += 5; }
     total += descPts;
     indicators.push({
       name: 'Meta Description',
       detail: metaDesc ? `${metaDesc.slice(0,60)}…（${descLen} 字）${descLen<80||descLen>160?' ⚠️ 建議 80-160 字':''}` : '❌ 未設定 meta description',
       why: '搜尋結果標題下方的說明文字。雖不直接影響排名，但決定點閱率（好的摘要可提升 20-30%）。沒設定的話 Google 會自己亂抓一段，常常抓到不相關的內容。AI 引擎也用這段快速判斷文章跟查詢相不相關。',
       fix: '寫中文 75-80 字（約 150-160 字元），包含關鍵字＋價值主張＋一句行動誘因，例：「本文用 8 分鐘帶你看懂綠色債券怎麼買、3 大風險與 5 檔台灣標的」。每篇都要有、且每篇不同。',
-      pts: descPts, max: 15,
-      pass: descPts >= 11,
+      pts: descPts, max: 13,
+      pass: descPts >= 9,
     });
 
-    // 5. Canonical URL (10 pts)
+    // 5. Canonical URL (8 pts)
     const canonical = doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || '';
-    const canonicalPts = canonical ? 10 : 0;
+    const canonicalPts = canonical ? 8 : 0;
     total += canonicalPts;
     indicators.push({
       name: 'Canonical URL',
       detail: canonical ? `✅ ${canonical.slice(0,60)}` : '❌ 未設定 canonical 標籤（可能導致重複內容問題）',
       why: '告訴 Google「這篇文章的正規網址是哪一個」，防止同一內容出現在多個網址（有無 www、http/https、帶參數）時互相稀釋排名。廣編常在多頻道轉載，沒 canonical 會讓各版本分食流量、甚至被判重複內容降權。',
       fix: '【技術部門】每頁 <head> 加 <link rel="canonical" href="本頁標準網址">，指向自己的正式 URL。轉載版本則 canonical 指向原始那篇。',
-      pts: canonicalPts, max: 10,
+      pts: canonicalPts, max: 8,
       pass: !!canonical,
     });
 
@@ -1297,11 +1309,11 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
       pass: !isNoindex, scope: 'site',
     });
 
-    // 7. Mobile 行動友善 (8 pts)
+    // 7. Mobile 行動友善 (7 pts)
     const vp = doc.querySelector('meta[name="viewport"]')?.getAttribute('content') || '';
     const hasDeviceWidth = /width\s*=\s*device-width/i.test(vp);
     const blocksZoom = /user-scalable\s*=\s*(no|0)|maximum-scale\s*=\s*1(\D|$)/i.test(vp);
-    const mobilePts = hasDeviceWidth ? (blocksZoom ? 5 : 8) : 0;
+    const mobilePts = hasDeviceWidth ? (blocksZoom ? 4 : 7) : 0;
     total += mobilePts;
     indicators.push({
       name: 'Mobile 行動友善',
@@ -1310,24 +1322,49 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
         : '⚠️ viewport 未使用 device-width',
       why: 'Google 自 2024 年 7 月全面改用「行動優先索引」——一律以手機版內容評分排名。超過 65% 新聞流量來自手機，行動體驗差會直接被降排名、跳出率也高。',
       fix: '【技術部門】<head> 加 <meta name="viewport" content="width=device-width, initial-scale=1">；內文字級 ≥16px、按鈕點擊區 ≥48px、避免水平捲動。切勿用 user-scalable=no（禁止縮放會傷害無障礙與 SEO）。',
-      pts: mobilePts, max: 8, pass: mobilePts >= 8, scope: 'page',
+      pts: mobilePts, max: 7, pass: mobilePts >= 7, scope: 'page',
     });
 
-    // 8. 圖片 alt 覆蓋率 (8 pts)
+    // 8. 圖片 alt 覆蓋率 (7 pts)
     const imgs = Array.from(doc.querySelectorAll('img'));
     const realImgs = imgs.filter(im => !/^data:/.test(im.getAttribute('src') || '') && (im.getAttribute('src') || '').length > 1);
     const withAlt = realImgs.filter(im => (im.getAttribute('alt') || '').trim().length > 0);
     let altPts;
-    if (realImgs.length === 0) altPts = 8; // 無圖不扣分
-    else { const cov = withAlt.length / realImgs.length; altPts = cov >= 0.9 ? 8 : cov >= 0.6 ? 5 : cov >= 0.3 ? 3 : 0; }
+    if (realImgs.length === 0) altPts = 0; // 無圖：標為不適用（下方 max 改 0）
+    else { const cov = withAlt.length / realImgs.length; altPts = cov >= 0.9 ? 7 : cov >= 0.6 ? 5 : cov >= 0.3 ? 3 : 0; }
+    const altMax = realImgs.length === 0 ? 0 : 7; // 無圖不計入分母（避免「沒圖就送 7 分」灌水）
     total += altPts;
     indicators.push({
       name: '圖片 alt 覆蓋率',
-      detail: realImgs.length === 0 ? '— 本頁未偵測到內文圖片'
+      detail: realImgs.length === 0 ? '— 本頁未偵測到內文圖片，本項不計分'
         : `${withAlt.length}/${realImgs.length} 張圖有 alt 文字（覆蓋率 ${Math.round(withAlt.length/realImgs.length*100)}%）`,
       why: 'alt 是「給看不到圖的人與機器的圖片說明」，是 Google 圖片搜尋排名的主要訊號，也是無障礙（WCAG）法規要求。AI 也靠 alt 理解圖片在講什麼。缺 alt 等於放棄圖片搜尋這個流量入口。',
       fix: '每張內文圖片都加具體 alt（「黃金獵犬在草地奔跑」而非「狗」或空白）。裝飾性圖片用 alt=""。記者上稿時在圖片欄位填圖說即可，多數 CMS 會帶入 alt。',
-      pts: altPts, max: 8, pass: altPts >= 5, scope: 'page',
+      pts: altPts, max: altMax, pass: altMax === 0 ? null : altPts >= 5, scope: 'page',
+    });
+
+    // 9. 社群分享預覽（Open Graph + Twitter Card）(12 pts)
+    // 註：原本放在 GEO，但 OG/Twitter Card 的主要價值是社群分享 CTR（SEO/SMO 訊號）而非 AI 引用，故歸到 SEO。
+    const ogTitle = doc.querySelector('meta[property="og:title"]')?.getAttribute('content');
+    const ogDesc = doc.querySelector('meta[property="og:description"]')?.getAttribute('content');
+    const ogImage = doc.querySelector('meta[property="og:image"]')?.getAttribute('content');
+    const ogType = doc.querySelector('meta[property="og:type"]')?.getAttribute('content');
+    const ogUrl = doc.querySelector('meta[property="og:url"]')?.getAttribute('content');
+    const ogSite = doc.querySelector('meta[property="og:site_name"]')?.getAttribute('content');
+    const twCard = doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content');
+    const twImage = doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content');
+    const ogCore = (ogTitle?2:0)+(ogDesc?2:0)+(ogImage?2:0)+(ogType?1:0)+((ogUrl||ogSite)?1:0); // OG 八分
+    const ogPts = Math.min(12, ogCore + (twCard?2:0) + ((twCard&&twImage)?2:0));
+    total += ogPts;
+    const ogMissing = [!ogTitle&&'og:title', !ogDesc&&'og:description', !ogImage&&'og:image', !ogType&&'og:type', !(ogUrl||ogSite)&&'og:url/site_name', !twCard&&'twitter:card'].filter(Boolean);
+    indicators.push({
+      name: '社群分享預覽（OG / Twitter Card）',
+      detail: ogPts >= 12 ? '✅ Open Graph 與 Twitter Card 標籤完整'
+        : ogMissing.length ? `⚠️ 缺少：${ogMissing.join('、')}`
+        : '✅ 標籤大致完整',
+      why: '決定文章分享到 LINE / FB / Threads / X 時的預覽縮圖與標題。標籤完整時點擊率明顯較高（FB 內測 +30% CTR）。社群分享是排名以外的第二大流量入口。',
+      fix: '【技術部門】補齊 og:title / og:description / og:image (1200×630) / og:url / og:type / og:site_name + twitter:card=summary_large_image + twitter:image。用 metatags.io 預覽各平台效果。',
+      pts: ogPts, max: 12, pass: ogPts >= 9, scope: 'page',
     });
   }
 
@@ -1361,42 +1398,67 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       } catch {}
     });
 
-    // 1. 結構化資料 (18 pts) — JSON-LD 優先，並驗 Article 必要欄位完整性
+    // 1. 結構化資料 + 品牌權威 (22 pts) — 合併原本獨立的「結構化資料 18」與「品牌權威 6」
+    // 理由：品牌權威的訊號（Organization schema、sameAs）本質上就是 schema 完整度的一部分，
+    // 拆兩項既重複又讓使用者搞不清楚要修哪邊；合併後也避免「品牌權威」單獨成項的雞肋感。
     const hasSchema = jsonLds.length > 0;
     const microNodes = doc.querySelectorAll('[itemscope][itemtype]');
     const hasMicrodata = microNodes.length > 0;
     const qualityTypes = ['Article','BlogPosting','NewsArticle','Product','Organization','WebSite','Person','FAQPage','HowTo'];
     const hasQuality = schemaTypes.some(t => qualityTypes.some(q => t.includes(q)));
-    // Article 必要欄位：author / datePublished / image / publisher
+    // Schema 完整度（14 pts）：Article 必要欄位
     let schemaPts, schemaDetail;
     if (articleNode) {
       const need = { author: !!articleNode.author, datePublished: !!articleNode.datePublished, image: !!articleNode.image, publisher: !!articleNode.publisher };
       const got = Object.values(need).filter(Boolean).length;
       const missing = Object.keys(need).filter(k => !need[k]);
-      schemaPts = got === 4 ? 18 : got >= 2 ? 13 : 9; // 完整18 / 半殘13 / 殘缺9
+      schemaPts = got === 4 ? 14 : got >= 2 ? 10 : 6;
       schemaDetail = got === 4
         ? `✅ Article schema 完整（含 author/date/image/publisher）`
         : `⚠️ 有 Article schema 但缺欄位：${missing.join('、')}（半殘 schema 降低 AI 信任）`;
     } else {
-      schemaPts = hasSchema ? (hasQuality ? 16 : 12) : (hasMicrodata ? 9 : 0);
+      schemaPts = hasSchema ? (hasQuality ? 12 : 9) : (hasMicrodata ? 6 : 0);
       schemaDetail = hasSchema
         ? `✅ 找到 ${jsonLds.length} 個 JSON-LD：${schemaTypes.join(', ').slice(0,50)}（建議含 NewsArticle）`
         : hasMicrodata
           ? `⚠️ 僅 Microdata（${microNodes.length} 項），建議改用 JSON-LD`
           : '❌ 未找到結構化資料（AI 無法理解頁面類型）';
     }
-    total += schemaPts;
+    // 品牌權威（8 pts）：Organization/Person schema、sameAs、社群連結、Wikipedia
+    let sameAsCount = 0, hasOrgPerson = false;
+    jsonLds.forEach(el => {
+      try {
+        const j = JSON.parse(el.textContent);
+        const nodes = Array.isArray(j) ? j : (j['@graph'] ? j['@graph'] : [j]);
+        nodes.forEach(o => {
+          if (!o) return;
+          const t = [].concat(o['@type'] || '').join(',');
+          if (/Organization|Person/.test(t)) hasOrgPerson = true;
+          if (o.sameAs) sameAsCount += [].concat(o.sameAs).length;
+        });
+      } catch {}
+    });
+    const socialLinks = doc.querySelectorAll('a[href*="facebook.com"], a[href*="twitter.com"], a[href*="//x.com"], a[href*="linkedin.com"], a[href*="instagram.com"], a[href*="youtube.com"], a[href*="threads.net"]').length;
+    const wikiLink = doc.querySelector('a[href*="wikipedia.org"]') ? 1 : 0;
+    let brandPts = (hasOrgPerson ? 2 : 0) + ((sameAsCount >= 2 || socialLinks >= 2) ? 2 : 0) + wikiLink * 4;
+    brandPts = Math.min(8, brandPts);
+    const brandBits = [hasOrgPerson && 'Organization/Person schema', (sameAsCount>=2||socialLinks>=2) && '社群檔案連結', wikiLink && 'Wikipedia 提及'].filter(Boolean);
+    const combinedPts = schemaPts + brandPts;
+    total += combinedPts;
     indicators.push({
-      name: '結構化資料（JSON-LD / Microdata）',
-      detail: schemaDetail,
-      why: 'JSON-LD 是藏在原始碼裡「給機器看的說明書」，是 AI 與 Google 理解內容類型最直接的方式，也是觸發 Rich Result 與 AI Overview 的必要條件。但「有 @type 卻缺欄位」反而傷信任——只寫 {"@type":"Article"} 等於說「這是文章但不告訴你誰寫、何時寫」。',
-      fix: '【技術部門】每篇用 NewsArticle JSON-LD，必填 headline、author（用 Person 物件）、datePublished、dateModified、image（≥1200×630）、publisher（Organization 含 logo）。用 Google Rich Results Test 驗證。',
-      pts: schemaPts, max: 18,
-      pass: schemaPts >= 13, scope: 'page',
+      name: '結構化資料 + 品牌權威',
+      detail: schemaDetail + (brandBits.length ? `；品牌訊號：${brandBits.join('、')}` : '；無品牌訊號（可加 Organization schema 與 sameAs）'),
+      why: 'JSON-LD 是給機器看的「說明書」，是 AI 與 Google 理解內容類型最直接的方式。完整的 Article schema（含 author / date / image / publisher）加上 Organization 品牌訊號（sameAs 列出所有官方平台）能大幅提升 AI 引用機率與 E-E-A-T 信任度。',
+      fix: '【技術部門】每篇用 NewsArticle JSON-LD，必填 headline / author（用 Person 物件）/ datePublished / dateModified / image（≥1200×630）/ publisher（Organization 含 logo）。網站層級加 Organization schema + sameAs 列出官方 FB/IG/LinkedIn/YouTube。用 Google Rich Results Test 驗證。',
+      pts: combinedPts, max: 22,
+      pass: combinedPts >= 15, scope: 'page',
     });
 
-    // 2. 自包含段落 citability (16 pts) — 中文計字 100-200 字 + 首段答案前置加分
-    const paragraphs = Array.from(doc.querySelectorAll('p, article p, main p, li'));
+    // 2. 自包含段落 citability (18 pts) — 中文計字 100-200 字 + 首段答案前置加分
+    // 排除 nav/footer/header/aside 內的 p 與 li，避免導覽選單虛胖內容分。
+    const isLayoutNode = (el) => !!el.closest('nav, footer, header, aside, [role="navigation"], [role="banner"], [role="contentinfo"], [class*="nav"], [class*="footer"], [class*="header"], [class*="sidebar"], [class*="menu"]');
+    const paragraphs = Array.from(doc.querySelectorAll('article p, main p, p, li'))
+      .filter(el => !isLayoutNode(el));
     const golden = paragraphs.filter(p => { const n = textLen(p.textContent); return n >= 80 && n <= 250; });
     // 答案前置首段（電梯答案）：第一個實質段落 60-250 字、且首句精煉（≤80 字，非冗長鋪陳）
     const contentParas = paragraphs.filter(p => p.tagName === 'P' && textLen(p.textContent) >= 40);
@@ -1407,7 +1469,7 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       const firstSentence = (lead.textContent.trim().split(/[。！？.!?]/)[0] || '');
       leadGood = n >= 60 && n <= 250 && textLen(firstSentence) <= 80;
     }
-    const contentPts = Math.min(16, golden.length * 3 + (leadGood ? 2 : 0));
+    const contentPts = Math.min(18, golden.length * 3 + (leadGood ? 3 : 0));
     total += contentPts;
     indicators.push({
       name: '自包含段落（AI 可引用性）',
@@ -1416,8 +1478,8 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
         : '❌ 缺少 100-200 字的自包含段落，建議拆段、每段以結論句開頭',
       why: 'AI 引用的單位是「段落」不是全文。Princeton 2024 論文實證：100-200 字（134-167 字最佳）、結論句開頭、能獨立讀懂的段落，被 AI 引用機率比長段落高 40%。尤其「首段」——AI 生成摘要最愛抓文章開頭。',
       fix: '把 500 字以上的長段拆成數個 100-200 字小段，每段聚焦一個論點、第一句就給結論（不要先鋪陳背景歷史）。文章第一段就要「答案前置」：用一句話講清楚這篇在回答什麼。',
-      pts: contentPts, max: 16,
-      pass: contentPts >= 10, scope: 'page',
+      pts: contentPts, max: 18,
+      pass: contentPts >= 12, scope: 'page',
     });
 
     // 3. 文章結構：目錄錨點 + 標題層級 (8 pts)
@@ -1431,11 +1493,11 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     const expectHeadings = Math.max(1, Math.round(totalChars / 250));
     const headingDensityOk = (h2c + h3c) >= Math.min(expectHeadings, 4);
     let structPts = 0;
-    if (anchorLinks.length >= 3) structPts += 3; else if (anchorLinks.length >= 1) structPts += 2;
-    if (h2c >= 3) structPts += 2; else if (h2c >= 1) structPts += 1;
+    if (anchorLinks.length >= 3) structPts += 4; else if (anchorLinks.length >= 1) structPts += 2;
+    if (h2c >= 3) structPts += 3; else if (h2c >= 1) structPts += 1;
     if (headingsWithId >= 1) structPts += 1;
-    if (headingDensityOk) structPts += 2;   // 子標題密度足夠
-    structPts = Math.min(8, structPts);
+    if (headingDensityOk) structPts += 2;
+    structPts = Math.min(10, structPts);
     total += structPts;
     const structBits = [
       anchorLinks.length > 0 ? `${anchorLinks.length} 個目錄錨點` : '無目錄錨點',
@@ -1444,10 +1506,10 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     ];
     indicators.push({
       name: '文章結構（目錄錨點）',
-      detail: (structPts >= 5 ? '✅ ' : structPts > 0 ? '⚠️ ' : '❌ ') + structBits.join('、'),
+      detail: (structPts >= 6 ? '✅ ' : structPts > 0 ? '⚠️ ' : '❌ ') + structBits.join('、'),
       why: '清楚的章節結構是強 GEO/AEO 訊號：AI 靠它理解長文、精準引用某一段；Google 也用它做 passage indexing（把長文切成段落分別參與排名），並可能顯示「跳到段落」子連結。小標太少，整篇被當一大塊、抓不出重點。',
       fix: '長文每 200-300 字放一個 H2/H3 小標（2000 字約 6-8 個），標題用問句更佳。文章開頭放「章節目錄」，用 <a href="#段落id"> 連到各小標（標題加 id）。記者層面：把長段落用小標分章節即可。',
-      pts: structPts, max: 8, pass: structPts >= 5, scope: 'page',
+      pts: structPts, max: 10, pass: structPts >= 6, scope: 'page',
     });
 
     // 3. 數據密度 citability (10 pts) — 含具體數字的段落
@@ -1484,7 +1546,7 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
 
     // 5. E-E-A-T 作者/日期/新鮮度 (15 pts)
     const authorEl = !!(
-      doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]') ||
+      doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]:not([class*="ad"]):not([class*="widget"]):not([class*="banner"]):not([class*="placeholder"])') ||
       doc.querySelector('meta[name="author"], meta[property="article:author"]') ||
       jsonLdHasAuthor
     );
@@ -1518,57 +1580,21 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       pass: eeatPts >= 10, scope: 'page',
     });
 
-    // 6. 品牌權威 Brand (8 pts) — Organization/Person schema、sameAs、社群檔案、Wikipedia
-    let sameAsCount = 0, hasOrgPerson = false;
-    jsonLds.forEach(el => {
-      try {
-        const j = JSON.parse(el.textContent);
-        const nodes = Array.isArray(j) ? j : (j['@graph'] ? j['@graph'] : [j]);
-        nodes.forEach(o => {
-          if (!o) return;
-          const t = [].concat(o['@type'] || '').join(',');
-          if (/Organization|Person/.test(t)) hasOrgPerson = true;
-          if (o.sameAs) sameAsCount += [].concat(o.sameAs).length;
-        });
-      } catch {}
-    });
-    const socialLinks = doc.querySelectorAll('a[href*="facebook.com"], a[href*="twitter.com"], a[href*="//x.com"], a[href*="linkedin.com"], a[href*="instagram.com"], a[href*="youtube.com"], a[href*="threads.net"]').length;
-    const wikiLink = doc.querySelector('a[href*="wikipedia.org"]') ? 1 : 0;
-    let brandPts = (hasOrgPerson ? 2 : 0) + ((sameAsCount >= 2 || socialLinks >= 2) ? 2 : 0) + wikiLink * 2;
-    brandPts = Math.min(6, brandPts);
-    total += brandPts;
-    const brandBits = [hasOrgPerson && 'Organization/Person schema', (sameAsCount>=2||socialLinks>=2) && '社群檔案連結', wikiLink && 'Wikipedia 提及'].filter(Boolean);
-    indicators.push({
-      name: '品牌權威（Brand）',
-      detail: brandPts > 0 ? `✅ ${brandBits.join('、')}` : '❌ 缺乏品牌權威訊號，建議加 Organization schema 與官方社群連結（sameAs）',
-      why: 'AI 訓練資料大量來自 Reddit、Wikipedia、YouTube。品牌在這些平台被討論越多，越容易被 AI「認識」並主動提及。這是 GEO 時代取代傳統網域權重的新指標。（註：真實「AI 提及率」需跨站查詢，本工具只能從單頁偵測代理訊號，故權重低。）',
-      fix: '單頁可做：加 Organization schema + sameAs 列出所有官方平台（FB/IG/LinkedIn/YouTube）。長期品牌工程（行銷/公關）：在相關 Reddit 真誠討論、爭取主流媒體報導後建立 Wikipedia 條目、上產業 podcast/KOL 訪談。',
-      pts: brandPts, max: 6, pass: brandPts >= 3, scope: 'page',
-    });
-
-    // 7. 平台優化 OG + Twitter Card + RSS (7 pts)
-    const ogTitle = doc.querySelector('meta[property="og:title"]')?.getAttribute('content');
-    const ogDesc = doc.querySelector('meta[property="og:description"]')?.getAttribute('content');
-    const ogImage = doc.querySelector('meta[property="og:image"]')?.getAttribute('content');
-    const ogType = doc.querySelector('meta[property="og:type"]')?.getAttribute('content');
-    const ogUrl = doc.querySelector('meta[property="og:url"]')?.getAttribute('content');
-    const ogSite = doc.querySelector('meta[property="og:site_name"]')?.getAttribute('content');
-    const twCard = doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content');
+    // 6. RSS / Atom feed (5 pts) — 從原「平台優化」拆出
+    // OG / Twitter Card 已搬到 SEO（社群分享預覽），這裡只留真正屬於 AI 引用訊號的 RSS。
     const hasRss = !!doc.querySelector('link[rel="alternate"][type="application/rss+xml"], link[rel="alternate"][type="application/atom+xml"]');
-    const ogCore = (ogTitle?1:0)+(ogDesc?1:0)+(ogImage?1:0)+(ogType?1:0)+(ogUrl||ogSite?1:0); // OG 五分
-    const ogPts = ogCore + (twCard?1:0) + (hasRss?1:0); // +Twitter +RSS = 7
-    total += ogPts;
-    const missing = [!ogTitle&&'og:title', !ogDesc&&'og:description', !ogImage&&'og:image', !ogType&&'og:type', !(ogUrl||ogSite)&&'og:url/site_name', !twCard&&'twitter:card', !hasRss&&'RSS feed'].filter(Boolean);
+    const rssPts = hasRss ? 5 : 0;
+    total += rssPts;
     indicators.push({
-      name: '平台優化（OG / Twitter / RSS）',
-      detail: ogPts >= 7 ? '✅ OG、Twitter Card、RSS feed 皆完整' : `⚠️ 缺少：${missing.join('、')}`,
-      why: '決定文章分享到 LINE/FB/Threads/X 時的預覽樣式，標籤完整點擊率明顯較高。RSS/Atom feed 則是 AI 爬蟲的「邀請函」——GPTBot、ClaudeBot 會讀 feed 發現新內容，沒有的話 AI 對你更新的感知會慢 7-14 天。',
-      fix: '【技術部門】補齊 og:title/description/image(1200×630)/url/type/site_name + twitter:card=summary_large_image；網站提供 RSS/Atom feed（保留最新 20 篇）。用 metatags.io 預覽各平台效果。',
-      pts: ogPts, max: 7,
-      pass: ogPts >= 5, scope: 'page',
+      name: 'RSS / Atom feed',
+      detail: hasRss ? '✅ 提供 RSS/Atom feed（AI 爬蟲發現新內容的快速管道）' : '❌ 未提供 RSS/Atom feed（AI 對新文章感知延遲 7-14 天）',
+      why: 'RSS/Atom feed 是給 AI 爬蟲的「邀請函」——GPTBot、ClaudeBot、PerplexityBot 會讀 feed 發現網站更新。沒有的話 AI 只能等下次重爬，新文被引用的時機點會慢上 1-2 週。',
+      fix: '【技術部門】網站提供 /rss.xml 或 /feed（保留最新 20-30 篇）；<head> 加 <link rel="alternate" type="application/rss+xml" href="/rss.xml">。',
+      pts: rssPts, max: 5, pass: hasRss, scope: 'site',
     });
   } else {
-    indicators.push({ name: 'Schema / 內容結構 / E-E-A-T', detail: '⚠️ 無法取得 HTML，略過', pts: 0, max: 90, pass: null });
+    // 無法取得 HTML → 本區內所有 page-level 項目標為不適用，不計分（避免「拿不到 HTML 就被扣 90 分」）
+    indicators.push({ name: 'Schema / 內容結構 / E-E-A-T', detail: '— 無法取得 HTML（CORS 防護或網站需登入），本區項目自動排除、不計分', pts: 0, max: 0, pass: null });
   }
 
   // 8. AI Crawlers in robots.txt (10 pts) — 9 隻主流 AI 爬蟲
@@ -1606,7 +1632,8 @@ function scoreAEO(doc, html, isDoc) {
     ]};
   }
 
-  // 1. FAQPage Schema (22 pts) — 驗 @type=FAQPage 且含 mainEntity 問答（非字串比對）
+  // 1. FAQPage Schema — 加分項（bonus）：有就加 22 分，無則 max:0 不計入分母。
+  // 理由：敘事報導本就不需要 Q&A 結構，硬設 max:22 等於對非 FAQ 文體永久扣分。
   let hasFaq = false, faqCount = 0;
   doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
     try {
@@ -1620,19 +1647,22 @@ function scoreAEO(doc, html, isDoc) {
     } catch {}
   });
   const faqPts = hasFaq ? 22 : 0;
+  const faqMax = hasFaq ? 22 : 0; // bonus：無則不計分母，有則計入
   total += faqPts;
   indicators.push({
     name: 'FAQPage 結構化資料',
-    detail: hasFaq ? `✅ 有效 FAQPage schema（${faqCount} 組問答）` : '❌ 未設定有效 FAQPage（需 @type=FAQPage 且含 mainEntity 問答陣列）',
-    why: 'FAQPage schema 讓搜尋與 AI 引擎直接理解「問答對應關係」。Google 2023 雖縮減一般網站的 FAQ 富摘要顯示，但 ChatGPT、Perplexity、Claude、Bing Copilot 仍優先解析 FAQ 問答對當引用單元。沒 schema，AI 得自己猜「這段是不是問答」，猜不到就略過。',
-    fix: '【技術部門＋記者】文末加 5-8 題 Q&A，套 FAQPage JSON-LD（必須含 mainEntity 問答陣列）。問題用使用者真實搜尋語氣（「綠色債券怎麼買？」優於「綠色債券簡介」）；每個答案 50-150 字、直接答覆＋一個數據。schema 文字要與頁面可見內容一致。',
-    pts: faqPts, max: 22,
-    pass: hasFaq, scope: 'page',
+    detail: hasFaq ? `✅ 有效 FAQPage schema（${faqCount} 組問答）加分 +22` : '— 無 FAQPage schema（非 Q&A 文體可忽略；問答型文章加上可提升 AI 引用率）',
+    why: 'FAQPage schema 讓搜尋與 AI 引擎直接理解「問答對應關係」。ChatGPT、Perplexity、Claude、Bing Copilot 仍優先解析 FAQ 問答對當引用單元。沒 schema，AI 得自己猜「這段是不是問答」，猜不到就略過。',
+    fix: '【技術部門＋記者】文末加 5-8 題 Q&A，套 FAQPage JSON-LD（必須含 mainEntity 問答陣列）。問題用使用者真實搜尋語氣（「綠色債券怎麼買？」優於「綠色債券簡介」）；每個答案 50-150 字、直接答覆＋一個數據。',
+    pts: faqPts, max: faqMax,
+    pass: hasFaq ? true : null, scope: 'page',
   });
 
   // 2. Question headings (22 pts) — 問號滿分；含疑問詞但無問號給部分分
   const headings = Array.from(doc.querySelectorAll('h2, h3'));
-  const qWord = /(為什麼|為何|如何|怎麼|怎樣|什麼是|是什麼|哪些|哪個|多少|該不該|要不要|是否|有沒有|嗎|呢|差別|差異|vs|比較)/i;
+  // 移除「差別/差異/vs/比較」——這些詞在陳述句小標（如「產品規格比較」）也會出現，
+  // 不足以代表真正的問句意圖，誤判會虛胖分數。
+  const qWord = /(為什麼|為何|如何|怎麼|怎樣|什麼是|是什麼|哪些|哪個|多少|該不該|要不要|是否|有沒有|嗎|呢)/i;
   const fullQ = headings.filter(h => /[?？]\s*$/.test(h.textContent.trim()));
   const wordQ = headings.filter(h => !/[?？]\s*$/.test(h.textContent.trim()) && qWord.test(h.textContent));
   const qhPts = Math.min(22, fullQ.length * 5 + wordQ.length * 3);  // 問號5/疑問詞3
@@ -1682,19 +1712,21 @@ function scoreAEO(doc, html, isDoc) {
     pass: saPts >= 13, scope: 'page',
   });
 
-  // 4. 表格 (10 pts) — 表格式精選摘要「低競爭高曝光」入口
+  // 4. 表格 — 加分項（bonus）：有就加 12 分，無則 max:0 不計入分母。
+  // 理由：非比較型文章本就不需要表格，硬設 max 等於對純敘事文章永久扣分。
   const tables = Array.from(doc.querySelectorAll('table')).filter(t => t.querySelector('td, th'));
   const tablePts = tables.length > 0 ? 12 : 0;
+  const tableMax = tables.length > 0 ? 12 : 0;
   total += tablePts;
   indicators.push({
     name: '比較表格（table）',
     detail: tables.length > 0
-      ? `✅ 找到 ${tables.length} 個 HTML 表格（表格式精選摘要・低競爭入口）`
-      : '— 涉及「A vs B／方案比較／規格對比」時，建議用 HTML <table>（多數對手用圖片，你做表格就贏）',
+      ? `✅ 找到 ${tables.length} 個 HTML 表格（表格式精選摘要・低競爭入口）加分 +12`
+      : '— 無比較表格（非比較型文章可忽略；涉及「A vs B／規格對比」時加上可拿低競爭精選摘要）',
     why: '表格式精選摘要是三大格式中競爭最低的入口——大部分網站用圖片或散文代替比較資訊，Google 抓不到結構化欄位只能放棄。只要文章有「比較、對照、vs」，做了結構化表格就有機會直接拿下第 0 位。',
     fix: '把比較型資訊（方案 A/B/C、規格對照、各年數據）改用標準 HTML <table>（含 thead/tbody），別用圖片或純文字排版。欄位 2-3 欄、列數 3-8 列，每格內容 10 字內。記者：用編輯器的「插入表格」功能即可。',
-    pts: tablePts, max: 12,
-    pass: tablePts >= 1, scope: 'page',
+    pts: tablePts, max: tableMax,
+    pass: tables.length > 0 ? true : null, scope: 'page',
   });
 
   // 5. List structure (12 pts) — 只算「≥4 項」的真實列表（Snippet 門檻）
@@ -1728,15 +1760,18 @@ function scoreAEO(doc, html, isDoc) {
       });
     } catch {}
   });
+  // 6. HowTo — 加分項（bonus）：有就加 10 分，無則 max:0 不計入分母。
+  // 理由：敘事型財經/ESG 報導本就不是教學文，硬設 max 等於永久扣分。
   const howToPts = hasHowTo ? 10 : 0;
+  const howToMax = hasHowTo ? 10 : 0;
   total += howToPts;
   indicators.push({
     name: 'HowTo 結構化資料',
-    detail: hasHowTo ? `✅ 有效 HowTo schema（${stepCount} 個步驟）` : '— 未設定有效 HowTo（步驟型文章才需要；非教學文可忽略）',
-    why: '步驟型內容（「如何申辦綠色債券」「怎麼評估 ESG 評級」）加 HowTo schema，AI 與 Google 才能逐步拆解、進入 AI Overview 步驟列表與語音助理朗讀順序。Google 2023 雖移除桌面富摘要，但手機端仍顯示、機器可讀性價值反而更高。',
-    fix: '【僅步驟型文章需要】H2 用「步驟 N：動詞＋受詞」，加 HowTo JSON-LD（含 step 陣列，每步有 name/text）。敘事型財經/ESG 報導不是教學文，可忽略此項、不影響分數判讀。',
-    pts: howToPts, max: 10,
-    pass: howToPts >= 1, scope: 'page',
+    detail: hasHowTo ? `✅ 有效 HowTo schema（${stepCount} 個步驟）加分 +10` : '— 無 HowTo schema（非步驟型文章可忽略；教學型文章加上可進入 AI Overview 步驟列表）',
+    why: '步驟型內容（「如何申辦綠色債券」「怎麼評估 ESG 評級」）加 HowTo schema，AI 與 Google 才能逐步拆解、進入 AI Overview 步驟列表與語音助理朗讀順序。',
+    fix: '【僅步驟型文章需要】H2 用「步驟 N：動詞＋受詞」，加 HowTo JSON-LD（含 step 陣列，每步有 name/text）。敘事型財經/ESG 報導不是教學文，可跳過。',
+    pts: howToPts, max: howToMax,
+    pass: hasHowTo ? true : null, scope: 'page',
   });
 
   neutralizeWebOnly(indicators, isDoc);
@@ -1990,8 +2025,9 @@ function renderSuggestions(scores) {
     '列表結構': { action: '遇到「步驟、方法、種類、重點」時改用條列清單（真實的項目符號，不是純文字的 1.2.3.）。每項 5-15 字、動詞開頭、至少 4 項，利於被精選摘要與 AI 擷取。', priority: 'low' },
     '頁面速度': { action: '【請技術處理】依 CrUX 真實用戶數據，重點壓低 LCP（圖片壓至 500KB 以下、延後第三方腳本）與 CLS（廣告版位預留高度）。Core Web Vitals 直接影響 Google 排名。', priority: 'mid' },
     'Mobile': { action: '【請技術處理】確認頁面有 <meta name="viewport" content="width=device-width, initial-scale=1">，並避免 user-scalable=no。Google 採行動優先索引，超過 6 成讀者用手機看新聞。', priority: 'mid' },
-    '品牌權威': { action: '加上 Organization 結構化標記與官方社群連結（sameAs：FB / IG / LinkedIn / YouTube）。長期則在相關 Reddit、Wikipedia 累積真誠的品牌提及——AI 訓練資料大量來自這些平台，被討論越多越容易被引用。', priority: 'mid' },
-    '平台優化': { action: '補齊 Open Graph 與 Twitter Card 標籤（標題、說明、封面圖）。分享到 LINE／FB／X 時有圖有摘要的點閱率高出數倍，也讓 AI 比對品牌跨平台資訊一致性。', priority: 'low' },
+    '結構化資料 + 品牌權威': { action: '【技術部門】加上完整 NewsArticle JSON-LD（headline / author / datePublished / image / publisher）+ Organization schema 與 sameAs 列出官方 FB/IG/LinkedIn/YouTube。這是 AI 理解「這是誰寫的、什麼時候寫的、代表什麼品牌」的最直接方式。', priority: 'high' },
+    '社群分享預覽': { action: '補齊 og:title / og:description / og:image (1200×630) / og:url + twitter:card=summary_large_image。文章分享到 LINE／FB／X 時，有圖有摘要的點閱率高出 3 倍以上。', priority: 'mid' },
+    'RSS': { action: '【技術部門】網站提供 /rss.xml 或 /feed，並在 <head> 加 <link rel="alternate" type="application/rss+xml">。GPTBot / ClaudeBot 靠 RSS 發現新文章，沒有的話 AI 感知你的新內容會慢 1-2 週。', priority: 'low' },
     '文章結構': { action: '長文開頭加「章節目錄」：用錨點連結(a href=#段落)連到各 H2/H3 小標（標題加 id）。AI 靠章節結構精準引用某一段，Google 也可能顯示「跳到段落」子連結。標題層級分明（H2 主段、H3 子段）也讓 AI 更易切分內容。', priority: 'mid' },
   };
 
