@@ -2196,14 +2196,14 @@ function renderResults(url, scores) {
     infoCard.classList.add('no-image');
   }
   // URL 行（Word 模式不顯示）
-  const urlEl = document.getElementById('articleInfoUrl');
+  const infoUrlEl = document.getElementById('articleInfoUrl');
   if (scores.isDoc) {
-    urlEl.textContent = '📄 Word 草稿模式';
+    infoUrlEl.textContent = '📄 Word 草稿模式';
   } else {
     try {
       const u = new URL(url);
-      urlEl.innerHTML = `<a href="${url}" target="_blank" rel="noopener">${u.hostname}${u.pathname}</a>`;
-    } catch { urlEl.textContent = url; }
+      infoUrlEl.innerHTML = `<a href="${url}" target="_blank" rel="noopener">${u.hostname}${u.pathname}</a>`;
+    } catch { infoUrlEl.textContent = url; }
   }
   document.getElementById('articleInfoTitle').textContent = am.title || (scores.isDoc ? '（Word 草稿）' : '（未取得標題）');
   const descEl = document.getElementById('articleInfoDesc');
