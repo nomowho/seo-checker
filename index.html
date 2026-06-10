@@ -1963,14 +1963,14 @@ function scoreAEO(doc, html, isDoc) {
     if (qaPairs >= 4) { hasVisibleFaq = true; visibleFaqCount = Math.floor(qaPairs / 2); }
   }
 
-  const faqPts = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 10 : 0);
+  const faqPts = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 7 : 0);
   const faqMax = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 10 : 4);
   let faqDetail, faqPass;
   if (hasJsonLdFaq) {
     faqDetail = `✅ FAQPage JSON-LD 結構化標記（${jsonLdFaqCount} 組問答）+22 分 — 可觸發 Google FAQ 富文本展開`;
     faqPass = true;
   } else if (hasVisibleFaq) {
-    faqDetail = `⚠️ 偵測到可見 Q&A 格式（${visibleFaqCount} 組）+10/22 分 — AI 引擎可讀取；補上 FAQPage JSON-LD 可再得 +12 並觸發 Google 搜尋展開問答`;
+    faqDetail = `⚠️ 偵測到可見 Q&A 格式（${visibleFaqCount} 組）— AI 引擎可讀取（7/10 分）；補上 FAQPage JSON-LD 可升至滿分並觸發 Google 搜尋展開問答`;
     faqPass = false;
   } else {
     faqDetail = '⚠️ 未偵測到 FAQ 結構（問答型文章建議加 5-8 組 Q&A + FAQPage JSON-LD，可顯著提升 AI 引用率）';
