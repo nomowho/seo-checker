@@ -137,8 +137,32 @@ header {
   background: var(--card);
   border: 1px solid var(--text);
   border-radius: 999px;
+  overflow: visible;
+}
+.url-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 80px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.10);
+  z-index: 999;
   overflow: hidden;
 }
+.url-dropdown-item {
+  padding: 11px 18px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid var(--border);
+}
+.url-dropdown-item:last-child { border-bottom: none; }
+.url-dropdown-item:hover { background: var(--primary-bg); color: var(--text); }
 .input-row input {
   flex: 1;
   border: none;
@@ -227,13 +251,111 @@ main { max-width: 1060px; margin: 0 auto; padding: 40px 24px 72px; }
 #resultsWrap { display: none; }
 #resultsWrap.show { display: block; }
 
-.result-url {
-  font-size: 13px;
-  color: var(--text3);
-  margin-bottom: 20px;
-  word-break: break-all;
+.result-url { display: none; }
+
+/* ─── ARTICLE INFO （上方橫條，分數卡之上）─── */
+.result-layout {
+  display: block;
+  margin-bottom: 24px;
 }
-.result-url a { color: var(--primary); text-decoration: none; }
+.article-info-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 22px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.article-info-card.no-image {
+  grid-template-columns: 1fr;
+}
+.article-info-label {
+  display: none; /* 上方布局不需要 ARTICLE INFO 標籤，標題已能表達 */
+}
+.article-og-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--primary-bg);
+  display: block;
+}
+.article-og-image.hidden { display: none; }
+.article-info-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.article-info-url {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--mono);
+  letter-spacing: .03em;
+  word-break: break-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.article-info-url a { color: inherit; text-decoration: none; }
+.article-info-url a:hover { color: var(--text); text-decoration: underline; }
+.article-info-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--text);
+  margin: 0;
+}
+.article-info-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.article-info-desc.hidden { display: none; }
+.article-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.article-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text2);
+}
+.article-meta-key {
+  color: var(--text3);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.article-meta-val {
+  color: var(--text);
+  font-weight: 600;
+  word-break: break-word;
+}
+@media (max-width: 600px) {
+  .article-info-card { grid-template-columns: 1fr; padding: 16px; gap: 14px; }
+  .article-og-image { aspect-ratio: 16 / 9; }
+  .article-info-title { font-size: 16px; }
+}
+
+.result-main {
+  min-width: 0;
+}
 
 /* ─── SCORE OVERVIEW ─── */
 .score-overview {
@@ -449,33 +571,38 @@ main { max-width: 1060px; margin: 0 auto; padding: 40px 24px 72px; }
 .sug-tag.aeo { background: var(--primary-bg); color: var(--text2); }
 
 /* ─── EDUCATION ─── */
-.edu-section { margin-top: 40px; }
-.edu-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+.edu-section { margin-top: 48px; }
+.edu-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
 .edu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 720px) {
+  .edu-grid { grid-template-columns: 1fr; }
 }
 .edu-card {
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 20px;
+  padding: 28px 24px;
 }
-.edu-emoji { font-size: 24px; margin-bottom: 10px; }
-.edu-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-.edu-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.edu-emoji { font-size: 28px; margin-bottom: 14px; }
+.edu-title { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.edu-desc { font-size: 13px; color: var(--text2); line-height: 1.7; }
 .edu-scoring {
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
   border-top: 1px dashed var(--border);
 }
 .edu-scoring-title {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--primary);
-  margin-bottom: 8px;
-  letter-spacing: 0.02em;
+  margin-bottom: 14px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 .edu-scoring-list {
   margin: 0;
@@ -483,25 +610,36 @@ main { max-width: 1060px; margin: 0 auto; padding: 40px 24px 72px; }
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 0;
 }
 .edu-scoring-list li {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text2);
-  line-height: 1.5;
+  line-height: 1.6;
   display: flex;
-  align-items: baseline;
-  gap: 7px;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+}
+.edu-scoring-list li:first-child { padding-top: 0; }
+.edu-scoring-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 .edu-pts {
   flex-shrink: 0;
+  min-width: 52px;
+  text-align: right;
   background: var(--primary-bg);
   color: var(--primary);
   font-weight: 700;
   font-size: 11px;
-  padding: 1px 6px;
+  padding: 3px 7px;
   border-radius: 4px;
   white-space: nowrap;
+  font-family: var(--mono);
+  letter-spacing: 0.02em;
 }
 
 /* ─── HISTORY ─── */
@@ -731,9 +869,10 @@ footer {
     <span class="badge badge-aeo">💬 AEO 精選摘要</span>
   </div>
   <div class="input-wrap">
-    <div class="input-row">
+    <div class="input-row" style="position:relative;">
       <input type="url" id="urlInput" placeholder="https://your-website.com" autocomplete="off" />
       <button id="analyzeBtn" onclick="startAnalysis()">開始分析</button>
+      <div id="urlDropdown" class="url-dropdown" style="display:none;"></div>
     </div>
     <div class="upload-row">
       <span class="upload-or">或</span>
@@ -788,59 +927,76 @@ footer {
     </div>
     <p class="result-url">分析網址：<a id="resultUrl" href="#" target="_blank"></a></p>
 
-    <!-- Score overview -->
-    <div class="score-overview">
-      <div class="score-card active" onclick="switchTab('seo')" id="cardSeo">
-        <div class="score-label">SEO · Google 排名</div>
-        <div class="score-big"><span id="numSeo">—</span><span class="unit"> /100</span></div>
-        <div class="score-bar"><div class="score-bar-fill" id="ringSeo"></div></div>
-        <div class="score-sublabel" id="labelSeo">—</div>
+    <!-- 上：文章資訊預覽橫條；下：分數與分析內容 -->
+    <div class="result-layout">
+      <!-- 文章資訊預覽（上方橫條） -->
+      <div class="article-info-card" id="articleInfoCard">
+        <img id="articleOgImage" class="article-og-image hidden" src="" alt="文章封面" onerror="this.classList.add('hidden'); document.getElementById('articleInfoCard').classList.add('no-image')">
+        <div class="article-info-body">
+          <div class="article-info-url" id="articleInfoUrl"></div>
+          <h2 id="articleInfoTitle" class="article-info-title"></h2>
+          <div id="articleInfoDesc" class="article-info-desc hidden"></div>
+          <div class="article-meta-row" id="articleMetaRow"></div>
+        </div>
       </div>
-      <div class="score-card" onclick="switchTab('geo')" id="cardGeo">
-        <div class="score-label">GEO · AI 引用</div>
-        <div class="score-big"><span id="numGeo">—</span><span class="unit"> /100</span></div>
-        <div class="score-bar"><div class="score-bar-fill" id="ringGeo"></div></div>
-        <div class="score-sublabel" id="labelGeo">—</div>
-      </div>
-      <div class="score-card" onclick="switchTab('aeo')" id="cardAeo">
-        <div class="score-label">AEO · 精選摘要</div>
-        <div class="score-big"><span id="numAeo">—</span><span class="unit"> /100</span></div>
-        <div class="score-bar"><div class="score-bar-fill" id="ringAeo"></div></div>
-        <div class="score-sublabel" id="labelAeo">—</div>
-      </div>
-    </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <div class="tab-nav">
-        <button class="tab-btn active" id="tabSeo" onclick="switchTab('seo')">🔍 SEO 分析</button>
-        <button class="tab-btn" id="tabGeo" onclick="switchTab('geo')">🤖 GEO 分析</button>
-        <button class="tab-btn" id="tabAeo" onclick="switchTab('aeo')">💬 AEO 分析</button>
-      </div>
-      <div class="tab-panel active" id="panelSeo">
-        <div class="indicator-grid" id="gridSeo"></div>
-      </div>
-      <div class="tab-panel" id="panelGeo">
-        <div class="indicator-grid" id="gridGeo"></div>
-      </div>
-      <div class="tab-panel" id="panelAeo">
-        <div class="indicator-grid" id="gridAeo"></div>
-      </div>
-    </div>
+      <!-- 分數與分析（下方） -->
+      <div class="result-main">
+        <!-- Score overview -->
+        <div class="score-overview">
+          <div class="score-card active" onclick="switchTab('seo')" id="cardSeo">
+            <div class="score-label">SEO · Google 排名</div>
+            <div class="score-big"><span id="numSeo">—</span><span class="unit"> /100</span></div>
+            <div class="score-bar"><div class="score-bar-fill" id="ringSeo"></div></div>
+            <div class="score-sublabel" id="labelSeo">—</div>
+          </div>
+          <div class="score-card" onclick="switchTab('geo')" id="cardGeo">
+            <div class="score-label">GEO · AI 引用</div>
+            <div class="score-big"><span id="numGeo">—</span><span class="unit"> /100</span></div>
+            <div class="score-bar"><div class="score-bar-fill" id="ringGeo"></div></div>
+            <div class="score-sublabel" id="labelGeo">—</div>
+          </div>
+          <div class="score-card" onclick="switchTab('aeo')" id="cardAeo">
+            <div class="score-label">AEO · 精選摘要</div>
+            <div class="score-big"><span id="numAeo">—</span><span class="unit"> /100</span></div>
+            <div class="score-bar"><div class="score-bar-fill" id="ringAeo"></div></div>
+            <div class="score-sublabel" id="labelAeo">—</div>
+          </div>
+        </div>
 
-    <!-- Suggestions -->
-    <div class="suggestions">
-      <h3>🎯 記者改稿建議</h3>
-      <div class="sug-intro">依影響程度排序，從最該優先處理的開始。每條都對應上方某個失分指標。</div>
-      <div id="suggestionList"></div>
-    </div>
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab-nav">
+            <button class="tab-btn active" id="tabSeo" onclick="switchTab('seo')">🔍 SEO 分析</button>
+            <button class="tab-btn" id="tabGeo" onclick="switchTab('geo')">🤖 GEO 分析</button>
+            <button class="tab-btn" id="tabAeo" onclick="switchTab('aeo')">💬 AEO 分析</button>
+          </div>
+          <div class="tab-panel active" id="panelSeo">
+            <div class="indicator-grid" id="gridSeo"></div>
+          </div>
+          <div class="tab-panel" id="panelGeo">
+            <div class="indicator-grid" id="gridGeo"></div>
+          </div>
+          <div class="tab-panel" id="panelAeo">
+            <div class="indicator-grid" id="gridAeo"></div>
+          </div>
+        </div>
 
-    <!-- Re-analyze -->
-    <div style="text-align:center; margin-top: 8px;">
-      <button onclick="startAnalysis()" style="background:var(--card);color:var(--text);border:1px solid var(--text);padding:10px 24px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;">
-        🔄 重新分析
-      </button>
-    </div>
+        <!-- Suggestions -->
+        <div class="suggestions">
+          <h3>🎯 記者改稿建議</h3>
+          <div class="sug-intro">依影響程度排序，從最該優先處理的開始。每條都對應上方某個失分指標。</div>
+          <div id="suggestionList"></div>
+        </div>
+
+        <!-- Re-analyze -->
+        <div style="text-align:center; margin-top: 8px;">
+          <button onclick="startAnalysis()" style="background:var(--card);color:var(--text);border:1px solid var(--text);padding:10px 24px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;">
+            🔄 重新分析
+          </button>
+        </div>
+      </div><!-- end result-main -->
+    </div><!-- end result-layout -->
   </div>
 
   <!-- History -->
@@ -911,9 +1067,9 @@ footer {
             <li><span class="edu-pts">22 pts</span> 問句式標題 — 以「？」結尾的 H2/H3（搶「大家也問」），疑問詞標題各 3 分</li>
             <li><span class="edu-pts">22 pts</span> 答案前置短段 — 小標正下方 40–120 字直接答案（精選摘要真實抓取位置）</li>
             <li><span class="edu-pts">12 pts</span> 列表結構 — 真實 &lt;ul&gt;/&lt;ol&gt; ≥4 項（列表式摘要觸發門檻）</li>
-            <li><span class="edu-pts">+22 加分</span> FAQPage Schema — 有問答 JSON-LD 則加分；無則不扣分（非 Q&A 文體可忽略）</li>
-            <li><span class="edu-pts">+12 加分</span> 比較表格 — 有 HTML &lt;table&gt; 則加分；無則不扣分（非比較型文章可忽略）</li>
-            <li><span class="edu-pts">+10 加分</span> HowTo Schema — 有步驟 JSON-LD 則加分；無則不扣分（非教學文可忽略）</li>
+            <li><span class="edu-pts">22 pts</span> FAQPage Schema — 偵測 JSON-LD 中是否有問答結構化標記</li>
+            <li><span class="edu-pts">12 pts</span> 比較表格 — HTML &lt;table&gt;，表格式精選摘要低競爭入口</li>
+            <li><span class="edu-pts">10 pts</span> HowTo Schema — 含步驟說明的結構化標記</li>
           </ul>
         </div>
       </div>
@@ -1107,6 +1263,96 @@ async function fetchCrux(url) {
 function calculateScores(doc, html, robotsTxt, ps, crux, sitemapOk, isDoc) {
   const robotsMeta = doc ? (doc.querySelector('meta[name="robots"]')?.getAttribute('content') || '') : '';
   const isNoindex = /noindex/i.test(robotsMeta);
+
+  // 抓取文章 meta 資訊供側邊欄顯示
+  let articleMeta = {};
+  if (doc) {
+    const title = doc.querySelector('title')?.textContent?.trim() || doc.querySelector('h1')?.textContent?.trim() || '';
+    const desc = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim()
+      || doc.querySelector('meta[property="og:description"]')?.getAttribute('content')?.trim() || '';
+    const ogImage = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '';
+    // 作者：優先抓帶文字的 DOM 元素，避免抓到 link[rel=author] 的 href URL
+    const isUrl = s => /^https?:\/\//.test(s);
+    let author = '';
+    // 作者：優先 meta，再找 DOM 文字節點，最後只取中文姓名
+    const authorMeta = doc.querySelector('meta[name="author"], meta[property="article:author"]');
+    if (authorMeta) {
+      author = authorMeta.getAttribute('content')?.trim() || '';
+    } else {
+      const authorSelectors = [
+        '[itemprop="author"]', '.author-name', '.byline__author',
+        '[class*="author-name"]', '[class*="authorName"]',
+        'a[rel="author"]', '.reporter', '[class*="reporter"]',
+        '[class*="writer"]',
+        'a[href*="author"]', 'a[href*="reporter"]', 'a[href*="journalist"]',
+        'a[href*="/author/"]', 'a[href*="/reporter/"]',
+        'a[href*="/blog/"]',   // GVM: <a class="user" href="/blog/6355">張金鶚</a>
+        '.user',
+      ];
+      for (const sel of authorSelectors) {
+        const el = doc.querySelector(sel);
+        if (!el) continue;
+        const raw = el.textContent.trim();
+        // 只要是 2–10 字的短文字（排除導覽列連結）
+        if (raw && raw.length >= 2 && raw.length <= 10) { author = raw; break; }
+      }
+      // 備援：找 h1 附近的短中文連結（適用作者連結緊鄰標題的版面）
+      if (!author) {
+        const h1 = doc.querySelector('h1');
+        if (h1) {
+          let el = h1.nextElementSibling;
+          for (let i = 0; i < 5 && el; i++, el = el.nextElementSibling) {
+            const links = Array.from(el.querySelectorAll('a'));
+            for (const a of links) {
+              const t = a.textContent.trim();
+              if (/^[一-鿿]{2,6}$/.test(t)) { author = t; break; }
+            }
+            if (author) break;
+          }
+        }
+      }
+    }
+    // 只保留第一個 2-6 字的中文姓名片段
+    const cnMatch = author.match(/[一-鿿·•]{2,6}/);
+    if (cnMatch) author = cnMatch[0];
+    else if (isUrl(author)) author = '';
+
+    const dateStr = doc.querySelector('meta[property="article:published_time"], meta[itemprop="datePublished"]')?.getAttribute('content')
+      || doc.querySelector('meta[property="article:modified_time"]')?.getAttribute('content')
+      || doc.querySelector('[datetime]')?.getAttribute('datetime') || '';
+    // 字數：抓 article/main 主體，排除導覽列、頁尾、側邊欄等版面噪聲
+    const articleRoot = doc.querySelector('article, main, [class*="article-content"], [class*="article-body"], [class*="post-content"], [class*="entry-content"]') || doc.body;
+    let bodyText = '';
+    if (articleRoot) {
+      const clone = articleRoot.cloneNode(true);
+      clone.querySelectorAll('nav, footer, header, aside, script, style, [class*="nav"], [class*="footer"], [class*="header"], [class*="sidebar"], [class*="menu"], [class*="recommend"], [class*="related"]').forEach(n => n.remove());
+      bodyText = clone.textContent || '';
+    }
+    const wordCount = bodyText.replace(/\s+/g, '').length;
+
+    // PV：嘗試從頁面常見位置萃取瀏覽數
+    let pageViews = '';
+    // 先搜尋包含「瀏覽數」「瀏覽」「閱讀數」的文字節點
+    const allText = Array.from(doc.querySelectorAll('*')).find(el =>
+      el.children.length === 0 && /瀏覽數|瀏覽次數|閱讀數|views?\s*[:：]?\s*\d/i.test(el.textContent)
+    );
+    if (allText) {
+      const m = allText.textContent.match(/瀏覽[數次]*\s*([\d,，+Kk萬]+)/i)
+        || allText.textContent.match(/([\d,，+Kk萬]+)\s*(?:次|瀏覽|views?)/i);
+      if (m) pageViews = m[1];
+    }
+    // 備援：常見 class
+    if (!pageViews) {
+      const pvPatterns = [
+        () => doc.querySelector('[class*="pv"], [class*="read-count"], [class*="hit"], [data-pv]')?.textContent?.match(/[\d,，+Kk]+/)?.[0],
+        () => doc.querySelector('[class*="view-count"], [class*="viewcount"]')?.textContent?.match(/[\d,，+]+/)?.[0],
+      ];
+      for (const fn of pvPatterns) { try { const v = fn(); if (v) { pageViews = v; break; } } catch {} }
+    }
+
+    articleMeta = { title, desc, ogImage, author, dateStr, wordCount, pageViews };
+  }
+
   return {
     seo: scoreSEO(doc, html, ps, crux, sitemapOk, isDoc),
     geo: scoreGEO(doc, html, robotsTxt, isDoc),
@@ -1114,6 +1360,7 @@ function calculateScores(doc, html, robotsTxt, ps, crux, sitemapOk, isDoc) {
     noindex: isNoindex,
     isDoc: !!isDoc,
     jsShell: !isDoc && detectJsShell(doc, html),
+    articleMeta,
   };
 }
 
@@ -1133,8 +1380,7 @@ const WEB_ONLY = [
   '網頁標題', 'Meta Description', '圖片 alt', '社群分享預覽',
   // GEO 技術項
   '結構化資料', 'RSS', 'AI 爬蟲', 'E-E-A-T',
-  // AEO Schema 項（bonus 項在 Word 模式已是 max:0，但仍列入確保一致）
-  'FAQPage', 'HowTo',
+  // AEO Schema 項（FAQPage/HowTo 已改為正式計分項，不在此排除）
 ];
 function neutralizeWebOnly(indicators, isDoc) {
   if (!isDoc) return indicators;
@@ -1646,12 +1892,32 @@ function scoreAEO(doc, html, isDoc) {
       });
     } catch {}
   });
+  // 補偵測 HTML FAQ 區塊（class*="faq"，或 Q1:/Q2:/A: 問答格式）
+  if (!hasFaq && doc) {
+    const faqEls = doc.querySelectorAll('[class*="faq"], [class*="FAQ"], [class*="qa"], [class*="QA"]');
+    if (faqEls.length > 0) { hasFaq = true; faqCount = faqEls.length; }
+  }
+  if (!hasFaq && doc) {
+    // 偵測 Q1: / Q：/ A：格式的問答段落
+    const qaPattern = /^[QqAaＱＡ][1-9１-９]?[\s：:\.]/;
+    const allP = Array.from(doc.querySelectorAll('p, li, div'));
+    const qaPairs = allP.filter(el => el.children.length === 0 && qaPattern.test(el.textContent.trim())).length;
+    if (qaPairs >= 4) { hasFaq = true; faqCount = Math.floor(qaPairs / 2); }
+  }
+
+  // Bonus 邏輯：有 FAQ 內容才加分 22；沒有則 max:0 不計入分母（不扣分）
+  // 理由：敘事報導本就不需要 Q&A 結構，硬設 max:22 等於對非 FAQ 文體永久扣分
   const faqPts = hasFaq ? 22 : 0;
-  const faqMax = hasFaq ? 22 : 0; // bonus：無則不計分母，有則計入
+  const faqMax = hasFaq ? 22 : 0;
   total += faqPts;
+  const hasSchema = hasFaq && faqCount > 0 && !doc?.querySelector('[class*="faq"],[class*="FAQ"]');
   indicators.push({
     name: 'FAQPage 結構化資料',
-    detail: hasFaq ? `✅ 有效 FAQPage schema（${faqCount} 組問答）加分 +22` : '— 無 FAQPage schema（非 Q&A 文體可忽略；問答型文章加上可提升 AI 引用率）',
+    detail: hasFaq
+      ? (hasSchema
+        ? `✅ 有效 FAQPage JSON-LD schema（${faqCount} 組問答）加分 +22`
+        : `✅ 偵測到 HTML FAQ 區塊（${faqCount} 組）加分 +22 — 建議同步加 FAQPage JSON-LD 讓 AI 更容易解析`)
+      : '— 未偵測到 FAQ 結構（非 Q&A 文體可忽略；問答型文章加 5-8 組 Q&A + FAQPage JSON-LD 可拿加分）',
     why: 'FAQPage schema 讓搜尋與 AI 引擎直接理解「問答對應關係」。ChatGPT、Perplexity、Claude、Bing Copilot 仍優先解析 FAQ 問答對當引用單元。沒 schema，AI 得自己猜「這段是不是問答」，猜不到就略過。',
     fix: '【技術部門＋記者】文末加 5-8 題 Q&A，套 FAQPage JSON-LD（必須含 mainEntity 問答陣列）。問題用使用者真實搜尋語氣（「綠色債券怎麼買？」優於「綠色債券簡介」）；每個答案 50-150 字、直接答覆＋一個數據。',
     pts: faqPts, max: faqMax,
@@ -1714,6 +1980,7 @@ function scoreAEO(doc, html, isDoc) {
 
   // 4. 表格 — 加分項（bonus）：有就加 12 分，無則 max:0 不計入分母。
   // 理由：非比較型文章本就不需要表格，硬設 max 等於對純敘事文章永久扣分。
+  // Bonus 邏輯：有比較表格才加分；沒有則 max:0 不計入分母
   const tables = Array.from(doc.querySelectorAll('table')).filter(t => t.querySelector('td, th'));
   const tablePts = tables.length > 0 ? 12 : 0;
   const tableMax = tables.length > 0 ? 12 : 0;
@@ -1722,7 +1989,7 @@ function scoreAEO(doc, html, isDoc) {
     name: '比較表格（table）',
     detail: tables.length > 0
       ? `✅ 找到 ${tables.length} 個 HTML 表格（表格式精選摘要・低競爭入口）加分 +12`
-      : '— 無比較表格（非比較型文章可忽略；涉及「A vs B／規格對比」時加上可拿低競爭精選摘要）',
+      : '— 未偵測到 HTML 表格（非比較型文章可忽略；涉及「A vs B／規格對比」時加上可拿低競爭精選摘要）',
     why: '表格式精選摘要是三大格式中競爭最低的入口——大部分網站用圖片或散文代替比較資訊，Google 抓不到結構化欄位只能放棄。只要文章有「比較、對照、vs」，做了結構化表格就有機會直接拿下第 0 位。',
     fix: '把比較型資訊（方案 A/B/C、規格對照、各年數據）改用標準 HTML <table>（含 thead/tbody），別用圖片或純文字排版。欄位 2-3 欄、列數 3-8 列，每格內容 10 字內。記者：用編輯器的「插入表格」功能即可。',
     pts: tablePts, max: tableMax,
@@ -1760,14 +2027,15 @@ function scoreAEO(doc, html, isDoc) {
       });
     } catch {}
   });
-  // 6. HowTo — 加分項（bonus）：有就加 10 分，無則 max:0 不計入分母。
-  // 理由：敘事型財經/ESG 報導本就不是教學文，硬設 max 等於永久扣分。
+  // Bonus 邏輯：有 HowTo schema 才加分；沒有則 max:0 不計入分母
   const howToPts = hasHowTo ? 10 : 0;
   const howToMax = hasHowTo ? 10 : 0;
   total += howToPts;
   indicators.push({
     name: 'HowTo 結構化資料',
-    detail: hasHowTo ? `✅ 有效 HowTo schema（${stepCount} 個步驟）加分 +10` : '— 無 HowTo schema（非步驟型文章可忽略；教學型文章加上可進入 AI Overview 步驟列表）',
+    detail: hasHowTo
+      ? `✅ 有效 HowTo schema（${stepCount} 個步驟）加分 +10`
+      : '— 未偵測到 HowTo schema（非步驟型文章可忽略；教學型文章加上可進入 AI Overview 步驟列表）',
     why: '步驟型內容（「如何申辦綠色債券」「怎麼評估 ESG 評級」）加 HowTo schema，AI 與 Google 才能逐步拆解、進入 AI Overview 步驟列表與語音助理朗讀順序。',
     fix: '【僅步驟型文章需要】H2 用「步驟 N：動詞＋受詞」，加 HowTo JSON-LD（含 step 陣列，每步有 name/text）。敘事型財經/ESG 報導不是教學文，可跳過。',
     pts: howToPts, max: howToMax,
@@ -1904,6 +2172,58 @@ function renderResults(url, scores) {
   // JS 渲染陷阱橫幅
   const jsb = document.getElementById('jsShellBanner');
   if (jsb) jsb.style.display = scores.jsShell ? 'block' : 'none';
+
+  // 填充文章資訊預覽（上方橫條）
+  const am = scores.articleMeta || {};
+  const infoCard = document.getElementById('articleInfoCard');
+  const ogImg = document.getElementById('articleOgImage');
+  if (am.ogImage && !scores.isDoc) {
+    ogImg.src = am.ogImage;
+    ogImg.classList.remove('hidden');
+    infoCard.classList.remove('no-image');
+  } else {
+    ogImg.classList.add('hidden');
+    infoCard.classList.add('no-image');
+  }
+  // URL 行（Word 模式不顯示）
+  const urlEl = document.getElementById('articleInfoUrl');
+  if (scores.isDoc) {
+    urlEl.textContent = '📄 Word 草稿模式';
+  } else {
+    try {
+      const u = new URL(url);
+      urlEl.innerHTML = `<a href="${url}" target="_blank" rel="noopener">${u.hostname}${u.pathname}</a>`;
+    } catch { urlEl.textContent = url; }
+  }
+  document.getElementById('articleInfoTitle').textContent = am.title || (scores.isDoc ? '（Word 草稿）' : '（未取得標題）');
+  const descEl = document.getElementById('articleInfoDesc');
+  if (am.desc) { descEl.textContent = am.desc; descEl.classList.remove('hidden'); }
+  else descEl.classList.add('hidden');
+  const metaRow = document.getElementById('articleMetaRow');
+  metaRow.innerHTML = '';
+  const metaItems = [];
+  if (am.author) metaItems.push(['👤 作者', am.author]);
+  if (am.dateStr) {
+    const d = new Date(am.dateStr);
+    const label = isNaN(d) ? am.dateStr : d.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    metaItems.push(['📅 日期', label]);
+  }
+  if (am.wordCount) {
+    const wc = am.wordCount;
+    const wcLabel = wc >= 10000 ? (wc/10000).toFixed(1) + ' 萬字' : wc.toLocaleString() + ' 字';
+    const readMin = Math.max(1, Math.round(wc / 350));
+    metaItems.push(['📝 字數', `${wcLabel}（約 ${readMin} 分鐘）`]);
+  }
+  if (am.pageViews) metaItems.push(['👁 瀏覽', am.pageViews]);
+  if (metaItems.length === 0) {
+    metaRow.style.display = 'none';
+  } else {
+    metaRow.style.display = '';
+    metaItems.forEach(([k, v]) => {
+      metaRow.insertAdjacentHTML('beforeend',
+        `<div class="article-meta-item"><span class="article-meta-key">${k}</span><span class="article-meta-val">${v}</span></div>`);
+    });
+  }
 
   ['seo', 'geo', 'aeo'].forEach(dim => {
     setRing(dim, scores[dim].score);
@@ -2223,7 +2543,35 @@ function hideNotice() {
 
 // Enter key triggers analysis
 document.getElementById('urlInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') startAnalysis();
+  if (e.key === 'Enter') { hideUrlDropdown(); startAnalysis(); }
+  if (e.key === 'Escape') hideUrlDropdown();
+});
+
+// History dropdown on focus/input
+function showUrlDropdown(filter = '') {
+  const dd = document.getElementById('urlDropdown');
+  const history = loadHistory();
+  const items = history
+    .filter(h => !h.isDoc && (!filter || h.url.includes(filter)))
+    .slice(0, 8);
+  if (items.length === 0) { hideUrlDropdown(); return; }
+  dd.innerHTML = items.map(h =>
+    `<div class="url-dropdown-item" title="${h.url}" onclick="pickUrl('${encodeURIComponent(h.url)}')">${h.url}</div>`
+  ).join('');
+  dd.style.display = 'block';
+}
+function hideUrlDropdown() {
+  document.getElementById('urlDropdown').style.display = 'none';
+}
+function pickUrl(encoded) {
+  document.getElementById('urlInput').value = decodeURIComponent(encoded);
+  hideUrlDropdown();
+}
+const urlInput = document.getElementById('urlInput');
+urlInput.addEventListener('focus', () => showUrlDropdown(urlInput.value));
+urlInput.addEventListener('input', () => showUrlDropdown(urlInput.value));
+document.addEventListener('click', e => {
+  if (!e.target.closest('.input-row')) hideUrlDropdown();
 });
 
 // ── Word 草稿評分 ──
