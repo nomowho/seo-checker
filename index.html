@@ -1080,7 +1080,7 @@ footer {
           <ul class="edu-scoring-list">
             <li><span class="edu-pts">22 pts</span> 結構化資料 + 品牌權威 — NewsArticle JSON-LD 完整度、Organization schema、sameAs</li>
             <li><span class="edu-pts">18 pts</span> 自包含段落 — 80-250 字、結論句開頭的可引用段落（中文計字，排除導覽／頁尾）</li>
-            <li><span class="edu-pts">15 pts</span> E-E-A-T — 作者署名、發布／更新日期、6 個月內新鮮度</li>
+            <li><span class="edu-pts">20 pts</span> E-E-A-T — 作者署名、日期新鮮度、專業資歷（CFA/MD/博士）、免責聲明（金融／醫療 YMYL）</li>
             <li><span class="edu-pts">10 pts</span> 文章結構 — 目錄錨點、H2/H3 層級、標題密度</li>
             <li><span class="edu-pts">10 pts</span> 數據密度 — 段落含具體數字（%／金額／倍數等統計單位）</li>
             <li><span class="edu-pts">10 pts</span> 權威外連 — 引用 .gov／.edu／Wikipedia 等高權威來源</li>
@@ -1810,7 +1810,7 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       pass: authPts >= 5, scope: 'page',
     });
 
-    // 5. E-E-A-T 作者/日期/新鮮度 (15 pts)
+    // 5. E-E-A-T 作者/日期/新鮮度/免責聲明/專業資歷 (20 pts)
     const authorEl = !!(
       doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]:not([class*="ad"]):not([class*="widget"]):not([class*="banner"]):not([class*="placeholder"])') ||
       doc.querySelector('meta[name="author"], meta[property="article:author"]') ||
@@ -1831,18 +1831,47 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     }
     const authorPts = authorEl ? 6 : 0;
     const datePts = dateEl ? 5 : 0;
-    const freshPts = fresh === true ? 4 : (fresh === false ? 1 : 2); // 6個月內+4；過期+1；未知+2
-    const eeatPts = authorPts + datePts + freshPts;
+    const freshPts = fresh === true ? 4 : (fresh === false ? 1 : 2);
     const freshTxt = fresh === true ? '✅ 內容新鮮（6 個月內更新）' : fresh === false ? '⚠️ 內容較舊（逾 6 個月未更新）' : '日期格式無法判斷新鮮度';
+
+    // 免責聲明偵測（金融 / 醫療 YMYL 訊號）
+    const pageText = doc.body?.innerText || doc.body?.textContent || '';
+    const hasDisclaimer = /投資風險|非投資建議|本文不構成.*投資|僅供參考.*非.*建議|非醫療建議|不構成.*醫療|建議.*就醫|請諮詢.*醫師|免責聲明|disclaimer/i.test(pageText);
+
+    // 專業資歷偵測（作者旁或全文前段）
+    const hasCredential = /CFA|CFP|CPA|FRM|CAIA|醫師|主治|MD\b|Ph\.?D|博士|教授|研究員|首席.*分析師|投資長|財務長|首席.*經濟學家|基金.*經理|法學博士/i.test(pageText.slice(0, 3000));
+
+    // 產業類型推測（用於 fix 文字個人化）
+    const isFinance = /金融|保險|基金|投資|股票|債券|理財|銀行|證券|資產管理|ESG.*投資|永續.*投資/i.test(pageText.slice(0, 1000));
+    const isMedical = /醫療|醫師|診所|藥品|疾病|臨床|療法|症狀|患者|手術|醫院|衛生福利|FDA|衛福部/i.test(pageText.slice(0, 1000));
+
+    const disclaimerPts = hasDisclaimer ? 5 : 0;
+    const credentialPts = hasCredential ? 4 : 0; // 偵測不到也不強制扣（FMCG不需要）
+    const eeatPts = Math.min(20, authorPts + datePts + freshPts + disclaimerPts + credentialPts);
+
+    // 組 detail
+    const eeatLines = [];
+    eeatLines.push(authorEl ? '✅ 有作者署名' : '❌ 未找到作者署名');
+    eeatLines.push(dateEl ? '✅ 有日期標記' : '❌ 未找到日期');
+    eeatLines.push(freshTxt);
+    if (hasCredential) eeatLines.push('✅ 偵測到專業資歷標記（CFA／MD／博士等）');
+    else if (isFinance || isMedical) eeatLines.push('⚠️ 未偵測到作者專業資歷（金融／醫療文章 YMYL 必需）');
+    if (hasDisclaimer) eeatLines.push('✅ 有免責聲明');
+    else if (isFinance) eeatLines.push('⚠️ 未偵測到投資風險聲明（金融 YMYL：建議補「本文不構成投資建議」）');
+    else if (isMedical) eeatLines.push('⚠️ 未偵測到醫療免責聲明（建議補「本文不構成醫療建議，請諮詢醫師」）');
+
+    // 組 fix（依產業個人化）
+    let eeatFix = '每篇有記者全名＋職稱（最好附 Person schema 與 sameAs 連 LinkedIn）；標明發布日與更新日，頁面可見處顯示「最後更新：YYYY-MM-DD」。每季回頭審舊文、補新數據並更新 dateModified。';
+    if (isFinance) eeatFix += '【金融 YMYL 加強】作者加註 CFA/CFP/執照字號；文末加「本文不構成投資建議，投資涉及風險，請自行審慎評估」；引用金管會、央行、Bloomberg 等權威來源，並附連結。';
+    else if (isMedical) eeatFix += '【醫療 YMYL 加強】作者加註醫師執照／學術職稱；文末加「本文僅供衛教參考，不構成醫療建議，請諮詢專業醫師」；引用衛福部、WHO、PubMed 等來源，並標記「最後醫療審閱日期」。';
+
     indicators.push({
-      name: 'E-E-A-T：作者・日期・新鮮度',
-      detail: (authorEl && dateEl)
-        ? `✅ 有作者與日期　|　${freshTxt}`
-        : `⚠️ ${!authorEl?'未找到作者 ':''}${!dateEl?'未找到日期':''}`,
-      why: 'E-E-A-T（經驗、專業、權威、可信）是 Google 與 AI 評估內容可信度的框架，醫療/金融類（YMYL）尤其關鍵——無作者署名幾乎進不了前 20。「新鮮度」在 2026 特別重要：AI 偏好 6 個月內更新的內容，過期逾 18 個月被引用機率下降約 60%。',
-      fix: '每篇有記者全名＋職稱（最好附 Person schema 與 sameAs 連 LinkedIn）；標明發布日與更新日，頁面可見處顯示「最後更新：YYYY-MM-DD」。每季回頭審舊文、補新數據並更新 dateModified。',
-      pts: eeatPts, max: 15,
-      pass: eeatPts >= 10, scope: 'page',
+      name: 'E-E-A-T：作者・日期・資歷・免責',
+      detail: eeatLines.join('　|　'),
+      why: 'E-E-A-T（經驗、專業、權威、可信）是 Google 與 AI 評估內容可信度的框架。金融、醫療屬 YMYL（Your Money or Your Life）高風險類，無作者資歷或免責聲明幾乎無法進入 AI 引用清單。新鮮度在 2026 尤其關鍵：AI 偏好 6 個月內更新，逾 18 個月被引用率下降約 60%。',
+      fix: eeatFix,
+      pts: eeatPts, max: 20,
+      pass: eeatPts >= 12, scope: 'page',
     });
 
     // 6. RSS / Atom feed (5 pts) — 從原「平台優化」拆出
