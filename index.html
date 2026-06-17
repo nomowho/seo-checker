@@ -857,6 +857,33 @@ footer {
 </head>
 <body>
 
+<!-- ─── PASSWORD GATE ─── -->
+<div id="pw-gate" style="position:fixed;inset:0;background:#FAFAFA;display:flex;align-items:center;justify-content:center;z-index:9999;">
+  <div style="text-align:center;max-width:360px;width:90%;">
+    <div style="font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px;font-family:'Space Grotesk',sans-serif;">Nomo 文章健檢室</div>
+    <div style="font-size:14px;color:#A0A0A0;margin-bottom:32px;">SEO · GEO · AEO 三維分析</div>
+    <input id="pw-input" type="password" placeholder="輸入密碼" autocomplete="off"
+      style="width:100%;box-sizing:border-box;padding:14px 18px;font-size:16px;border:1.5px solid #E6E6E6;border-radius:10px;outline:none;font-family:inherit;text-align:center;letter-spacing:.1em;transition:border-color .2s;"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" style="color:#C4C4C4;font-size:13px;margin-top:10px;min-height:20px;"></div>
+    <button onclick="checkPw()"
+      style="margin-top:8px;width:100%;padding:14px;background:#0A0A0A;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">
+      進入
+    </button>
+  </div>
+</div>
+<script>
+(function(){
+  const K='_sc_auth';
+  if(sessionStorage.getItem(K)==='1'){document.getElementById('pw-gate').style.display='none';}
+  window.checkPw=function(){
+    const v=document.getElementById('pw-input').value;
+    if(v==='20905449'){sessionStorage.setItem(K,'1');document.getElementById('pw-gate').style.display='none';}
+    else{const e=document.getElementById('pw-err');e.textContent='密碼錯誤';document.getElementById('pw-input').value='';setTimeout(()=>e.textContent='',2000);}
+  };
+})();
+</script>
+
 <header>
   <div class="logo">
     Nomo 文章健檢室
