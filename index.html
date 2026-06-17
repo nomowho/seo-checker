@@ -1080,7 +1080,7 @@ footer {
           <ul class="edu-scoring-list">
             <li><span class="edu-pts">22 pts</span> 結構化資料 + 品牌權威 — NewsArticle JSON-LD 完整度、Organization schema、sameAs</li>
             <li><span class="edu-pts">18 pts</span> 自包含段落 — 80-250 字、結論句開頭的可引用段落（中文計字，排除導覽／頁尾）</li>
-            <li><span class="edu-pts">20 pts</span> E-E-A-T — 作者署名、日期新鮮度、專業資歷（CFA/MD/博士）、免責聲明（金融／醫療 YMYL）</li>
+            <li><span class="edu-pts">26 pts</span> E-E-A-T — 第一手採訪訊號、作者署名＋bio 深度、專業資歷、日期新鮮度、免責聲明、廣編揭露</li>
             <li><span class="edu-pts">10 pts</span> 文章結構 — 目錄錨點、H2/H3 層級、標題密度</li>
             <li><span class="edu-pts">10 pts</span> 數據密度 — 段落含具體數字（%／金額／倍數等統計單位）</li>
             <li><span class="edu-pts">10 pts</span> 權威外連 — 引用 .gov／.edu／Wikipedia 等高權威來源</li>
@@ -1810,68 +1810,93 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       pass: authPts >= 5, scope: 'page',
     });
 
-    // 5. E-E-A-T 作者/日期/新鮮度/免責聲明/專業資歷 (20 pts)
+    // 5. E-E-A-T 全面評估 (26 pts)
+    // ── 作者署名 ──
     const authorEl = !!(
       doc.querySelector('[rel="author"], [itemprop="author"], .author, [class*="author"]:not([class*="ad"]):not([class*="widget"]):not([class*="banner"]):not([class*="placeholder"])') ||
       doc.querySelector('meta[name="author"], meta[property="article:author"]') ||
       jsonLdHasAuthor
     );
+    // ── 作者簡介深度（Expertise）──
+    const hasAuthorBio = !!(
+      doc.querySelector('[class*="author-bio"], [class*="authorBio"], [class*="author-profile"], [class*="authorProfile"], [class*="reporter-bio"], [itemprop="description"]') ||
+      doc.querySelector('a[href*="/author/"], a[href*="/reporter/"], a[href*="/journalist/"]')
+    );
+    // ── 日期 & 新鮮度 ──
     const modifiedStr = jsonLdModified
       || doc.querySelector('meta[property="article:modified_time"]')?.getAttribute('content')
       || jsonLdDate
       || doc.querySelector('meta[property="article:published_time"], meta[itemprop="datePublished"]')?.getAttribute('content')
       || doc.querySelector('[datetime]')?.getAttribute('datetime') || '';
     const dateEl = !!(modifiedStr || doc.querySelector('time, .date, [class*="date"], [itemprop="datePublished"]'));
-    // 新鮮度：dateModified / 發布日是否在 6 個月內
     let fresh = null;
     const d = modifiedStr ? new Date(modifiedStr) : null;
     if (d && !isNaN(d)) {
       const months = (Date.now() - d.getTime()) / (1000 * 60 * 60 * 24 * 30);
       fresh = months <= 6;
     }
-    const authorPts = authorEl ? 6 : 0;
-    const datePts = dateEl ? 5 : 0;
-    const freshPts = fresh === true ? 4 : (fresh === false ? 1 : 2);
     const freshTxt = fresh === true ? '✅ 內容新鮮（6 個月內更新）' : fresh === false ? '⚠️ 內容較舊（逾 6 個月未更新）' : '日期格式無法判斷新鮮度';
 
-    // 免責聲明偵測（金融 / 醫療 YMYL 訊號）
+    // ── 全文文字 ──
     const pageText = doc.body?.innerText || doc.body?.textContent || '';
+    const pageTextHead = pageText.slice(0, 3000);
+
+    // ── 第一手經驗訊號（Experience）── Google QRG 2024 重點
+    const hasExperience = /採訪|獨家|記者.*實地|現場直擊|我們.*走訪|親自.*體驗|親眼.*目睹|實測|親赴|專訪|親身|直擊|第一手|記者會|受訪|深度報導/i.test(pageText);
+
+    // ── 專業資歷（Expertise）──
+    const hasCredential = /CFA|CFP|CPA|FRM|CAIA|醫師|主治|MD\b|Ph\.?D|博士|教授|研究員|首席.*分析師|投資長|財務長|首席.*經濟學家|基金.*經理|法學博士/i.test(pageTextHead);
+
+    // ── 產業類型推測 ──
+    const isFinance = /金融|保險|基金|投資|股票|債券|理財|銀行|證券|資產管理|ESG.*投資|永續.*投資/i.test(pageTextHead);
+    const isMedical = /醫療|醫師|診所|藥品|疾病|臨床|療法|症狀|患者|手術|醫院|衛生福利|FDA|衛福部/i.test(pageTextHead);
+
+    // ── YMYL 免責聲明（Trustworthiness）──
     const hasDisclaimer = /投資風險|非投資建議|本文不構成.*投資|僅供參考.*非.*建議|非醫療建議|不構成.*醫療|建議.*就醫|請諮詢.*醫師|免責聲明|disclaimer/i.test(pageText);
 
-    // 專業資歷偵測（作者旁或全文前段）
-    const hasCredential = /CFA|CFP|CPA|FRM|CAIA|醫師|主治|MD\b|Ph\.?D|博士|教授|研究員|首席.*分析師|投資長|財務長|首席.*經濟學家|基金.*經理|法學博士/i.test(pageText.slice(0, 3000));
+    // ── 廣編揭露聲明（Trustworthiness）── 僅偵測，不計分，顯示於 detail
+    const isSponsored = /廣告合作|廣編特輯|品牌提供|贊助內容|sponsored|品牌廣告|合作推廣|廣告企劃/i.test(pageText);
+    const hasAdDisclosure = isSponsored; // 有偵測到才顯示
 
-    // 產業類型推測（用於 fix 文字個人化）
-    const isFinance = /金融|保險|基金|投資|股票|債券|理財|銀行|證券|資產管理|ESG.*投資|永續.*投資/i.test(pageText.slice(0, 1000));
-    const isMedical = /醫療|醫師|診所|藥品|疾病|臨床|療法|症狀|患者|手術|醫院|衛生福利|FDA|衛福部/i.test(pageText.slice(0, 1000));
+    // ── 計分 ──
+    const authorPts     = authorEl      ? 4 : 0;
+    const bioPts        = hasAuthorBio  ? 3 : 0;
+    const datePts       = dateEl        ? 4 : 0;
+    const freshPts      = fresh === true ? 3 : (fresh === false ? 1 : 2);
+    const expPts        = hasExperience ? 4 : 0;
+    const credPts       = hasCredential ? 4 : 0;
+    const disclaimerPts = hasDisclaimer ? 4 : 0;
+    const eeatPts = Math.min(26, authorPts + bioPts + datePts + freshPts + expPts + credPts + disclaimerPts);
 
-    const disclaimerPts = hasDisclaimer ? 5 : 0;
-    const credentialPts = hasCredential ? 4 : 0; // 偵測不到也不強制扣（FMCG不需要）
-    const eeatPts = Math.min(20, authorPts + datePts + freshPts + disclaimerPts + credentialPts);
-
-    // 組 detail
+    // ── 組 detail ──
     const eeatLines = [];
+    // Experience
+    eeatLines.push(hasExperience ? '✅ 有第一手採訪／實地經驗訊號' : '⚠️ 未偵測到採訪／現場訊號（建議加「記者親赴」「實地採訪」等字樣）');
+    // Expertise
     eeatLines.push(authorEl ? '✅ 有作者署名' : '❌ 未找到作者署名');
+    eeatLines.push(hasAuthorBio ? '✅ 有作者簡介連結或 bio 區塊' : '⚠️ 未偵測到作者簡介（author bio）');
+    if (hasCredential) eeatLines.push('✅ 偵測到專業資歷標記（CFA／MD／博士等）');
+    else if (isFinance || isMedical) eeatLines.push('⚠️ 未偵測到作者專業資歷（金融／醫療 YMYL 必需）');
+    // Trustworthiness
     eeatLines.push(dateEl ? '✅ 有日期標記' : '❌ 未找到日期');
     eeatLines.push(freshTxt);
-    if (hasCredential) eeatLines.push('✅ 偵測到專業資歷標記（CFA／MD／博士等）');
-    else if (isFinance || isMedical) eeatLines.push('⚠️ 未偵測到作者專業資歷（金融／醫療文章 YMYL 必需）');
     if (hasDisclaimer) eeatLines.push('✅ 有免責聲明');
-    else if (isFinance) eeatLines.push('⚠️ 未偵測到投資風險聲明（金融 YMYL：建議補「本文不構成投資建議」）');
-    else if (isMedical) eeatLines.push('⚠️ 未偵測到醫療免責聲明（建議補「本文不構成醫療建議，請諮詢醫師」）');
+    else if (isFinance) eeatLines.push('⚠️ 未偵測到投資風險聲明（金融 YMYL 必需）');
+    else if (isMedical) eeatLines.push('⚠️ 未偵測到醫療免責聲明（醫療 YMYL 必需）');
+    if (hasAdDisclosure) eeatLines.push('✅ 偵測到廣編揭露聲明（合規透明）');
 
-    // 組 fix（依產業個人化）
-    let eeatFix = '每篇有記者全名＋職稱（最好附 Person schema 與 sameAs 連 LinkedIn）；標明發布日與更新日，頁面可見處顯示「最後更新：YYYY-MM-DD」。每季回頭審舊文、補新數據並更新 dateModified。';
-    if (isFinance) eeatFix += '【金融 YMYL 加強】作者加註 CFA/CFP/執照字號；文末加「本文不構成投資建議，投資涉及風險，請自行審慎評估」；引用金管會、央行、Bloomberg 等權威來源，並附連結。';
-    else if (isMedical) eeatFix += '【醫療 YMYL 加強】作者加註醫師執照／學術職稱；文末加「本文僅供衛教參考，不構成醫療建議，請諮詢專業醫師」；引用衛福部、WHO、PubMed 等來源，並標記「最後醫療審閱日期」。';
+    // ── 組 fix ──
+    let eeatFix = '【Experience】採訪報導加入「記者親赴現場」「專訪 OOO」「實測後發現」等第一手字樣，是 2024 Google QRG 核心訊號，也能與 AI 生成文做出區別。【Expertise】每篇有記者全名＋職稱；在作者頁建立完整 bio（附學經歷、過往報導）；Person schema 加 sameAs 連 LinkedIn。【Trustworthiness】標明發布日與更新日；每季回頭審舊文補新數據並更新 dateModified。';
+    if (isFinance) eeatFix += '【金融 YMYL+】作者加註 CFA/CFP/執照字號；文末加「本文不構成投資建議，投資涉及風險，請審慎評估」；引用金管會、央行、Bloomberg 並附連結。';
+    if (isMedical) eeatFix += '【醫療 YMYL+】作者加註醫師執照／學術職稱；文末加「本文不構成醫療建議，請諮詢專業醫師」；引用衛福部、WHO、PubMed 並標記醫療審閱日期。';
 
     indicators.push({
-      name: 'E-E-A-T：作者・日期・資歷・免責',
-      detail: eeatLines.join('　|　'),
-      why: 'E-E-A-T（經驗、專業、權威、可信）是 Google 與 AI 評估內容可信度的框架。金融、醫療屬 YMYL（Your Money or Your Life）高風險類，無作者資歷或免責聲明幾乎無法進入 AI 引用清單。新鮮度在 2026 尤其關鍵：AI 偏好 6 個月內更新，逾 18 個月被引用率下降約 60%。',
+      name: 'E-E-A-T：經驗・專業・權威・可信',
+      detail: eeatLines.join('\n'),
+      why: 'E-E-A-T（Experience 經驗、Expertise 專業、Authoritativeness 權威、Trustworthiness 可信）是 Google QRG 評估內容品質的核心框架，也是 AI 引擎判斷「值不值得引用」的主要依據。第一手採訪訊號能與 AI 生成文做出區別，作者 bio 深度直接影響 Expertise 評分，YMYL 類別無免責聲明幾乎無法進 AI 引用清單。',
       fix: eeatFix,
-      pts: eeatPts, max: 20,
-      pass: eeatPts >= 12, scope: 'page',
+      pts: eeatPts, max: 26,
+      pass: eeatPts >= 16, scope: 'page',
     });
 
     // 6. RSS / Atom feed (5 pts) — 從原「平台優化」拆出
