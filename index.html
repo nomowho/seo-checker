@@ -1478,12 +1478,18 @@ function textLen(s) {
 
 // 偵測段落是否含具體數字（年份、百分比、金額、統計數據等）→ citability 訊號
 function hasNumber(s) {
-  // 必須有具體統計單位（%、金額、倍數、人/件/筆等量化單位），或五位數以上大數字。
-  // 排除純年份（19xx/20xx）與純頁碼，避免「2024年」「第1章」這類虛胖。
+  // 必須有具體統計單位，或五位數以上大數字。排除純年份與純頁碼。
   s = s || '';
   if (/^(19|20)\d{2}[年\s]*$/.test(s.trim())) return false;
-  return /\d[\d,]*(\.\d+)?\s*(%|％|倍|億|萬|千萬|百萬|美元|台幣|新台幣|元|名|人|位|筆|件|家|起|公噸|億元|萬元)/.test(s)
-      || /\d{5,}/.test(s);
+  // 阿拉伯數字 + 單位
+  if (/\d[\d,]*(\.\d+)?\s*(%|％|倍|億|萬|千萬|百萬|美元|台幣|新台幣|元|名|人|位|筆|件|家|起|公噸|億元|萬元)/.test(s)) return true;
+  // 五位數以上大數字
+  if (/\d{5,}/.test(s)) return true;
+  // 中文數字 + 單位（三成、八成、數十億、近百家、逾千人等）
+  if (/[一二三四五六七八九十百千萬億兩數近逾超約幾][成%％倍億萬千百人名家件筆]/.test(s)) return true;
+  // 中文比例寫法（XX%、每X人中有X人）
+  if (/[一二三四五六七八九十]分之[一二三四五六七八九十]/.test(s)) return true;
+  return false;
 }
 
 // ── SEO Scoring (100 pts) ──────────────────────────
@@ -1934,10 +1940,20 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       pts: wcPts, max: 10, pass: wcPts >= 7, scope: 'page',
     });
 
-    // 7c. 內部連結 (8 pts) — 相對路徑連結，排除錨點
+    // 7c. 內部連結 (8 pts) — 同時支援相對路徑與絕對同域 URL
+    const selfHostname = (() => {
+      const canon = doc.querySelector('link[rel="canonical"]')?.getAttribute('href')
+        || doc.querySelector('meta[property="og:url"]')?.getAttribute('content') || '';
+      try { return new URL(canon).hostname; } catch { return ''; }
+    })();
     const internalLinks = Array.from(doc.querySelectorAll('a[href]')).filter(a => {
       const href = a.getAttribute('href') || '';
-      return href.startsWith('/') && !href.startsWith('//') && href.length > 1;
+      if (href.startsWith('#') || href.length <= 1) return false;
+      if (href.startsWith('/') && !href.startsWith('//')) return true;
+      if (selfHostname) {
+        try { return new URL(href).hostname === selfHostname; } catch { return false; }
+      }
+      return false;
     });
     const uniqueInternal = [...new Set(internalLinks.map(a => a.getAttribute('href')))].length;
     const intPts = uniqueInternal >= 5 ? 8 : uniqueInternal >= 3 ? 6 : uniqueInternal >= 1 ? 3 : 0;
