@@ -1122,6 +1122,7 @@ footer {
 // ══════════════════════════════════════════════════
 const PAGESPEED_API = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 const PAGESPEED_KEY = 'AIzaSyBwANmZJdQMQgFvN8SknImI5CgScD2wgy8';
+const FIRECRAWL_KEY = 'fc-74063ff260004595bfb34c45768bc8d6';
 const CORS_PROXY = url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 const CIRCUMFERENCE = 2 * Math.PI * 38; // r=38
 
@@ -1246,6 +1247,20 @@ async function fetchHTML(url, minLen = 500) {
       const d = await r.json();
       if (!ok(d.contents)) throw new Error('empty/blocked');
       return d.contents;
+    },
+    // Firecrawl（瀏覽器渲染，可突破 Cloudflare 防護，消耗 1 credit/次，500次/月）
+    async () => {
+      const r = await fetch('https://api.firecrawl.dev/v1/scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${FIRECRAWL_KEY}` },
+        body: JSON.stringify({ url, formats: ['html'], waitFor: 2000 }),
+        signal: AbortSignal.timeout(30000),
+      });
+      if (!r.ok) throw new Error('firecrawl ' + r.status);
+      const d = await r.json();
+      const t = d?.data?.html || '';
+      if (!ok(t)) throw new Error('empty/blocked');
+      return t;
     },
   ];
   let lastErr = '';
