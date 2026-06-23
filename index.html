@@ -1159,7 +1159,11 @@ async function startAnalysis() {
     } catch (e) {
       corsOk = false;
       setStep(1, 'error');
-      showNotice('⚠️ 無法抓取網站 HTML（可能有 CORS 防護）。SEO 數據仍可從 PageSpeed 取得，GEO / AEO 部分指標以「未知」計入。', 'warn');
+      if (e.message === 'FIRECRAWL_QUOTA') {
+        showNotice('⚠️ Firecrawl 本月額度已用完（500次/月上限）。Cloudflare 防護站本月無法分析，一般網站仍可正常使用。額度每月初自動重置。', 'warn');
+      } else {
+        showNotice('⚠️ 無法抓取網站 HTML（可能有 CORS 防護）。SEO 數據仍可從 PageSpeed 取得，GEO / AEO 部分指標以「未知」計入。', 'warn');
+      }
     }
 
     // Step 2: robots.txt + sitemap.xml（爬取與索引設定）
@@ -1256,6 +1260,7 @@ async function fetchHTML(url, minLen = 500) {
         body: JSON.stringify({ url, formats: ['html'], waitFor: 2000 }),
         signal: AbortSignal.timeout(30000),
       });
+      if (r.status === 402 || r.status === 429) throw new Error('FIRECRAWL_QUOTA');
       if (!r.ok) throw new Error('firecrawl ' + r.status);
       const d = await r.json();
       const t = d?.data?.html || '';
@@ -1265,7 +1270,10 @@ async function fetchHTML(url, minLen = 500) {
   ];
   let lastErr = '';
   for (const proxy of proxies) {
-    try { return await proxy(); } catch (e) { lastErr = e.message; }
+    try { return await proxy(); } catch (e) {
+      if (e.message === 'FIRECRAWL_QUOTA') throw e;
+      lastErr = e.message;
+    }
   }
   throw new Error('所有 proxy 均失敗（' + lastErr + '）');
 }
