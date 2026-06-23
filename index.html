@@ -1927,18 +1927,29 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     const wcClone = articleRoot.cloneNode(true);
     wcClone.querySelectorAll('nav, footer, header, aside, script, style, [class*="nav"], [class*="footer"], [class*="header"], [class*="sidebar"], [class*="menu"], [class*="recommend"], [class*="related"]').forEach(n => n.remove());
     const wc = textLen(wcClone.textContent);
-    const wcPts = wc < 500 ? 0 : wc < 800 ? 3 : wc < 1500 ? 7 : wc <= 2500 ? 10 : wc <= 4000 ? 8 : 6;
-    indicators.push({
-      name: '文章字數',
-      detail: wc < 500 ? `❌ 字數過少（${wc} 字）— AI 引擎傾向略過覆蓋不完整的短文`
-        : wc < 800 ? `⚠️ 字數偏少（${wc} 字）— 建議補充至 800 字以上`
-        : wc <= 2500 ? `✅ 字數理想（${wc} 字）— 1,000-2,500 字是 AI 引用最佳區間`
-        : wc <= 4000 ? `✅ 字數充足（${wc} 字）— 篇幅較長，確保每段有清楚主題句`
-        : `⚠️ 字數偏多（${wc} 字）— 超過 4,000 字建議加強目錄結構或拆分子主題`,
-      why: 'AI 引擎傾向引用 800-2,500 字的文章——字數太少代表主題覆蓋不完整；超過 4,000 字需要更好的結構才能讓 AI 精準截取片段。Google Passage Ranking 也偏好中等長度的獨立段落。',
-      fix: '目標 1,500-2,500 字：補充背景脈絡、數據佐證、案例說明。避免湊字數——每段必須有新資訊。超過 3,000 字時務必加目錄錨點方便 AI 定位段落。',
-      pts: wcPts, max: 10, pass: wcPts >= 7, scope: 'page',
-    });
+    if (wc === 0) {
+      // 內文為 0：proxy 拿到的是 Cloudflare 防護頁或空殼，非真實字數
+      indicators.push({
+        name: '文章字數',
+        detail: '— 無法取得文章內文（網站有 Cloudflare 防護或 CORS 限制，字數無法計算）',
+        why: 'AI 引擎傾向引用 800-2,500 字的文章——字數太少代表主題覆蓋不完整；超過 4,000 字需要更好的結構才能讓 AI 精準截取片段。',
+        fix: '此網站有防爬保護，建議改用 Word 草稿模式（上傳 .docx）進行內容分析。',
+        pts: 0, max: 0, pass: null, scope: 'page',
+      });
+    } else {
+      const wcPts = wc < 500 ? 0 : wc < 800 ? 3 : wc < 1500 ? 7 : wc <= 2500 ? 10 : wc <= 4000 ? 8 : 6;
+      indicators.push({
+        name: '文章字數',
+        detail: wc < 500 ? `❌ 字數過少（${wc} 字）— AI 引擎傾向略過覆蓋不完整的短文`
+          : wc < 800 ? `⚠️ 字數偏少（${wc} 字）— 建議補充至 800 字以上`
+          : wc <= 2500 ? `✅ 字數理想（${wc} 字）— 1,000-2,500 字是 AI 引用最佳區間`
+          : wc <= 4000 ? `✅ 字數充足（${wc} 字）— 篇幅較長，確保每段有清楚主題句`
+          : `⚠️ 字數偏多（${wc} 字）— 超過 4,000 字建議加強目錄結構或拆分子主題`,
+        why: 'AI 引擎傾向引用 800-2,500 字的文章——字數太少代表主題覆蓋不完整；超過 4,000 字需要更好的結構才能讓 AI 精準截取片段。Google Passage Ranking 也偏好中等長度的獨立段落。',
+        fix: '目標 1,500-2,500 字：補充背景脈絡、數據佐證、案例說明。避免湊字數——每段必須有新資訊。超過 3,000 字時務必加目錄錨點方便 AI 定位段落。',
+        pts: wcPts, max: 10, pass: wcPts >= 7, scope: 'page',
+      });
+    }
 
     // 7c. 內部連結 (8 pts) — 同時支援相對路徑與絕對同域 URL
     const selfHostname = (() => {
