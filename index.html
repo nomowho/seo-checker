@@ -2031,6 +2031,13 @@ function scoreAEO(doc, html, isDoc) {
     ]};
   }
 
+  // 偵測 CORS 防護空殼（Cloudflare challenge / 空頁）：body 有 HTML 但無實質文字
+  if (!isDoc && textLen(doc.body?.textContent || '') < 50) {
+    return { score: 0, indicators: [
+      { name: '所有 AEO 指標', detail: '— 無法取得文章內文（網站有 Cloudflare 防護或 CORS 限制），AEO 指標自動排除、不計分', pts: 0, max: 0, pass: null }
+    ]};
+  }
+
   // 1. FAQPage JSON-LD — 加分項（bonus）：只有明確的結構化標記才給分。
   //    可見 Q&A 格式不給分（避免與「問句式標題」「答案前置短段」重複計分），
   //    但偵測到時在 detail 給建議。完全沒有則 max:0 不計入分母。
