@@ -116,7 +116,7 @@ footer{text-align:center;color:var(--text3);font-size:12px;padding:24px;border-t
 
     <div class="item"><div class="chk"></div><div class="item-body">
       <div class="t">能列表就列表、能表格就表格</div>
-      <div class="d">步驟／種類／重點 → 用條列清單（真項目符號，至少 4 項）。「A vs B／方案比較」→ 用表格（表格式精選摘要競爭最低，最好搶）。</div>
+      <div class="d">步驟／種類／重點 → 用條列清單（真項目符號，至少 4 項）。「A vs B／方案比較」→ 用真正的 HTML 表格，不要用圖片或純文字排版，否則欄列關係機器讀不到。</div>
     </div><span class="tag aeo">AEO 24</span></div>
 
     <div class="item"><div class="chk"></div><div class="item-body">
@@ -130,27 +130,27 @@ footer{text-align:center;color:var(--text3);font-size:12px;padding:24px;border-t
     </div><span class="tag geo">GEO 15</span></div>
 
     <div class="item"><div class="chk"></div><div class="item-body">
-      <div class="t">文末加 FAQ 問答區（4–8 組 Q&amp;A）</div>
-      <div class="d">在文章最後新增一區「FAQ 問答」，格式為 Q1：⋯ / A：⋯，至少 4 組。光有這區段就讓 AI 引擎能讀取問答關係（+10 分）；再請技術部門加 FAQPage JSON-LD，Google 搜尋結果才會展開問答富文本（滿分 +22）。<br><br>問題用讀者真實搜尋語氣；每個答案 50–150 字、第一句直接回答＋一個數據，不要先鋪陳背景。</div>
-      <div class="eg">Q1：什麼是綠色債券？ / A：綠色債券是⋯（直接答）。截至 2024 年，台灣市場已發行⋯（數據）。</div>
-    </div><span class="tag aeo">AEO 10→22</span></div>
+      <div class="t">讀者真的會追問時，文末加 3–5 組問答</div>
+      <div class="d"><strong>2026-09 更新：Google 已於 5 月 7 日停止顯示 FAQ 富文本</strong>，所以重點不再是請技術部門加 FAQPage 標記（那只剩小幅加分），而是問答內容本身好不好。<br><br>題目取自真實查詢（Search Console 搜尋字詞、Google「大家也問」、客戶的客服常見問題），用讀者的問法並加問號；每個答案 40–150 字，第一句直接回答，並帶一個數據或具名出處——不要把內文換句話重講。</div>
+      <div class="eg">✓ 散戶最低多少錢可以買？ / 目前櫃買中心掛牌的綠色債券面額多為十萬元，透過基金參與可降到三千元。</div>
+    </div><span class="tag aeo">AEO 16</span></div>
 
     <div class="item"><div class="chk"></div><div class="item-body">
       <div class="t">保留受訪者直接引言（具名引述）</div>
-      <div class="d">把「某某表示⋯」「某某指出⋯」的直接引言用「　」框起來留在文中，每篇 2–4 處。這是第一手採訪的證明，AI 引擎明顯偏好有具名來源的內容。若是純分析文，改引述官方報告（「根據金管會 2024 年報告⋯」）效果相同。</div>
+      <div class="d">把「某某表示⋯」「某某指出⋯」的直接引言用「　」框起來留在文中，每篇 2–4 處。<strong>這是目前實證效果最好的一項</strong>：KDD 2024 的 GEO 論文實測九種寫法，加入引述讓內容在生成式引擎的可見度提升約 41%，排名第一（統計數據約 33%、來源引用約 28%）。2026-09 起已從加分項升為正式計分。若是純分析文，改引述官方報告（「根據金管會 2026 年報告⋯」）效果相同。</div>
       <div class="eg">✗ 官員認為政策有效　✓「這項政策三個月內見效」，金管會主委王曉明表示。</div>
-    </div><span class="tag geo">GEO 8*</span></div>
+    </div><span class="tag geo">GEO 10</span></div>
 
     <div class="item"><div class="chk"></div><div class="item-body">
-      <div class="t">教學步驟文：用編號清單寫步驟，並通知技術加 HowTo schema</div>
-      <div class="d">只適用「步驟型文章」（如何申辦⋯、3步驟完成⋯）。記者用 &lt;ol&gt; 編號清單、每步驟「動詞＋受詞」開頭；同時通知技術部門加 HowTo JSON-LD，才能進入 AI Overview 步驟列表與語音助理朗讀。一般報導、分析文不需要此項。</div>
+      <div class="t">教學步驟文：用編號清單寫步驟</div>
+      <div class="d">只適用「步驟型文章」（如何申辦⋯、3 步驟完成⋯）。用 &lt;ol&gt; 編號清單、每步驟「動詞＋受詞」開頭。<strong>HowTo 結構化資料已於 2023 年停用，不需要再請技術部門加</strong>，編號清單本身就夠了。一般報導、分析文不需要此項。</div>
       <div class="eg">步驟 1：開立帳戶（50字說明）/ 步驟 2：填寫申請表（50字說明）⋯</div>
-    </div><span class="tag aeo">AEO 10*</span></div>
+    </div><span class="tag aeo">AEO 12</span></div>
 
     <div class="item"><div class="chk"></div><div class="item-body">
-      <div class="t">字數目標 1,500–2,500 字；文中加 3–5 個站內連結</div>
-      <div class="d">字數太少（&lt;800）AI 略過；太多（&gt;4,000）需搭配強結構。1,500–2,500 字是 AI 引用最佳區間。<br>上稿時在關鍵詞加超連結，指向站內相關文章（「台積電 2024 財報分析」而非「點此閱讀」），分散在正文比全塞在文末效果好。</div>
-    </div><span class="tag geo">GEO 18</span></div>
+      <div class="t">篇幅寫到把問題講完為止；文中加 3–5 個站內連結</div>
+      <div class="d"><strong>字數不是排名因素</strong>，Google 明確說內容長度該由讀者需求決定，舊版寫的「1,500–2,500 字最佳」查無出處已移除。判準改成：讀者最可能追問的三個問題有沒有回答到。<br>上稿時在關鍵詞加超連結，指向站內相關文章（「台積電 2026 財報分析」而非「點此閱讀」），分散在正文比全塞在文末效果好。</div>
+    </div><span class="tag geo">GEO 13</span></div>
   </section>
 
   <!-- 2 -->
@@ -159,18 +159,28 @@ footer{text-align:center;color:var(--text3);font-size:12px;padding:24px;border-t
 
     <div class="item"><div class="chk"></div><div class="item-body">
       <div class="t">結構化資料 JSON-LD</div>
-      <div class="d">NewsArticle（作者／發布日／更新日）＋ FAQPage（含問答 mainEntity）＋ HowTo（含 step）。讓 AI 一眼看懂「這是專業報導、誰寫的、何時發」。</div>
-    </div><span class="tag geo">GEO 18</span></div>
+      <div class="d">Article／NewsArticle，補齊 Google 的建議屬性：headline、author（Person 物件＋author.url）、datePublished、dateModified、image。<strong>官方說 Article 沒有必填屬性，生成式 AI 搜尋也不需要結構化資料</strong>——這項的價值在一般搜尋的呈現，不必期待它換到 AI 引用。FAQPage 可有可無，HowTo 已停用。</div>
+    </div><span class="tag geo">GEO 20</span></div>
 
     <div class="item"><div class="chk"></div><div class="item-body">
-      <div class="t">robots.txt 開放 AI 爬蟲</div>
-      <div class="d">允許 GPTBot、ClaudeBot、PerplexityBot、Google-Extended、CCBot。封鎖＝主動把文章從 AI 資料庫刪掉。特別注意 Google-Extended（Gemini）。</div>
+      <div class="t">robots.txt 放行「搜尋引用型」AI 爬蟲</div>
+      <div class="d">要被 AI 引用，至少放行這六隻：<strong>OAI-SearchBot</strong>（ChatGPT 搜尋的門票，擋了就不會出現在答案裡）、<strong>Claude-SearchBot</strong>、<strong>Claude-User</strong>、<strong>PerplexityBot</strong>、Googlebot、Bingbot。<br>訓練型（GPTBot／ClaudeBot／CCBot／Google-Extended）擋不擋是內容授權的商業決策，<strong>不影響搜尋引用</strong>——Google 官方明載 Google-Extended 不影響 Google 搜尋收錄與排名。<br>注意 robots.txt 採「最具體的 user-agent 群組優先，且不與 * 合併」。</div>
     </div><span class="tag geo">GEO 10</span></div>
 
     <div class="item"><div class="chk"></div><div class="item-body">
-      <div class="t">確認廣編「沒有」被設 noindex</div>
-      <div class="d">noindex＝Google 與 AI 完全不收錄這頁。部分媒體預設廣編為 noindex，務必確認。</div>
-    </div><span class="tag seo">SEO</span></div>
+      <div class="t">確認廣編沒有被設 noindex 或 nosnippet</div>
+      <div class="d">noindex＝完全不收錄這頁。<strong>nosnippet 與 max-snippet:0 同樣致命</strong>：官方寫明會阻止內容被當作 AI Overviews 與 AI Mode 的直接輸入，等於整篇對 AI 隱形。部分媒體的付費牆或廣編模板會誤加，務必確認。要保護特定段落請改用 data-nosnippet 標在那一小段上。</div>
+    </div><span class="tag aeo">AEO 8</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">廣編外連加 rel="sponsored"</div>
+      <div class="d">Google 連結 spam 政策明訂：付費或贊助性質的連結，只要標上 rel="sponsored" 或 rel="nofollow" 就不違規；<strong>沒標記則落在「用金錢換取連結」的違規描述裡</strong>。廣編連到客戶官網、活動報名頁、產品頁一律要標；引用政府、學術、百科等佐證來源不用標。</div>
+    </div><span class="tag geo">GEO 8</span></div>
+
+    <div class="item"><div class="chk"></div><div class="item-body">
+      <div class="t">加上 Google「設為偏好來源」按鈕</div>
+      <div class="d">2026 年新功能：讀者把遠見設為偏好來源後，內容更容易出現在頭條新聞並帶「偏好」標記，5 月起也延伸到 AI Overviews 與 AI Mode。載入 news.google.com/swg/js/v1/publisher.js 後放 &lt;div google-add-preferred-source-btn&gt;&lt;/div&gt; 即可。</div>
+    </div><span class="tag seo">SEO 4</span></div>
 
     <div class="item"><div class="chk"></div><div class="item-body">
       <div class="t">基礎技術四件套</div>

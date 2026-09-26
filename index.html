@@ -955,7 +955,7 @@ footer {
       ⚠️ <strong>偵測到 JS 動態渲染（內容可信度提醒）</strong>：這個網址的初始 HTML 幾乎沒有內文，內容是靠 JavaScript 載入後才出現。<strong>Googlebot 第一波抓取與本工具都可能讀不到完整內文</strong>，因此「內容類」分數（自包含段落、答案前置等）可能偏低失真。建議技術部門確認有做 SSR／SSG，讓初始 HTML 就含完整內容。
     </div>
     <div id="docBanner" style="display:none; background:var(--primary-bg); border:1px solid var(--border); border-left:3px solid var(--text); border-radius:8px; padding:12px 16px; margin-bottom:18px; font-size:13px; line-height:1.6; color:var(--text2);">
-      📄 <strong style="color:var(--text)">Word 草稿模式</strong>：只評「內容寫作結構」（記者能控制的部分）。PageSpeed、Schema、robots、meta 等<strong>發布後才能檢測的技術項標為「不適用」、不計分</strong>，分數只用適用項目換算。發布上線後再貼網址做完整健檢。
+      📄 <strong style="color:var(--text)">Word 草稿模式</strong>：只評「內容寫作結構」（記者能控制的部分）。PageSpeed、Schema、robots、meta 等<strong>發布後才能檢測的技術項標為「不適用」、不計分</strong>，分數只用適用項目換算。發布上線後再貼網址做完整健檢。<span id="docHeadingHint"></span>
     </div>
     <p class="result-url">分析網址：<a id="resultUrl" href="#" target="_blank"></a></p>
 
@@ -1061,13 +1061,14 @@ footer {
           <ul class="edu-scoring-list">
             <li><span class="edu-pts">16 pts</span> 頁面速度 Core Web Vitals — CrUX 真實用戶數據 LCP／CLS／INP（無資料則自動排除不扣分）</li>
             <li><span class="edu-pts">16 pts</span> Google SEO 基礎評分 — PageSpeed Lighthouse 可索引性、連結品質（API 失敗自動排除）</li>
-            <li><span class="edu-pts">14 pts</span> 網頁標題（Title Tag）— 是否存在、長度 10–60 字</li>
-            <li><span class="edu-pts">13 pts</span> Meta Description — 是否存在、長度 80–160 字</li>
-            <li><span class="edu-pts">12 pts</span> 社群分享預覽 — OG / Twitter Card 完整度（社群分享 CTR 訊號）</li>
+            <li><span class="edu-pts">14 pts</span> 網頁標題（Title Tag）— 是否存在、寬度約 10–30 個中文字（依裝置寬度截斷）</li>
+            <li><span class="edu-pts">8 pts</span> Meta Description — 是否存在、寬度約 50–85 個中文字（非排名因素，權重已調降）</li>
+            <li><span class="edu-pts">8 pts</span> 社群分享預覽 — OG / Twitter Card 完整度（社群端呈現，非 Google 排名因素）</li>
             <li><span class="edu-pts">8 pts</span> Canonical 標籤 — 是否防止重複索引</li>
             <li><span class="edu-pts">7 pts</span> Mobile 行動友善 — viewport 響應式設定（行動優先索引）</li>
             <li><span class="edu-pts">7 pts</span> 圖片 alt 覆蓋率 — 內文圖片替代文字（無圖頁面自動排除）</li>
             <li><span class="edu-pts">7 pts</span> 可索引性 + Sitemap — robots meta 是否 noindex、是否有 sitemap.xml</li>
+            <li><span class="edu-pts">4 pts</span> Preferred Sources 偏好來源 — 是否提供「設為偏好來源」按鈕（2026 新功能）</li>
           </ul>
         </div>
       </div>
@@ -1078,34 +1079,36 @@ footer {
         <div class="edu-scoring">
           <div class="edu-scoring-title">📊 本工具評分機制（滿分 100）</div>
           <ul class="edu-scoring-list">
-            <li><span class="edu-pts">22 pts</span> 結構化資料 + 品牌權威 — NewsArticle JSON-LD 完整度、Organization schema、sameAs</li>
-            <li><span class="edu-pts">18 pts</span> 自包含段落 — 80-250 字、結論句開頭的可引用段落（中文計字，排除導覽／頁尾）</li>
             <li><span class="edu-pts">26 pts</span> E-E-A-T — 第一手採訪訊號、作者署名＋bio 深度、專業資歷、日期新鮮度、免責聲明、廣編揭露</li>
-            <li><span class="edu-pts">10 pts</span> 文章結構 — 目錄錨點、H2/H3 層級、標題密度</li>
-            <li><span class="edu-pts">10 pts</span> 數據密度 — 段落含具體數字（%／金額／倍數等統計單位）</li>
-            <li><span class="edu-pts">10 pts</span> 權威外連 — 引用 .gov／.edu／Wikipedia 等高權威來源</li>
-            <li><span class="edu-pts">10 pts</span> 文章字數 — 800-2,500 字最佳；過短 AI 略過，過長需強化結構</li>
+            <li><span class="edu-pts">20 pts</span> 結構化資料 + 品牌權威 — Article JSON-LD 建議屬性、Organization schema、sameAs</li>
+            <li><span class="edu-pts">14 pts</span> 自包含段落 — 段落能否獨立讀懂（權重已調降：Google 把「切成小塊」列為迷思）</li>
+            <li><span class="edu-pts">12 pts</span> 數據密度 — 段落含具體數字（GEO 論文實測約 +33% 可見度）</li>
+            <li><span class="edu-pts">10 pts</span> 具名引述 — 「」＋引述動詞（GEO 論文實測約 +41%，效果第一，已升為正式計分）</li>
+            <li><span class="edu-pts">10 pts</span> 文章結構 — 目錄錨點、H2/H3 層級、標題密度、摺疊內容偵測</li>
+            <li><span class="edu-pts">10 pts</span> 權威外連 — 引用 .gov／.edu／Wikipedia 等高權威來源（約 +28%）</li>
+            <li><span class="edu-pts">10 pts</span> AI 爬蟲開放度 — 只計搜尋引用型（OAI-SearchBot／Claude-SearchBot／Claude-User／PerplexityBot／Googlebot／Bingbot）；訓練型只顯示不計分</li>
             <li><span class="edu-pts">8 pts</span> 內部連結 — 文中加 3-5 個站內延伸閱讀連結（技術項，Word 稿不適用）</li>
-            <li><span class="edu-pts">8 pts*</span> 具名引述 — 「」＋引述動詞，有採訪有據加分；無則不計入分母</li>
-            <li><span class="edu-pts">10 pts</span> AI 爬蟲開放度 — GPTBot／ClaudeBot／PerplexityBot 等 9 隻主流爬蟲</li>
-            <li><span class="edu-pts">5 pts</span> RSS / Atom feed — AI 爬蟲發現新文章的訂閱管道</li>
+            <li><span class="edu-pts">8 pts*</span> 廣編合規 — 偵測到廣編揭露時才出現：外連是否標 rel="sponsored"</li>
+            <li><span class="edu-pts">5 pts</span> 文章字數 — 僅在篇幅明顯過短時提醒（字數不是排名因素，權重已調降）</li>
+            <li><span class="edu-pts">3 pts</span> RSS / Atom feed — 網站更新的標準訂閱管道</li>
           </ul>
         </div>
       </div>
       <div class="edu-card">
         <div class="edu-emoji">💬</div>
         <div class="edu-title">AEO — 答案引擎優化</div>
-        <div class="edu-desc">讓 Google 精選摘要（Featured Snippet）和「大家也問」抓到你的回答。核心：問句式 H2/H3 標題、小標下 40-120 字直接答案、列表結構。FAQ／表格／HowTo 為加分項。</div>
+        <div class="edu-desc">讓精選摘要、「大家也問」與 AI 答案抓得到你的回答。核心：頁面沒有被 nosnippet 擋住、問句式 H2/H3 標題、小標下直接給答案、列表與表格結構。</div>
         <div class="edu-scoring">
           <div class="edu-scoring-title">📊 本工具評分機制（分數換算為 100 分制）</div>
           <ul class="edu-scoring-list">
+            <li><span class="edu-pts">16 pts</span> 問答區塊品質 — 可見問答是否寫成真實問句（FAQPage JSON-LD 僅小幅加分）</li>
+            <li><span class="edu-pts">16 pts</span> 答案前置短段 — 小標正下方 40–120 字直接答案（權重已調降，見說明）</li>
             <li><span class="edu-pts">12 pts</span> 問句式標題 — 以「？」結尾的 H2/H3（搶「大家也問」），疑問詞標題各 3 分</li>
-            <li><span class="edu-pts">22 pts</span> 答案前置短段 — 小標正下方 40–120 字直接答案（精選摘要真實抓取位置）</li>
-            <li><span class="edu-pts">12 pts</span> 列表結構 — 真實 &lt;ul&gt;/&lt;ol&gt; ≥4 項（列表式摘要觸發門檻）</li>
-            <li><span class="edu-pts">22 pts</span> FAQPage Schema — 偵測 JSON-LD 中是否有問答結構化標記</li>
-            <li><span class="edu-pts">12 pts</span> 比較表格 — HTML &lt;table&gt;，表格式精選摘要低競爭入口</li>
-            <li><span class="edu-pts">10 pts</span> HowTo Schema — 含步驟說明的結構化標記</li>
+            <li><span class="edu-pts">12 pts</span> 列表結構 — 真實 &lt;ul&gt;/&lt;ol&gt; ≥4 項（步驟型內容用編號清單）</li>
+            <li><span class="edu-pts">12 pts*</span> 比較表格 — HTML &lt;table&gt;，加分項，敘事型報導沒有不扣分</li>
+            <li><span class="edu-pts">8 pts</span> 摘要可用性 — 是否被 nosnippet／max-snippet 擋住（擋住等於 AI 完全讀不到）</li>
           </ul>
+          <div style="margin-top:10px;font-size:12px;color:var(--text3);line-height:1.6">※ 2026-09 更新：Google 已於 2026-05-07 停止顯示 FAQ 富文本、HowTo 富文本則於 2023 年停用，兩項的權重已大幅調降或移除。</div>
         </div>
       </div>
     </div>
@@ -1435,10 +1438,11 @@ function detectJsShell(doc, html) {
 const WEB_ONLY = [
   // SEO 技術項
   '頁面速度', 'Google SEO 基礎評分', 'Canonical', '可索引性', 'Mobile',
-  '網頁標題', 'Meta Description', '圖片 alt', '社群分享預覽',
+  '網頁標題', 'Meta Description', '圖片 alt', '社群分享預覽', 'Preferred Sources',
   // GEO 技術項
-  '結構化資料', 'RSS', 'AI 爬蟲', 'E-E-A-T', '內部連結',
-  // AEO Schema 項（FAQPage/HowTo 已改為正式計分項，不在此排除）
+  '結構化資料', 'RSS', 'AI 爬蟲', 'E-E-A-T', '內部連結', '廣編合規',
+  // AEO 技術項（2026-09 新增：摘要可用性靠 meta robots，Word 稿無從檢測）
+  '摘要可用性',
 ];
 function neutralizeWebOnly(indicators, isDoc) {
   if (!isDoc) return indicators;
@@ -1499,6 +1503,15 @@ function textLen(s) {
   return cjk + latin;
 }
 
+// 顯示寬度：中日韓字元佔兩個半形位。Google 的標題與摘要是「依裝置寬度截斷」而非算字數，
+// 所以用寬度判斷才準——舊版直接用 .length，會讓 60 個中文字的標題拿滿分卻在搜尋結果被截掉。
+function displayWidth(s) {
+  s = (s || '').trim();
+  let w = 0;
+  for (const ch of s) w += /[一-鿿㐀-䶿぀-ヿ가-힯！-｠]/.test(ch) ? 2 : 1;
+  return w;
+}
+
 // 偵測段落是否含具體數字（年份、百分比、金額、統計數據等）→ citability 訊號
 function hasNumber(s) {
   // 必須有具體統計單位，或五位數以上大數字。排除純年份與純頁碼。
@@ -1549,8 +1562,8 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     indicators.push({
       name: 'Google SEO 基礎評分',
       detail: `PageSpeed SEO 分：${Math.round(seoScore * 100)} / 100（含連結、可爬取性、可索引性）`,
-      why: 'Google Lighthouse 的 SEO 審查，是搜尋引擎「能不能順利讀懂這頁」的綜合健檢，涵蓋 10+ 項技術檢查：連結可爬取性、文字大小可讀性、圖片 alt、meta 完整性、robots 設定等。分數 < 80 代表有明顯技術問題，即使內容再好也難被 Google 收錄。',
-      fix: '【多數需技術部門】到 PageSpeed Insights 看紅字項目逐一修：補圖片 alt、確認連結文字有描述、文字對比度足夠、行動裝置字級不要太小。記者層面能做的是把連結文字寫清楚（避免「點此」）。',
+      why: 'Google Lighthouse 的 SEO 審查，是搜尋引擎「能不能順利讀懂這頁」的綜合健檢，涵蓋 meta description、連結文字是否有描述、hreflang、rel=canonical、HTTP 狀態碼、robots.txt 是否有效、行動裝置點擊目標大小等項目。分數偏低代表有明顯技術問題，內容再好也可能吃虧。（註：Lighthouse 13 已移除字級與結構化資料兩項稽核，本工具說明同步更新。）',
+      fix: '【多數需技術部門】到 PageSpeed Insights 看紅字項目逐一修：補 meta description、確認 canonical 與 hreflang 正確、檢查 robots.txt 格式、行動版按鈕點擊區不要太擠。記者層面能做的是把連結文字寫清楚（避免「點此」這種沒有描述性的寫法）。',
       pts, max: 16,
       pass: pts >= 11,
     });
@@ -1562,30 +1575,32 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
   if (doc) {
     // 3. Title tag (14 pts)
     const title = doc.querySelector('title')?.textContent?.trim() || '';
-    const titleLen = title.length;
+    const titleW = displayWidth(title);             // 中文字算 2、英數算 1
+    const titleCn = Math.round(titleW / 2);         // 換算成約當中文字數
     let titlePts = 0;
-    if (title) { titlePts += 9; if (titleLen >= 10 && titleLen <= 60) titlePts += 5; }
+    if (title) { titlePts += 9; if (titleW >= 20 && titleW <= 60) titlePts += 5; }
     indicators.push({
       name: '網頁標題（Title Tag）',
-      detail: title ? `「${title.slice(0,50)}${title.length>50?'…':''}」（${titleLen} 字）${titleLen<10||titleLen>60?' ⚠️ 建議 10-60 字':''}` : '❌ 未設定 title 標籤',
-      why: '搜尋結果第一行的藍色大字，是 Google 判斷文章主題最重要的依據，也決定使用者點不點。研究顯示含數字與情緒詞的標題，點擊率比平均高 30% 以上，而點擊率本身又是排名前 10 的關鍵因子。',
-      fix: '長度控制在中文 25-30 字（約 50-60 字元），核心關鍵字放最前面，後綴品牌名，例：「綠色債券怎麼買？2026 完整指南｜遠見」。避免用「廣告」「特輯」開頭。一頁只能一個 title。',
+      detail: title ? `「${title.slice(0,50)}${title.length>50?'…':''}」（約 ${titleCn} 個中文字寬）${titleW<20||titleW>60?' ⚠️ 建議約 10-30 個中文字':''}` : '❌ 未設定 title 標籤',
+      why: '搜尋結果第一行的大字，是 Google 判斷文章主題最重要的依據，也決定使用者點不點。Google 官方說明 title 沒有長度上限，但「會依裝置寬度需要而截斷」，所以太長的標題後半段讀者根本看不到。另外 Google 會自動生成標題連結，會同時參考 title、頁面標題與其他網站對這頁的描述，所以 title 寫得清楚，被改寫的機率才低。',
+      fix: '長度控制在約 10-30 個中文字，核心關鍵字放最前面，後面接品牌名，例：「綠色債券怎麼買？2026 完整指南｜遠見」。避免用「廣告」「特輯」開頭。一頁只能有一個 title。',
       pts: titlePts, max: 14,
       pass: titlePts >= 10,
     });
 
-    // 4. Meta description (13 pts)
+    // 4. Meta description (8 pts) — 2026-09：權重 13→8（非排名因素，且 Google 常自行生成摘要）
     const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '';
-    const descLen = metaDesc.length;
+    const descW = displayWidth(metaDesc);
+    const descCn = Math.round(descW / 2);
     let descPts = 0;
-    if (metaDesc) { descPts += 8; if (descLen >= 80 && descLen <= 160) descPts += 5; }
+    if (metaDesc) { descPts += 5; if (descW >= 100 && descW <= 170) descPts += 3; }
     indicators.push({
       name: 'Meta Description',
-      detail: metaDesc ? `${metaDesc.slice(0,60)}…（${descLen} 字）${descLen<80||descLen>160?' ⚠️ 建議 80-160 字':''}` : '❌ 未設定 meta description',
-      why: '搜尋結果標題下方的說明文字。雖不直接影響排名，但決定點閱率（好的摘要可提升 20-30%）。沒設定的話 Google 會自己亂抓一段，常常抓到不相關的內容。AI 引擎也用這段快速判斷文章跟查詢相不相關。',
-      fix: '寫中文 75-80 字（約 150-160 字元），包含關鍵字＋價值主張＋一句行動誘因，例：「本文用 8 分鐘帶你看懂綠色債券怎麼買、3 大風險與 5 檔台灣標的」。每篇都要有、且每篇不同。',
-      pts: descPts, max: 13,
-      pass: descPts >= 9,
+      detail: metaDesc ? `${metaDesc.slice(0,60)}…（約 ${descCn} 個中文字寬）${descW<100||descW>170?' ⚠️ 建議約 50-85 個中文字':''}` : '❌ 未設定 meta description',
+      why: '搜尋結果標題下方的說明文字，不是排名因素，作用是影響點閱意願。Google 官方說明它「沒有長度上限，但摘要會依裝置寬度需要而截斷」，而且 Google 只有在「認為它比頁面內文更能準確描述這一頁」時才會採用——多數情況下會自己從內文抓一段。所以這一項值得寫好，但不值得投入太多時間，權重已調降。',
+      fix: '寫約 50-85 個中文字，包含主題關鍵字、這篇能給讀者什麼，以及一句行動誘因，例：「8 分鐘看懂綠色債券怎麼買、3 大風險與 5 檔台灣標的」。每篇都要有，而且每篇不一樣。',
+      pts: descPts, max: 8,
+      pass: descPts >= 5,
     });
 
     // 5. Canonical URL (8 pts)
@@ -1656,16 +1671,33 @@ function scoreSEO(doc, html, ps, crux, sitemapOk, isDoc) {
     const twCard = doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content');
     const twImage = doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content');
     const ogCore = (ogTitle?2:0)+(ogDesc?2:0)+(ogImage?2:0)+(ogType?1:0)+((ogUrl||ogSite)?1:0); // OG 八分
-    const ogPts = Math.min(12, ogCore + (twCard?2:0) + ((twCard&&twImage)?2:0));
+    // 2026-09：權重 12→8（OG 不是 Google 排名因素，價值在社群分享的呈現）
+    const ogPts = Math.round(Math.min(12, ogCore + (twCard?2:0) + ((twCard&&twImage)?2:0)) / 12 * 8);
     const ogMissing = [!ogTitle&&'og:title', !ogDesc&&'og:description', !ogImage&&'og:image', !ogType&&'og:type', !(ogUrl||ogSite)&&'og:url/site_name', !twCard&&'twitter:card'].filter(Boolean);
     indicators.push({
       name: '社群分享預覽（OG / Twitter Card）',
       detail: ogPts >= 12 ? '✅ Open Graph 與 Twitter Card 標籤完整'
         : ogMissing.length ? `⚠️ 缺少：${ogMissing.join('、')}`
         : '✅ 標籤大致完整',
-      why: '決定文章分享到 LINE / FB / Threads / X 時的預覽縮圖與標題。標籤完整時點擊率明顯較高（FB 內測 +30% CTR）。社群分享是排名以外的第二大流量入口。',
-      fix: '【技術部門】補齊 og:title / og:description / og:image (1200×630) / og:url / og:type / og:site_name + twitter:card=summary_large_image + twitter:image。用 metatags.io 預覽各平台效果。',
-      pts: ogPts, max: 12, pass: ogPts >= 9, scope: 'page',
+      why: '決定文章分享到 LINE、FB、Threads、X 時的預覽縮圖與標題。沒設定的話，各平台會自己抓一張圖和一段文字，常常抓到不相干的內容，分享出去的賣相就差。這不是 Google 的排名因素，價值在社群端的呈現與點擊意願，所以權重已從 12 分調降為 8 分。',
+      fix: '【技術部門】補齊 og:title、og:description、og:image（1200×630）、og:url、og:type、og:site_name，以及 twitter:card=summary_large_image 與 twitter:image。上線前用各平台的分享偵錯工具實際預覽一次。',
+      pts: ogPts, max: 8, pass: ogPts >= 6, scope: 'page',
+    });
+
+    // 10. Preferred Sources 偏好來源 (4 pts) — 2026-09 新增
+    // Google 2026-01 推出、05-27 擴及 AI Overviews 與 AI Mode：讀者可把媒體設為偏好來源，
+    // 該媒體的內容就更容易出現在頭條新聞並帶「偏好」標記。網域／子網域層級才符合資格。
+    const prefBtn = doc.querySelector('[google-add-preferred-source-btn]');
+    const prefLink = doc.querySelector('a[href*="google.com/preferences/source"]');
+    const prefPts = (prefBtn || prefLink) ? 4 : 0;
+    indicators.push({
+      name: 'Preferred Sources 偏好來源',
+      detail: prefBtn ? '✅ 頁面有官方的「設為偏好來源」按鈕'
+        : prefLink ? '✅ 頁面有偏好來源設定連結'
+        : '— 未設置「設為偏好來源」按鈕或連結（新聞媒體建議加）',
+      why: '這是 Google 在 2026 年推出的新功能：讀者把你的網站設為偏好來源後，你的內容更容易出現在「頭條新聞」並標示「偏好」，2026 年 5 月起也延伸到 AI Overviews 與 AI Mode。對經營忠實讀者的新聞媒體來說，這是少數能直接請讀者替自己加分的機制。只有網域與子網域層級符合資格，子目錄不行。',
+      fix: '【技術部門】在文章頁或訂閱頁放官方按鈕：載入 https://news.google.com/swg/js/v1/publisher.js，再放 <div google-add-preferred-source-btn></div>（會自動依語言顯示）。或用文字連結 https://www.google.com/preferences/source?q=你的網域。【編輯台】搭配電子報或社群，引導讀者按下去。',
+      pts: prefPts, max: 4, pass: prefPts > 0, scope: 'site',
     });
   }
 
@@ -1709,13 +1741,22 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     // Schema 完整度（14 pts）：Article 必要欄位
     let schemaPts, schemaDetail;
     if (articleNode) {
-      const need = { author: !!articleNode.author, datePublished: !!articleNode.datePublished, image: !!articleNode.image, publisher: !!articleNode.publisher };
+      // 依 Google 官方「建議屬性」清單（headline / author / datePublished / dateModified / image）。
+      // 官方明載 Article 沒有必填屬性，且 publisher 不在建議清單內 → 改為僅顯示、不計分。
+      const need = {
+        headline: !!articleNode.headline,
+        author: !!articleNode.author,
+        datePublished: !!articleNode.datePublished,
+        dateModified: !!articleNode.dateModified,
+        image: !!articleNode.image,
+      };
       const got = Object.values(need).filter(Boolean).length;
       const missing = Object.keys(need).filter(k => !need[k]);
-      schemaPts = got === 4 ? 14 : got >= 2 ? 10 : 6;
-      schemaDetail = got === 4
-        ? `✅ Article schema 完整（含 author/date/image/publisher）`
-        : `⚠️ 有 Article schema 但缺欄位：${missing.join('、')}（半殘 schema 降低 AI 信任）`;
+      schemaPts = got === 5 ? 14 : got >= 3 ? 10 : 6;
+      schemaDetail = got === 5
+        ? '✅ Article schema 建議屬性齊全（headline／author／datePublished／dateModified／image）'
+        : `⚠️ 有 Article schema，缺建議屬性：${missing.join('、')}`;
+      if (articleNode.publisher) schemaDetail += '；另有 publisher（非官方建議屬性，不計分）';
     } else {
       schemaPts = hasSchema ? (hasQuality ? 12 : 9) : (hasMicrodata ? 6 : 0);
       schemaDetail = hasSchema
@@ -1739,18 +1780,18 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
         });
       } catch {}
     });
-    const wikiLink = doc.querySelector('a[href*="wikipedia.org"]') ? 1 : 0;
-    let brandPts = (hasOrgPerson ? 2 : 0) + (sameAsCount >= 2 ? 4 : sameAsCount === 1 ? 2 : 0) + wikiLink * 2;
-    brandPts = Math.min(8, brandPts);
-    const brandBits = [hasOrgPerson && 'Organization/Person schema', sameAsCount >= 1 && `sameAs(${sameAsCount}個)`, wikiLink && 'Wikipedia 引用'].filter(Boolean);
+    // 2026-09：移除「內文連到 Wikipedia 就算品牌權威」的加分——那是外連訊號，已在「權威來源外連」計分，重複了
+    let brandPts = (hasOrgPerson ? 2 : 0) + (sameAsCount >= 2 ? 4 : sameAsCount === 1 ? 2 : 0);
+    brandPts = Math.min(6, brandPts);
+    const brandBits = [hasOrgPerson && 'Organization/Person schema', sameAsCount >= 1 && `sameAs(${sameAsCount}個)`].filter(Boolean);
     const combinedPts = schemaPts + brandPts;
     indicators.push({
       name: '結構化資料 + 品牌權威',
       detail: schemaDetail + (brandBits.length ? `；品牌訊號：${brandBits.join('、')}` : '；無品牌訊號（可加 Organization schema 與 sameAs）'),
-      why: 'JSON-LD 是給機器看的「說明書」，是 AI 與 Google 理解內容類型最直接的方式。完整的 Article schema（含 author / date / image / publisher）加上 Organization 品牌訊號（sameAs 列出所有官方平台）能大幅提升 AI 引用機率與 E-E-A-T 信任度。',
-      fix: '【技術部門】每篇用 NewsArticle JSON-LD，必填 headline / author（用 Person 物件）/ datePublished / dateModified / image（≥1200×630）/ publisher（Organization 含 logo）。網站層級加 Organization schema + sameAs 列出官方 FB/IG/LinkedIn/YouTube。用 Google Rich Results Test 驗證。',
-      pts: combinedPts, max: 22,
-      pass: combinedPts >= 15, scope: 'page',
+      why: 'JSON-LD 是給機器看的「說明書」，讓 Google 明確知道作者、發布與更新時間、主圖是什麼，也是取得各種搜尋結果呈現方式的前提。要留意兩件事：Google 官方說 Article 結構化資料「沒有必填屬性」，只要加上符合內容的屬性即可；而且生成式 AI 搜尋「不需要結構化資料」。所以這一項的價值在於一般搜尋的呈現與資料正確性，不要期待它直接換到 AI 引用。',
+      fix: '【技術部門】每篇用 NewsArticle 或 Article JSON-LD，加上官方建議屬性：headline、author（用 Person 物件並附 author.url）、datePublished、dateModified、image（建議 ≥1200×630）。網站層級加 Organization schema，用 sameAs 列出官方 FB／IG／LinkedIn／YouTube。改完用 Google 複合式搜尋結果測試工具驗證。',
+      pts: combinedPts, max: 20,
+      pass: combinedPts >= 14, scope: 'page',
     });
 
     // 2. 自包含段落 citability (18 pts) — 中文計字 100-200 字 + 首段答案前置加分
@@ -1768,16 +1809,16 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       const firstSentence = (lead.textContent.trim().split(/[。！？.!?]/)[0] || '');
       leadGood = n >= 60 && n <= 250 && textLen(firstSentence) <= 80;
     }
-    const contentPts = Math.min(18, golden.length * 3 + (leadGood ? 3 : 0));
+    const contentPts = Math.min(14, golden.length * 3 + (leadGood ? 3 : 0));
     indicators.push({
       name: '自包含段落（AI 可引用性）',
       detail: golden.length > 0
         ? `✅ ${golden.length} 個 80-250 字自包含段落${leadGood ? '；首段答案前置 ✅' : '；⚠️ 首段建議改答案前置'}`
         : '❌ 缺少 100-200 字的自包含段落，建議拆段、每段以結論句開頭',
-      why: 'AI 引用的單位是「段落」不是全文。Princeton 2024 論文實證：100-200 字（134-167 字最佳）、結論句開頭、能獨立讀懂的段落，被 AI 引用機率比長段落高 40%。尤其「首段」——AI 生成摘要最愛抓文章開頭。',
-      fix: '把 500 字以上的長段拆成數個 100-200 字小段，每段聚焦一個論點、第一句就給結論（不要先鋪陳背景歷史）。文章第一段就要「答案前置」：用一句話講清楚這篇在回答什麼。',
-      pts: contentPts, max: 18,
-      pass: contentPts >= 12, scope: 'page',
+      why: '段落能獨立讀懂，讀者掃讀時好抓重點，AI 要截取一段話當引用時也比較完整。必須說清楚的是：KDD 2024 的 GEO 論文並沒有提出任何「最佳段落字數」，網路上流傳的「134-167 字最佳」不是該論文的結論；Google 也在 2026 年的生成式 AI 指南裡，把「必須把內容切成小塊」列為迷思。所以本項權重已調降，判斷標準是「段落是否自成一個完整意思」，而不是湊字數。',
+      fix: '把 500 字以上的長段，依論點拆成幾個自成段落的小段，每段第一句就給結論，不要先鋪陳背景。文章第一段用一句話講清楚這篇要回答什麼。段落長度以讀起來順暢為準，不必刻意切碎。',
+      pts: contentPts, max: 14,
+      pass: contentPts >= 9, scope: 'page',
     });
 
     // 3. 文章結構：目錄錨點 + 標題層級 (8 pts)
@@ -1796,31 +1837,34 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     if (headingsWithId >= 1) structPts += 1;
     if (headingDensityOk) structPts += 2;
     structPts = Math.min(10, structPts);
+    // 摺疊／分頁容器：Google 的「read more」深層連結要求內容一載入就看得到
+    const collapsedCount = doc.querySelectorAll('details, [class*="accordion"], [class*="collapse"], [class*="tab-pane"]').length;
     const structBits = [
       anchorLinks.length > 0 ? `${anchorLinks.length} 個目錄錨點` : '無目錄錨點',
       `H2×${h2c}／H3×${h3c}`,
       headingDensityOk ? '小標密度足夠' : '小標偏少（長文建議每 250 字一個）',
-    ];
+      collapsedCount > 0 ? `⚠️ 偵測到 ${collapsedCount} 個摺疊／分頁區塊（可能影響深層連結）` : '',
+    ].filter(Boolean);
     indicators.push({
       name: '文章結構（目錄錨點）',
       detail: (structPts >= 6 ? '✅ ' : structPts > 0 ? '⚠️ ' : '❌ ') + structBits.join('、'),
-      why: '清楚的章節結構是強 GEO/AEO 訊號：AI 靠它理解長文、精準引用某一段；Google 也用它做 passage indexing（把長文切成段落分別參與排名），並可能顯示「跳到段落」子連結。小標太少，整篇被當一大塊、抓不出重點。',
-      fix: '長文每 200-300 字放一個 H2/H3 小標（2000 字約 6-8 個），標題用問句更佳。文章開頭放「章節目錄」，用 <a href="#段落id"> 連到各小標（標題加 id）。記者層面：把長段落用小標分章節即可。',
+      why: '清楚的章節結構讓讀者快速找到需要的段落，機器也才分得出長文的層次。Google 2026 年 4 月新增了「read more」深層連結說明：搜尋結果可能直接把使用者帶到頁面中的某個段落，但前提是「內容一載入就要讓人看得到，不能藏在可展開區塊或分頁介面裡」，也不能用 JavaScript 強制把捲動位置拉回頂端、或在載入時把網址的 # 片段移除。',
+      fix: '長文每 200-300 字放一個 H2/H3 小標（2000 字約 6-8 個），標題盡量貼近讀者會問的事。文章開頭放章節目錄，用 <a href="#段落id"> 連到各小標（小標記得加 id）。【技術部門】正文不要包在摺疊區塊或分頁標籤裡；不要在載入時用 JS 改捲動位置或清掉網址的 # 片段。',
       pts: structPts, max: 10, pass: structPts >= 6, scope: 'page',
     });
 
     // 3. 數據密度 citability (10 pts) — 含具體數字的段落
     const dataParas = paragraphs.filter(p => textLen(p.textContent) >= 30 && hasNumber(p.textContent));
-    const dataPts = Math.min(10, dataParas.length * 2);
+    const dataPts = Math.min(12, dataParas.length * 2);
     indicators.push({
       name: '數據密度（可驗證事實）',
       detail: dataParas.length > 0
         ? `✅ ${dataParas.length} 個段落含具體數字（AI 偏好可驗證的數據）`
         : '❌ 內容缺少具體數字，建議把「很多、大幅」換成「+23%、12,000 名」等明確數據',
-      why: 'AI 引用時優先選帶數字的句子，因為它們是明確的事實主張（claim）、不易產生幻覺，AI 可以直接拼接進回答。一篇全是形容詞、沒有數字的文章，AI 寧可去引用別人有數據的內容。',
-      fix: '把模糊形容詞換成具體數字：「成長很多」→「年增 23%」、「規模龐大」→「資產達 8 億」、「許多用戶」→「12,000 名」。每個關鍵論點盡量配一個數字、年份或比例。',
-      pts: dataPts, max: 10,
-      pass: dataPts >= 6, scope: 'page',
+      why: '這是目前少數有實證支持的做法。KDD 2024 的 GEO 論文實測九種寫法，加入統計數據能讓內容在生成式引擎中的可見度提升約 33%，是效果第二好的方法；相對地，傳統的關鍵字堆砌表現反而低於未優化的基準。原因是帶數字的句子是明確、可查證的事實主張，AI 引用時比較不會出錯。',
+      fix: '把模糊形容詞換成具體數字：「成長很多」→「年增 23%」、「規模龐大」→「資產達 8 億」、「許多用戶」→「12,000 名」。每個關鍵論點盡量配一個數字、年份或比例，並標明資料年度與出處。',
+      pts: dataPts, max: 12,
+      pass: dataPts >= 8, scope: 'page',
     });
 
     // 4. 權威外連 citability / E-E-A-T (10 pts) — .gov/.edu/wikipedia 等高權威網域
@@ -1833,7 +1877,7 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       detail: authLinks.length > 0
         ? `✅ 引用了 ${authLinks.length} 個高權威來源（.gov/.edu/Wikipedia 等）`
         : '— 未引用權威來源，建議在關鍵論點旁加 1-2 個 .gov/.edu/Wikipedia 連結',
-      why: '引用權威來源等於告訴 AI 與 Google「我的內容經得起查證」，直接提升 authority（E-E-A-T）評估與被引用機率。Princeton 論文也指出「引用權威來源＋統計數據」是提升 AI 引用率最有效的組合之一。',
+      why: '引用權威來源等於告訴讀者與 AI「這段話經得起查證」。KDD 2024 的 GEO 論文實測，加入來源引用可讓內容在生成式引擎中的可見度提升約 28%，是效果前三名的做法；搭配統計數據（約 +33%）與具名引述（約 +41%）效果更好。',
       fix: '在關鍵數據／論點旁加 1-2 個指向高權威網域的連結。優先級：.gov／.gov.tw ＞ .edu ＞ Wikipedia ＞ 國際權威機構（IEA、WHO…）。注意要與內容直接相關，同段超過 3 個外連反而像 spam。',
       pts: authPts, max: 10,
       pass: authPts >= 5, scope: 'page',
@@ -1870,8 +1914,9 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     const pageText = doc.body?.innerText || doc.body?.textContent || '';
     const pageTextHead = pageText.slice(0, 3000);
 
-    // ── 第一手經驗訊號（Experience）── Google QRG 2024 重點
-    const hasExperience = /採訪|獨家|記者.*實地|現場直擊|我們.*走訪|親自.*體驗|親眼.*目睹|實測|親赴|專訪|親身|直擊|第一手|記者會|受訪|深度報導/i.test(pageText);
+    // ── 第一手經驗訊號（Experience）── Google 搜尋品質評估指南的重點之一
+    // 2026-09：移除「記者會」——轉述記者會內容不等於第一手經驗，會造成誤判
+    const hasExperience = /採訪|獨家|記者.*實地|現場直擊|我們.*走訪|親自.*體驗|親眼.*目睹|實測|親赴|專訪|親身|直擊|第一手|受訪|深度報導/i.test(pageText);
 
     // ── 專業資歷（Expertise）──
     const hasCredential = /CFA|CFP|CPA|FRM|CAIA|醫師|主治|MD\b|Ph\.?D|博士|教授|研究員|首席.*分析師|投資長|財務長|首席.*經濟學家|基金.*經理|法學博士/i.test(pageTextHead);
@@ -1915,29 +1960,62 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
     if (hasAdDisclosure) eeatLines.push('✅ 偵測到廣編揭露聲明（合規透明）');
 
     // ── 組 fix ──
-    let eeatFix = '【Experience】採訪報導加入「記者親赴現場」「專訪 OOO」「實測後發現」等第一手字樣，是 2024 Google QRG 核心訊號，也能與 AI 生成文做出區別。【Expertise】每篇有記者全名＋職稱；在作者頁建立完整 bio（附學經歷、過往報導）；Person schema 加 sameAs 連 LinkedIn。【Trustworthiness】標明發布日與更新日；每季回頭審舊文補新數據並更新 dateModified。';
+    let eeatFix = '【Experience】採訪報導如實寫出「記者親赴現場」「專訪 OOO」「實測後發現」等第一手過程，這是 Google 搜尋品質評估指南長期強調的訊號，也是與 AI 生成內容拉開差距的地方（注意：要真的做過才寫）。【Expertise】每篇有記者全名＋職稱；在作者頁建立完整 bio（附學經歷、過往報導）；Person schema 加 sameAs 連 LinkedIn。【Trustworthiness】標明發布日與更新日；每季回頭審舊文補新數據並更新 dateModified。';
     if (isFinance) eeatFix += '【金融 YMYL+】作者加註 CFA/CFP/執照字號；文末加「本文不構成投資建議，投資涉及風險，請審慎評估」；引用金管會、央行、Bloomberg 並附連結。';
     if (isMedical) eeatFix += '【醫療 YMYL+】作者加註醫師執照／學術職稱；文末加「本文不構成醫療建議，請諮詢專業醫師」；引用衛福部、WHO、PubMed 並標記醫療審閱日期。';
 
     indicators.push({
       name: 'E-E-A-T：經驗・專業・權威・可信',
       detail: eeatLines.join('\n'),
-      why: 'E-E-A-T（Experience 經驗、Expertise 專業、Authoritativeness 權威、Trustworthiness 可信）是 Google QRG 評估內容品質的核心框架，也是 AI 引擎判斷「值不值得引用」的主要依據。第一手採訪訊號能與 AI 生成文做出區別，作者 bio 深度直接影響 Expertise 評分，YMYL 類別無免責聲明幾乎無法進 AI 引用清單。',
+      why: 'E-E-A-T（Experience 經驗、Expertise 專業、Authoritativeness 權威、Trustworthiness 可信）是 Google 搜尋品質評估指南用來衡量內容品質的框架，評估員依它來判斷內容值不值得信任。第一手採訪的過程、作者的專業背景、清楚的發布與更新日期，都是讀者和機器判斷可信度的依據。金融、醫療這類 YMYL 主題，免責聲明主要是合規與讀者保護的需求；AI 引擎會不會因此加分，各家都沒有公開說明。',
       fix: eeatFix,
       pts: eeatPts, max: 26,
       pass: eeatPts >= 16, scope: 'page',
     });
 
+    // 5b. 廣編合規 (8 pts) — 2026-09 新增，只在偵測到廣編／業配揭露字樣時才出現
+    // 依據：Google 連結 spam 政策明載付費連結「只要標上 rel="nofollow" 或 rel="sponsored" 就不違規」；
+    // site reputation abuse 政策則允許 advertorial，前提是揭露商業性質、有編輯監督、與主站整合。
+    if (isSponsored) {
+      const advSelfHost = (() => {
+        const canon = doc.querySelector('link[rel="canonical"]')?.getAttribute('href')
+          || doc.querySelector('meta[property="og:url"]')?.getAttribute('content') || '';
+        try { return new URL(canon).hostname; } catch { return ''; }
+      })();
+      const outLinks = Array.from(doc.querySelectorAll('a[href^="http"]')).filter(a => {
+        const h = a.getAttribute('href') || '';
+        let host = '';
+        try { host = new URL(h).hostname; } catch { return false; }
+        if (advSelfHost && host === advSelfHost) return false;   // 同站連結不算外連
+        return !authDomains.test(h);                              // 政府／學術／百科等引用來源不算商業連結
+      });
+      const qualified = outLinks.filter(a => /sponsored|nofollow/i.test(a.getAttribute('rel') || ''));
+      const unqualified = outLinks.length - qualified.length;
+      const linkPts = outLinks.length === 0 ? 4 : (unqualified === 0 ? 4 : unqualified <= 2 ? 2 : 0);
+      const advPts = 4 + linkPts;   // 揭露字樣 4 分 + 連結標記 4 分
+      indicators.push({
+        name: '廣編合規（揭露 + 連結標記）',
+        detail: `✅ 偵測到廣編／業配揭露字樣　|　` + (
+          outLinks.length === 0 ? '未偵測到外部商業連結'
+          : unqualified === 0 ? `${outLinks.length} 個外部連結都已標記 rel="sponsored" 或 "nofollow"`
+          : `⚠️ ${unqualified}/${outLinks.length} 個外部連結未標記 rel="sponsored"（付費連結未標記有被判連結 spam 的風險）`),
+        why: 'Google 的連結 spam 政策寫明，付費或贊助性質的連結「只要標上 rel="nofollow" 或 rel="sponsored" 屬性就不違反政策」；反過來說，廣編文章連到客戶官網卻沒有標記，就落在「用金錢換取連結」的違規描述裡。另一方面，site reputation abuse 政策明確允許 advertorial 與原生廣告，條件是目的在於把內容傳達給讀者、而不是借用主站既有的排名訊號，並且要有清楚的作者標示、編輯監督與商業性質揭露。這一項對媒體是合規問題，不只是分數問題。',
+        fix: '【上稿人員】廣編頁連到客戶官網、活動報名頁、產品頁的連結，一律加上 rel="sponsored"（CMS 若不支援，退而求其次用 rel="nofollow"）。引用政府、學術、百科等佐證來源不需要標記。【編輯台】維持清楚的廣編標示與編輯監督，避免整個頻道變成純粹代管第三方內容。',
+        pts: advPts, max: 8,
+        pass: advPts >= 8, scope: 'page',
+      });
+    }
+
     // 6. RSS / Atom feed (5 pts) — 從原「平台優化」拆出
     // OG / Twitter Card 已搬到 SEO（社群分享預覽），這裡只留真正屬於 AI 引用訊號的 RSS。
     const hasRss = !!doc.querySelector('link[rel="alternate"][type="application/rss+xml"], link[rel="alternate"][type="application/atom+xml"]');
-    const rssPts = hasRss ? 5 : 0;
+    const rssPts = hasRss ? 3 : 0;
     indicators.push({
       name: 'RSS / Atom feed',
-      detail: hasRss ? '✅ 提供 RSS/Atom feed（AI 爬蟲發現新內容的快速管道）' : '❌ 未提供 RSS/Atom feed（AI 對新文章感知延遲 7-14 天）',
-      why: 'RSS/Atom feed 是給 AI 爬蟲的「邀請函」——GPTBot、ClaudeBot、PerplexityBot 會讀 feed 發現網站更新。沒有的話 AI 只能等下次重爬，新文被引用的時機點會慢上 1-2 週。',
-      fix: '【技術部門】網站提供 /rss.xml 或 /feed（保留最新 20-30 篇）；<head> 加 <link rel="alternate" type="application/rss+xml" href="/rss.xml">。',
-      pts: rssPts, max: 5, pass: hasRss, scope: 'site',
+      detail: hasRss ? '✅ 提供 RSS/Atom feed' : '— 未提供 RSS/Atom feed',
+      why: 'feed 是讓外部服務（新聞聚合器、訂閱工具、部分爬蟲）快速得知網站更新的標準管道，對新聞網站是基本配備。至於各家 AI 爬蟲是否真的靠 feed 發現新文章、能加快多久，官方都沒有公開說明——先前版本寫的「延遲 7-14 天」查無出處，已移除，本項權重也一併調降。',
+      fix: '【技術部門】網站提供 /rss.xml 或 /feed（保留最新 20-30 篇）；在 <head> 加上 <link rel="alternate" type="application/rss+xml" href="/rss.xml">。',
+      pts: rssPts, max: 3, pass: hasRss, scope: 'site',
     });
   } else {
     // 無法取得 HTML → 本區內所有 page-level 項目標為不適用，不計分（避免「拿不到 HTML 就被扣 90 分」）
@@ -1955,22 +2033,22 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       indicators.push({
         name: '文章字數',
         detail: '— 無法取得文章內文（網站有 Cloudflare 防護或 CORS 限制，字數無法計算）',
-        why: 'AI 引擎傾向引用 800-2,500 字的文章——字數太少代表主題覆蓋不完整；超過 4,000 字需要更好的結構才能讓 AI 精準截取片段。',
+        why: '字數不是排名因素，本項只用來提醒「篇幅明顯過短、主題可能沒交代完」。目前抓不到內文，所以不計分。',
         fix: '此網站有防爬保護，建議改用 Word 草稿模式（上傳 .docx）進行內容分析。',
         pts: 0, max: 0, pass: null, scope: 'page',
       });
     } else {
-      const wcPts = wc < 500 ? 0 : wc < 800 ? 3 : wc < 1500 ? 7 : wc <= 2500 ? 10 : wc <= 4000 ? 8 : 6;
+      // 2026-09：權重 10 → 5。Google 官方說內容長度應該由讀者需求決定，並沒有偏好的字數區間，
+      // 舊版的「800-2,500 字最佳」查無出處，因此改為只在明顯過短時提醒。
+      const wcPts = wc < 300 ? 0 : wc < 600 ? 3 : 5;
       indicators.push({
         name: '文章字數',
-        detail: wc < 500 ? `❌ 字數過少（${wc} 字）— AI 引擎傾向略過覆蓋不完整的短文`
-          : wc < 800 ? `⚠️ 字數偏少（${wc} 字）— 建議補充至 800 字以上`
-          : wc <= 2500 ? `✅ 字數理想（${wc} 字）— 1,000-2,500 字是 AI 引用最佳區間`
-          : wc <= 4000 ? `✅ 字數充足（${wc} 字）— 篇幅較長，確保每段有清楚主題句`
-          : `⚠️ 字數偏多（${wc} 字）— 超過 4,000 字建議加強目錄結構或拆分子主題`,
-        why: 'AI 引擎傾向引用 800-2,500 字的文章——字數太少代表主題覆蓋不完整；超過 4,000 字需要更好的結構才能讓 AI 精準截取片段。Google Passage Ranking 也偏好中等長度的獨立段落。',
-        fix: '目標 1,500-2,500 字：補充背景脈絡、數據佐證、案例說明。避免湊字數——每段必須有新資訊。超過 3,000 字時務必加目錄錨點方便 AI 定位段落。',
-        pts: wcPts, max: 10, pass: wcPts >= 7, scope: 'page',
+        detail: wc < 300 ? `⚠️ 篇幅很短（${wc} 字）— 確認主題是否交代完整`
+          : wc < 600 ? `${wc} 字 — 篇幅偏短，確認關鍵問題都有回答到`
+          : `✅ ${wc} 字 — 篇幅足夠（字數本身不是排名因素，重點是有沒有講完）`,
+        why: '字數不是排名因素。Google 的生成式 AI 指南明說內容長度應該取決於讀者需要什麼，而不是為了 AI 而寫長或寫短。這一項只用來提醒「篇幅明顯過短、主題可能沒交代完」，權重已從 10 分調降為 5 分。',
+        fix: '不要為了湊字數而灌水——每一段都要有新資訊。篇幅短的話，先問自己讀者最可能追問的三個問題有沒有回答到，再決定要不要補背景脈絡、數據佐證或案例。',
+        pts: wcPts, max: 5, pass: wcPts >= 3, scope: 'page',
       });
     }
 
@@ -2007,37 +2085,43 @@ function scoreGEO(doc, html, robotsTxt, isDoc) {
       const txt = p.textContent;
       return /[「」""'']/.test(txt) && quoteVerbs.test(txt);
     });
-    const quotePts = quoteParas.length >= 3 ? 8 : quoteParas.length >= 1 ? 4 : 0;
-    const quoteMax = quoteParas.length > 0 ? 8 : 0;
+    // 2026-09：從 bonus 升為正式計分項——KDD 2024 的 GEO 論文實測，加入引述是九種寫法中效果最好的一種
+    const quotePts = quoteParas.length >= 3 ? 10 : quoteParas.length >= 1 ? 5 : 0;
     indicators.push({
       name: '具名引述',
-      detail: quoteParas.length >= 3 ? `✅ 偵測到 ${quoteParas.length} 處具名引述（採訪有據・強 E-E-A-T 訊號）+${quotePts} 分`
-        : quoteParas.length >= 1 ? `⚠️ 偵測到 ${quoteParas.length} 處引述（+${quotePts} 分）— 建議補至 3 處以上`
-        : '— 未偵測到具名引述（純分析文可忽略；採訪報導建議保留官員或專家直接引言）',
-      why: '「某某表示…」這類具名引述是第一手採訪的證明，是 Google QRG（搜尋品質評估指南）與 AI 引擎評估內容可信度的重要訊號。有具名消息來源的文章被 AI 引用的機率明顯高於同主題的無來源整理文。',
-      fix: '採訪後把受訪者直接引言（用「」括起來）保留在文中，加上姓名＋職稱。若是分析型文章，可引述研究報告（「根據金管會 2024 年報告…」）。每篇建議 2-4 處。',
-      pts: quotePts, max: quoteMax,
-      pass: quoteParas.length > 0 ? quotePts >= 4 : null, scope: 'page',
+      detail: quoteParas.length >= 3 ? `✅ 偵測到 ${quoteParas.length} 處具名引述（採訪有據）`
+        : quoteParas.length >= 1 ? `⚠️ 只偵測到 ${quoteParas.length} 處引述 — 建議補到 3 處以上`
+        : '❌ 未偵測到具名引述 — 建議保留受訪者或專家的直接引言（純資料整理文可忽略）',
+      why: '這是目前實證效果最好的一項。KDD 2024 的 GEO 論文實測九種寫法，加入引述讓內容在生成式引擎中的可見度提升約 41%，排名第一，超過統計數據（約 33%）與來源引用（約 28%）。原因是直接引言有明確的歸屬對象，AI 轉述時比較安全。對編輯台來說，它同時是第一手採訪的證明。',
+      fix: '採訪後把受訪者的直接引言用「」保留在文中，加上姓名與職稱，不要全部改寫成轉述。分析型文章可引述研究報告原文（例如「根據金管會 2026 年報告指出……」）。每篇建議 2-4 處。',
+      pts: quotePts, max: 10,
+      pass: quotePts >= 5, scope: 'page',
     });
   }
 
-  // 8. AI Crawlers in robots.txt (10 pts) — 9 隻主流 AI 爬蟲
+  // 8. AI 爬蟲開放度 (10 pts) — 只計「搜尋引用型」；訓練型僅顯示、不計分
+  // 依據官方文件：OAI-SearchBot 決定能否出現在 ChatGPT 搜尋答案；Claude-SearchBot／Claude-User
+  // 決定 Claude 的搜尋能見度；PerplexityBot 負責 Perplexity 搜尋結果（官方聲明不用於訓練）。
+  // 反之 Google-Extended 官方明載「不影響 Google 搜尋收錄，也不是排名訊號」，GPTBot／ClaudeBot／
+  // CCBot 等皆為模型訓練用途——擋不擋是內容授權的商業決策，不該當作扣分項。
   const crawlers = checkAICrawlers(robotsTxt);
-  const botList = ['GPTBot','ClaudeBot','anthropic-ai','PerplexityBot','Google-Extended','CCBot','Bytespider','Applebot-Extended','Amazonbot'];
-  const allowedCount = botList.filter(b => crawlers[b]).length;
-  const crawlerPts = Math.round((allowedCount / botList.length) * 10);
-  const blocked = botList.filter(b => crawlers[b] === false);
+  const searchBlocked = AI_BOTS_SEARCH.filter(b => crawlers[b] === false);
+  const trainBlocked = AI_BOTS_TRAINING.filter(b => crawlers[b] === false);
+  const crawlerPts = Math.round(((AI_BOTS_SEARCH.length - searchBlocked.length) / AI_BOTS_SEARCH.length) * 10);
+  const trainLine = trainBlocked.length === 0
+    ? '　|　訓練型爬蟲全部允許'
+    : `　|　訓練型封鎖中：${trainBlocked.join('、')}（不影響搜尋引用，屬授權政策，不計分）`;
   indicators.push({
     name: 'AI 爬蟲 robots.txt 開放度',
     detail: !robotsTxt
-      ? '⚠️ 無法取得 robots.txt（預設允許，但建議明確設定）'
-      : blocked.length === 0
-        ? `✅ 9 隻主流 AI 爬蟲皆允許（GPTBot、ClaudeBot、PerplexityBot、Google-Extended、CCBot、Bytespider 等）`
-        : `⚠️ 封鎖中：${blocked.join('、')}（這些 AI 將無法引用你的內容）`,
-    why: 'AI 要引用你，前提是爬蟲抓得到。robots.txt 是「曝光資格賽」第一道閘門。封鎖某隻 = 主動把文章從該 AI 的資料庫移除。涵蓋 9 隻：GPTBot(ChatGPT)、ClaudeBot/anthropic-ai(Claude)、PerplexityBot、Google-Extended(Gemini)、CCBot(多數 LLM 資料源)、Bytespider(字節/豆包)、Applebot-Extended(Apple)、Amazonbot。',
-    fix: '【技術部門】robots.txt 對以上爬蟲明確 Allow: /（敏感路徑如 /admin/ 可個別 Disallow）。Google-Extended 雖預設「沒擋＝可用」，仍建議明確 Allow 以策安全。可在伺服器 log 過濾 User-Agent 確認爬蟲真的有來。',
+      ? '⚠️ 無法取得 robots.txt（依規範預設為允許）'
+      : (searchBlocked.length === 0
+          ? '✅ 搜尋引用型爬蟲全部允許（OAI-SearchBot／Claude-SearchBot／Claude-User／PerplexityBot／Googlebot／Bingbot）'
+          : `❌ 搜尋引用被封鎖：${searchBlocked.join('、')}（這些 AI 的搜尋答案將不會引用你）`) + trainLine,
+    why: 'AI 爬蟲要分兩類看。【搜尋引用型】決定你會不會出現在 AI 的答案裡：OpenAI 官方寫明「退出 OAI-SearchBot 的網站不會出現在 ChatGPT 搜尋答案」；Anthropic 說停用 Claude-SearchBot／Claude-User 會降低網站在搜尋結果的能見度；Perplexity 則說 PerplexityBot 專門用於搜尋結果、不做訓練。【訓練型】是模型訓練授權：Google 官方明載 Google-Extended「不影響網站在 Google 搜尋的收錄，也不是排名訊號」，GPTBot、ClaudeBot、CCBot 同屬此類。所以封鎖訓練型爬蟲不等於失去 AI 曝光，本工具不扣分。另外 ChatGPT-User 與 Perplexity-User 屬使用者當下觸發的抓取，官方說明不一定遵守 robots.txt。',
+    fix: '【技術部門】想被 AI 引用，robots.txt 至少放行這六隻：OAI-SearchBot、Claude-SearchBot、Claude-User、PerplexityBot、Googlebot、Bingbot。訓練型（GPTBot／ClaudeBot／CCBot／Google-Extended）開不開屬內容授權決策，由公司政策決定。注意 Google 規範採「最具體的 user-agent 群組優先，且不與 User-agent: * 合併」——若寫了專屬群組，該群組就要完整列出允許與禁止的路徑。',
     pts: crawlerPts, max: 10,
-    pass: crawlerPts >= 7, scope: 'site',
+    pass: searchBlocked.length === 0, scope: 'site',
   });
 
   neutralizeWebOnly(indicators, isDoc);
@@ -2061,9 +2145,10 @@ function scoreAEO(doc, html, isDoc) {
     ]};
   }
 
-  // 1. FAQPage JSON-LD — 加分項（bonus）：只有明確的結構化標記才給分。
-  //    可見 Q&A 格式不給分（避免與「問句式標題」「答案前置短段」重複計分），
-  //    但偵測到時在 detail 給建議。完全沒有則 max:0 不計入分母。
+  // 1. 問答區塊品質 (16 pts) — 2026-09 重構
+  //    Google 已於 2026-05-07 停止顯示 FAQ 富文本（06-15 下架說明文件），FAQPage JSON-LD
+  //    在 Google 端已無顯示回報，故不再是主要計分依據。改以「可見問答的品質」為主：
+  //    題目是不是真實問句、答案是否直接回答，JSON-LD 降為小幅加分（機器可讀性）。
   let hasJsonLdFaq = false, jsonLdFaqCount = 0, faqItems = [];
   doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
     try {
@@ -2085,42 +2170,44 @@ function scoreAEO(doc, html, isDoc) {
     } catch {}
   });
 
-  // 偵測可見 Q&A 格式（僅用於建議訊息，不計分）
-  let hasVisibleFaq = false, visibleFaqCount = 0;
-  if (!hasJsonLdFaq) {
-    const faqEls = doc.querySelectorAll('[class*="faq"], [class*="FAQ"], [class*="qa"], [class*="QA"]');
-    if (faqEls.length > 0) { hasVisibleFaq = true; visibleFaqCount = faqEls.length; }
+  // 偵測可見問答：抓出「題目」文字，才能判斷是不是真的問句（而非「常見問題」標題而已）
+  const faqQWord = /(為什麼|為何|如何|怎麼|怎樣|什麼是|是什麼|哪些|哪個|多少|該不該|要不要|是否|有沒有|嗎|呢)/;
+  let visibleQs = [];
+  const faqScope = doc.querySelector('[class*="faq"], [class*="FAQ"], [id*="faq"], [id*="FAQ"]');
+  if (faqScope) {
+    visibleQs = Array.from(faqScope.querySelectorAll('h2, h3, h4, dt, summary, strong, b'))
+      .map(el => el.textContent.trim())
+      .filter(t => t.length >= 4 && t.length <= 120);
   }
-  if (!hasJsonLdFaq && !hasVisibleFaq) {
-    const qaPattern = /^[QqAaＱＡ][1-9１-９]?[\s：:\.]/;
-    const allP = Array.from(doc.querySelectorAll('p, li, div, strong, b, dt'));
-    const qaPairs = allP.filter(el => {
-      const txt = el.textContent.trim();
-      return txt.length < 400 && qaPattern.test(txt);
-    }).length;
-    if (qaPairs >= 4) { hasVisibleFaq = true; visibleFaqCount = Math.floor(qaPairs / 2); }
+  if (!visibleQs.length) {
+    const qaPattern = /^[QqＱ][1-9１-９]?[\s：:\.、]/;
+    visibleQs = Array.from(doc.querySelectorAll('p, li, div, strong, b, dt, h3, h4'))
+      .map(el => el.textContent.trim())
+      .filter(t => t.length < 200 && qaPattern.test(t));
   }
+  // 真正的問句題目（有問號或疑問詞）——這才是 AI 能對上使用者問題的部分
+  const realQs = visibleQs.filter(t => /[?？]/.test(t) || faqQWord.test(t));
+  const hasVisibleFaq = realQs.length >= 2 || visibleQs.length >= 3;
 
-  const faqPts = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 7 : 0);
-  const faqMax = hasJsonLdFaq ? 22 : (hasVisibleFaq ? 10 : 4);
-  let faqDetail, faqPass;
-  if (hasJsonLdFaq) {
-    faqDetail = `✅ FAQPage JSON-LD 結構化標記（${jsonLdFaqCount} 組問答）+22 分 — 可觸發 Google FAQ 富文本展開`;
-    faqPass = true;
-  } else if (hasVisibleFaq) {
-    faqDetail = `⚠️ 偵測到可見 Q&A 格式（${visibleFaqCount} 組）— AI 引擎可讀取（7/10 分）；補上 FAQPage JSON-LD 可升至滿分並觸發 Google 搜尋展開問答`;
-    faqPass = false;
-  } else {
-    faqDetail = '⚠️ 未偵測到 FAQ 結構（問答型文章建議加 5-8 組 Q&A + FAQPage JSON-LD，可顯著提升 AI 引用率）';
-    faqPass = false;
-  }
+  let faqPts = 0;
+  if (hasVisibleFaq) faqPts += 8;                                  // 有成塊的問答區
+  faqPts += realQs.length >= 3 ? 4 : realQs.length >= 1 ? 2 : 0;   // 題目寫成真實問句
+  if (hasJsonLdFaq) faqPts += 4;                                   // JSON-LD：機器可讀性小加分
+  faqPts = Math.min(16, faqPts);
+  const faqMax = (hasVisibleFaq || hasJsonLdFaq) ? 16 : 4;         // 完全沒有 → 小扣 0/4
+  const jsonLdNote = hasJsonLdFaq ? `；另有 FAQPage JSON-LD（${jsonLdFaqCount} 組）+4` : '';
+  const faqDetail = hasVisibleFaq
+    ? `✅ 可見問答區 ${visibleQs.length} 題，其中 ${realQs.length} 題寫成真實問句${jsonLdNote}`
+    : hasJsonLdFaq
+      ? `⚠️ 只有 FAQPage JSON-LD（${jsonLdFaqCount} 組）、頁面上看不到問答內容 — 讀者與 AI 主要讀的是可見內文，建議把問答寫進正文${jsonLdNote}`
+      : '⚠️ 未偵測到問答區塊（讀者真的會追問時，建議補 3-5 題，題目用讀者的問法）';
   indicators.push({
-    name: 'FAQPage 結構化資料',
+    name: '問答區塊品質（FAQ）',
     detail: faqDetail,
-    why: 'FAQPage JSON-LD 讓 Google 在搜尋結果直接展開問答（FAQ Rich Result），也讓 ChatGPT、Perplexity、Bing Copilot 能精確解析問答對應關係並引用。光有可見 Q&A 格式，AI 引擎得自行猜測問答邊界，引用準確度較低。',
-    fix: '【技術部門＋記者】文末加 5-8 題 Q&A，套 FAQPage JSON-LD（必須含 mainEntity 問答陣列）。問題用使用者真實搜尋語氣（「綠色債券怎麼買？」優於「綠色債券簡介」）；每個答案 50-150 字、直接答覆＋一個數據。',
+    why: '注意：Google 已於 2026 年 5 月 7 日停止顯示 FAQ 富文本，6 月 15 日下架說明文件，所以 FAQPage JSON-LD 在 Google 端已經換不到任何顯示效果，本工具只給小幅加分。真正有價值的是「可見的好問答」——使用者問 AI 的是自然語句，文章裡若有一題幾乎就是同一句話、答案又獨立讀得懂，就容易被引用。Google 官方也說生成式 AI 搜尋不需要結構化資料。KDD 2024 的 GEO 論文實測，真正提升被引用率的是加入引述（約 +41%）、統計數據（約 +33%）與來源引用（約 +28%），而不是問答的格式本身。',
+    fix: '【記者】只在讀者真的會追問時才寫，3-5 題即可。題目取自真實查詢（Search Console 搜尋字詞、Google「大家也問」、客戶的客服常見問題），用讀者的問法並加問號。每個答案 40-150 字，第一句直接回答，並帶一個數據或具名出處——不要把內文換句話重講。【技術部門】FAQPage JSON-LD 屬可有可無：CMS 能自動產生就留著，不值得專案投入。',
     pts: faqPts, max: faqMax,
-    pass: faqPass, scope: 'page',
+    pass: faqPts >= 10, scope: 'page',
     faqItems: faqItems.length ? faqItems : null,
   });
 
@@ -2138,7 +2225,7 @@ function scoreAEO(doc, html, isDoc) {
     detail: (fullQ.length + wordQ.length) > 0
       ? `✅ ${fullQ.length} 個問號標題 + ${wordQ.length} 個疑問詞標題${qhEx ? `（如：「${qhEx.textContent.trim().slice(0,26)}…」）` : ''}`
       : '❌ 小標多為陳述句，建議改問句（提高「大家也問」命中率）',
-    why: '問句式標題與使用者真實搜尋字串相似度最高，是搶佔 Google「大家也問（PAA）」的核心；AI 生成回答時也會把問句標題視為 question、直接複製下方段落當 answer。研究顯示改問句後精選摘要觸發率提升 2-3 倍。',
+    why: '問句式標題和使用者真實搜尋字串的相似度最高，有機會搶進 Google「大家也問（PAA）」；AI 生成回答時，也容易把問句標題當成問題、把下方段落當成答案。要留意的是 Google 官方說「不需要為了生成式 AI 用特別的寫法」，所以這裡的效益主要來自「標題貼近讀者真正想問的事」，而不是問號本身這個格式。',
     fix: '把陳述小標改問句：「台積電 2024 展望」→「台積電 2024 年能維持高獲利嗎？」。四種模板：「為什麼…？」「如何…？」「什麼是…？」「A 跟 B 有什麼差別？」。記得加上問號（有問號分數最高）。一篇 2000 字配 6-8 個問句小標。',
     pts: qhPts, max: 12,
     pass: qhPts >= 6, scope: 'page',
@@ -2162,7 +2249,7 @@ function scoreAEO(doc, html, isDoc) {
   });
   const looseShort = allParas.filter(isShort).length;
   // 答案前置段落每個 6 分（真實機制）；零散短段落最多補 4 分
-  const saPts = Math.min(22, answerFirst * 6 + Math.min(4, looseShort));
+  const saPts = Math.min(16, answerFirst * 5 + Math.min(3, looseShort));
   indicators.push({
     name: '答案前置短段（精選摘要就緒）',
     detail: answerFirst > 0
@@ -2170,10 +2257,10 @@ function scoreAEO(doc, html, isDoc) {
       : looseShort > 0
         ? `⚠️ 有 ${looseShort} 個短段落，但都不在小標正下方——精選摘要抓的是「標題→答案」結構，位置不對抓不到`
         : '❌ 缺少答案前置段落：每個小標下第一段請用 40-120 字直接給結論',
-    why: 'Google 精選摘要、PAA、AI Overview 抓的是「小標題 → 緊接著的第一段答案」。所以關鍵不只是「有短段落」，而是「短答案放在標題正下方」。位置不對，再好的答案也抓不到。這個結構同時是 ChatGPT、Perplexity 抓引用的最愛——一魚多吃。',
-    fix: '每個問句小標的「正下方第一段」用 40-120 字直接給結論，結構「定義＋關鍵特性＋一個數據」，第一句就是答案、不要先鋪陳。後段再展開細節。文章開頭第一段也比照辦理。',
-    pts: saPts, max: 22,
-    pass: saPts >= 13, scope: 'page',
+    why: '「小標題 → 緊接著一段簡短答案」是精選摘要與 PAA 長年偏好的版面結構，對讀者掃讀也最友善。要誠實說明的是：Google 在 2026 年的生成式 AI 指南裡，把「必須把內容切成小塊」列為迷思，明講「沒有規定要把內容切得很碎」，所以這一項對 Google AI 的效果沒有官方背書；ChatGPT、Perplexity 等引擎則未公開說明。本項權重已因此調降，定位是「對讀者好、且對非 Google 的 AI 擷取可能有利」。',
+    fix: '每個問句小標的正下方第一段，用 40-120 字直接給結論：第一句就是答案，接著補關鍵特性和一個數據，細節留到後面幾段。文章開頭第一段也比照辦理。不必為了湊結構硬拆段落——讀起來順暢仍然是第一原則。',
+    pts: saPts, max: 16,
+    pass: saPts >= 10, scope: 'page',
   });
 
   // 4. 表格 — 加分項（bonus）：有就加 12 分，無則 max:0 不計入分母。
@@ -2187,7 +2274,7 @@ function scoreAEO(doc, html, isDoc) {
     detail: tables.length > 0
       ? `✅ 找到 ${tables.length} 個 HTML 表格（表格式精選摘要・低競爭入口）加分 +12`
       : '⚠️ 未偵測到 HTML 表格（涉及比較、規格對照、各年數據時加 &lt;table&gt; 可拿低競爭精選摘要）',
-    why: '表格式精選摘要是三大格式中競爭最低的入口——大部分網站用圖片或散文代替比較資訊，Google 抓不到結構化欄位只能放棄。只要文章有「比較、對照、vs」，做了結構化表格就有機會直接拿下第 0 位。',
+    why: '涉及比較、規格對照、各年數據時，真正的 HTML 表格能讓機器讀到欄列關係；用圖片或純文字排版的話，這層結構就消失了。表格式精選摘要也是常見的呈現方式之一。（註：本項為加分項，敘事型報導沒有表格不扣分。）',
     fix: '把比較型資訊（方案 A/B/C、規格對照、各年數據）改用標準 HTML <table>（含 thead/tbody），別用圖片或純文字排版。欄位 2-3 欄、列數 3-8 列，每格內容 10 字內。記者：用編輯器的「插入表格」功能即可。',
     pts: tablePts, max: tableMax,
     pass: tables.length > 0 ? true : false, scope: 'page',
@@ -2202,39 +2289,47 @@ function scoreAEO(doc, html, isDoc) {
     detail: qualLists.length > 0
       ? `✅ ${qualLists.length} 個 ≥4 項的列表（列表式精選摘要就緒）`
       : allLists.length > 0
-        ? `⚠️ 有 ${allLists.length} 個列表但項目都 <4 項——Google 列表式 Snippet 要求至少 4 項才會抓`
-        : '— 遇到「步驟／方法／種類」建議改用條列清單（真實 <ul>/<ol>）',
-    why: '列表式精選摘要觸發於「How to／步驟／排名」查詢。Google 要求至少 4 項、且是真正的 <ol>/<ul> 標記（用「1. 2. 3.」純文字排版抓不到）。是 Google 與 AI 都偏好的易擷取格式。',
-    fix: '把「步驟、方法、種類、重點」改成條列清單（編輯器的項目符號/編號，不是手打數字），每個列表至少 4 項、每項 5-15 字、動詞開頭。',
+        ? `⚠️ 有 ${allLists.length} 個列表但項目都少於 4 項（本工具以 4 項為列表門檻）`
+        : '— 遇到「步驟／方法／種類」建議改用條列清單（真實的 <ul>/<ol> 標記）',
+    why: '步驟、排名、種類這類內容用真正的 <ul>／<ol> 標記，機器才讀得到「這是一組並列項目」；用「1. 2. 3.」純文字排版，這層結構就消失了。列表式精選摘要也偏好這種格式。項目數門檻 4 項是本工具依常見呈現方式設定的，Google 沒有公布官方數字。步驟型內容用 <ol> 編號清單即可——HowTo 結構化資料已於 2023 年停用，不需要再做。',
+    fix: '把「步驟、方法、種類、重點」改成條列清單（用編輯器的項目符號或編號功能，不要手打數字），每個列表至少 4 項、每項 5-15 字、動詞開頭。步驟型內容用「編號清單」而不是項目符號。',
     pts: listPts, max: 12,
     pass: listPts >= 6, scope: 'page',
   });
 
-  // 6. HowTo Schema (10 pts) — 驗 @type=HowTo 且含 step 步驟（非字串比對）
-  let hasHowTo = false, stepCount = 0;
-  doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
-    try {
-      const j = JSON.parse(el.textContent);
-      const nodes = Array.isArray(j) ? j : (j['@graph'] ? j['@graph'] : [j]);
-      nodes.forEach(o => {
-        if (!o) return;
-        const t = [].concat(o['@type'] || '').join(',');
-        if (/HowTo/.test(t) && o.step) { hasHowTo = true; stepCount = [].concat(o.step).length; }
-      });
-    } catch {}
-  });
-  // Bonus 邏輯：有 HowTo schema 才加分；沒有則 max:0 不計入分母
-  const howToPts = hasHowTo ? 10 : 0;
-  const howToMax = hasHowTo ? 10 : 3;
+  // 6. 摘要可用性 (8 pts) — 2026-09 新增，取代已停用的 HowTo 結構化資料
+  // 官方明載：nosnippet「會阻止內容被當作 AI Overviews 與 AI Mode 的直接輸入」，
+  // max-snippet 則限制可用的內容量。這是 AEO 真正的閘門——被擋住的話，其他項目做再好也不會出現。
+  const snippetMeta = Array.from(doc.querySelectorAll('meta[name="robots"], meta[name="googlebot"]'))
+    .map(m => (m.getAttribute('content') || '').toLowerCase()).join(',');
+  const hasNoSnippet = /\bnosnippet\b/.test(snippetMeta);
+  const maxSnippetM = snippetMeta.match(/max-snippet\s*:\s*(-?\d+)/);
+  const maxSnippetVal = maxSnippetM ? parseInt(maxSnippetM[1], 10) : null;
+  const dataNoSnippetCount = doc.querySelectorAll('[data-nosnippet]').length;
+  let snipPts, snipDetail;
+  if (hasNoSnippet) {
+    snipPts = 0;
+    snipDetail = '❌ 頁面設了 nosnippet — 內容不會出現在精選摘要，也不會被當作 AI Overviews／AI Mode 的輸入';
+  } else if (maxSnippetVal === 0) {
+    snipPts = 0;
+    snipDetail = '❌ max-snippet:0 等同禁止摘要 — 精選摘要與 AI 功能都取不到內容';
+  } else if (maxSnippetVal !== null && maxSnippetVal > 0 && maxSnippetVal < 160) {
+    snipPts = 4;
+    snipDetail = `⚠️ max-snippet:${maxSnippetVal} 限制了可引用的字數（不想限制請改用 -1）`;
+  } else {
+    snipPts = 8;
+    snipDetail = maxSnippetVal === -1
+      ? '✅ max-snippet:-1（不限制摘要長度）'
+      : '✅ 未限制摘要擷取（可被精選摘要與 AI 功能引用）';
+  }
+  if (dataNoSnippetCount > 0) snipDetail += `　|　另有 ${dataNoSnippetCount} 個 data-nosnippet 區塊，該區塊文字不會被引用`;
   indicators.push({
-    name: 'HowTo 結構化資料',
-    detail: hasHowTo
-      ? `✅ 有效 HowTo schema（${stepCount} 個步驟）加分 +10`
-      : '⚠️ 未偵測到 HowTo schema（教學步驟型文章加上可進入 AI Overview 步驟列表）',
-    why: '步驟型內容（「如何申辦綠色債券」「怎麼評估 ESG 評級」）加 HowTo schema，AI 與 Google 才能逐步拆解、進入 AI Overview 步驟列表與語音助理朗讀順序。',
-    fix: '【僅步驟型文章需要】H2 用「步驟 N：動詞＋受詞」，加 HowTo JSON-LD（含 step 陣列，每步有 name/text）。敘事型財經/ESG 報導不是教學文，可跳過。',
-    pts: howToPts, max: howToMax,
-    pass: hasHowTo ? true : false, scope: 'page',
+    name: '摘要可用性（nosnippet／max-snippet）',
+    detail: snipDetail,
+    why: '這是 AEO 的第一道閘門，而且常被忽略。Google 官方文件寫明，nosnippet「適用於所有形式的搜尋結果（網頁搜尋、圖片、Discover、AI Overviews、AI Mode），並且會阻止該內容被當作 AI Overviews 與 AI Mode 的直接輸入」；max-snippet 則會限制可使用的內容量，設成 0 等同完全禁止。部分媒體會在付費牆或廣編頁面加上這些標記，結果是整篇文章對 AI 完全隱形——內容寫得再好也沒有用。',
+    fix: '【技術部門】確認廣編與一般文章頁「沒有」nosnippet，也沒有 max-snippet:0。想完全開放就設 max-snippet:-1。若只是要保護特定段落（例如付費內容），改用 data-nosnippet 標在那一小段上，不要整頁封鎖。付費牆內容另有官方的 subscription and paywalled content 標記方式可用。',
+    pts: snipPts, max: 8,
+    pass: snipPts >= 8, scope: 'page',
   });
 
   neutralizeWebOnly(indicators, isDoc);
@@ -2242,41 +2337,63 @@ function scoreAEO(doc, html, isDoc) {
 }
 
 // ── robots.txt parser ──────────────────────────────
-// 偵測 5 隻主流 AI 爬蟲是否被封鎖。回傳 true=允許 / false=封鎖。
-function checkAICrawlers(txt) {
-  const bots = ['GPTBot','ClaudeBot','anthropic-ai','PerplexityBot','Google-Extended','CCBot','Bytespider','Applebot-Extended','Amazonbot'];
-  const result = {}; bots.forEach(b => result[b] = null);
-  if (!txt) return result;
+// 依 Google 官方規範實作（2026-09 重寫，修正舊版「* 群組會覆蓋專屬群組」的 bug）：
+//   1. 採用「最具體的 user-agent 群組」，專屬群組與 * 群組【不合併】
+//   2. 同一個 user-agent 若出現在多個群組，規則合併
+//   3. 路徑比對取最長匹配；長度相同時 Allow 勝過 Disallow
+// 爬蟲分兩類：搜尋引用型（擋了就真的不會被該 AI 引用）vs 訓練型（是否授權訓練的商業決策）
+const AI_BOTS_SEARCH = ['OAI-SearchBot','Claude-SearchBot','Claude-User','PerplexityBot','Googlebot','Bingbot'];
+const AI_BOTS_TRAINING = ['GPTBot','ClaudeBot','CCBot','Google-Extended','Bytespider','Applebot-Extended','Amazonbot'];
 
-  const lines = txt.split('\n').map(l => l.replace(/#.*/, '').trim());
-  let currentAgents = [], expectingAgents = false;
-  const matchBot = (agent) => bots.find(b => b.toLowerCase() === agent.toLowerCase());
-
-  for (const line of lines) {
-    if (!line) { currentAgents = []; expectingAgents = false; continue; }
-    if (/^user-agent:/i.test(line)) {
-      // 規則出現後再遇 user-agent → 開新群組
-      if (expectingAgents) { currentAgents = []; expectingAgents = false; }
-      currentAgents.push(line.replace(/^user-agent:\s*/i, '').trim());
-    } else if (/^(dis)?allow:/i.test(line)) {
+function parseRobots(txt) {
+  const groups = [];
+  let cur = null, expectingAgents = false;
+  (txt || '').split('\n').forEach(raw => {
+    const line = raw.replace(/#.*/, '').trim();
+    if (!line) return;                                   // 空行不切群組（Google 以 user-agent 行界定群組）
+    const m = line.match(/^([A-Za-z-]+)\s*:\s*(.*)$/);
+    if (!m) return;
+    const field = m[1].toLowerCase(), value = m[2].trim();
+    if (field === 'user-agent') {
+      if (!cur || expectingAgents) { cur = { agents: [], rules: [] }; groups.push(cur); expectingAgents = false; }
+      cur.agents.push(value.toLowerCase());
+    } else if (field === 'allow' || field === 'disallow') {
+      if (!cur) return;                                  // 規則出現在任何 user-agent 之前 → 忽略
       expectingAgents = true;
-      const isDisallow = /^disallow:/i.test(line);
-      const path = line.replace(/^(dis)?allow:\s*/i, '').trim();
-      const blocks = isDisallow && (path === '/' || path === '/*');
-      const opens = !isDisallow || path === '';
-      for (const agent of currentAgents) {
-        const bot = matchBot(agent);
-        if (agent === '*') {
-          bots.forEach(k => { if (result[k] === null) result[k] = blocks ? false : (opens ? true : result[k]); });
-        } else if (bot) {
-          if (blocks) result[bot] = false;
-          else if (opens && result[bot] !== false) result[bot] = true;
-        }
-      }
+      cur.rules.push({ allow: field === 'allow', path: value });
     }
-  }
-  // 未明確設定 → 預設允許（robots.txt 的預設行為）
-  bots.forEach(k => { if (result[k] === null) result[k] = true; });
+  });
+  return groups;
+}
+
+// 規則路徑比對（支援 * 萬用字元與 $ 結尾錨點）
+function robotsRuleMatches(rulePath, path) {
+  if (!rulePath) return false;                           // 「Disallow:」空值 = 不限制，視為不匹配
+  let p = rulePath, anchored = false;
+  if (p.endsWith('$')) { p = p.slice(0, -1); anchored = true; }
+  const re = new RegExp('^' + p.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '.*') + (anchored ? '$' : ''));
+  return re.test(path);
+}
+
+function robotsAllows(groups, bot, path = '/') {
+  const name = bot.toLowerCase();
+  let rules = groups.filter(g => g.agents.includes(name)).flatMap(g => g.rules);
+  if (!rules.length) rules = groups.filter(g => g.agents.includes('*')).flatMap(g => g.rules);
+  let best = null;
+  rules.forEach(r => {
+    if (!robotsRuleMatches(r.path, path)) return;
+    const len = r.path.length;
+    if (!best || len > best.len || (len === best.len && r.allow)) best = { allow: r.allow, len };
+  });
+  return best ? best.allow : true;                       // 沒有適用規則 → 允許（robots.txt 預設行為）
+}
+
+function checkAICrawlers(txt) {
+  const bots = [...AI_BOTS_SEARCH, ...AI_BOTS_TRAINING];
+  const result = {};
+  if (!txt) { bots.forEach(b => result[b] = true); return result; }
+  const groups = parseRobots(txt);
+  bots.forEach(b => result[b] = robotsAllows(groups, b, '/'));
   return result;
 }
 
@@ -2527,26 +2644,31 @@ function renderSuggestions(scores) {
 
   // 記者白話版改稿建議
   const ACTIONS = {
-    'Meta Description': { action: '請在後台補上文章摘要（120-160 字），說明這篇報導的核心內容與讀者收穫。Google 和 AI 都靠這段來判斷文章在講什麼。', priority: 'high' },
-    '網頁標題': { action: '標題建議控制在 30-60 字。最重要的關鍵字放最前面，避免以「廣編」「特輯」等字開頭。', priority: 'high' },
+    'Meta Description': { action: '請在後台補上文章摘要（約 50-85 個中文字），說明這篇報導的核心內容與讀者收穫。注意 Google 只有在認為它比內文更準確時才會採用，多數情況會自己抓一段。', priority: 'mid' },
+    '網頁標題': { action: '標題建議控制在約 10-30 個中文字。最重要的關鍵字放最前面，避免以「廣編」「特輯」等字開頭。太長的話搜尋結果會截斷，後半段讀者看不到。', priority: 'high' },
     'Canonical URL': { action: '【請技術處理】加入 canonical 標籤，避免同一篇文章在不同網址重複出現而互相扣分。', priority: 'mid' },
-    'FAQPage': { action: '在文章末尾加一個 Q&A 區塊（3-5 個問答），並請技術部門加上 FAQPage 標記。Google 精選摘要會直接抓取這個區塊，是搶「零位排名」最有效的做法。', priority: 'high' },
+    '問答區塊': { action: '只在讀者真的會追問時，於文末加 3-5 組問答。題目用讀者的問法並加問號，答案 40-150 字直接回答，並帶一個數據或具名出處。注意 Google 已於 2026 年 5 月停止顯示 FAQ 富文本，所以重點是「問答內容本身有用」，不是加標記。', priority: 'mid' },
+    '摘要可用性': { action: '【請技術處理，最優先】這頁被 nosnippet 或 max-snippet:0 擋住了，等於告訴 Google 不要使用內容，AI Overviews 與 AI Mode 也拿不到。先確認是不是付費牆或廣編模板誤加，其他項目做得再好都補不回來。', priority: 'high' },
+    '廣編合規': { action: '【上稿人員】廣編文章連到客戶官網、活動頁、產品頁的連結，要加上 rel="sponsored"（或至少 rel="nofollow"）。Google 連結 spam 政策明訂付費連結須標記，沒標有被判違規的風險。引用政府或學術來源則不需要標。', priority: 'high' },
+    'Preferred Sources': { action: '【技術部門】在文章頁加上 Google 官方的「設為偏好來源」按鈕。讀者按下後，你的內容更容易出現在頭條新聞，2026 年 5 月起也延伸到 AI Overviews 與 AI Mode。', priority: 'low' },
     'Schema.org': { action: '【請技術處理】加入 NewsArticle 或 BlogPosting 結構化標記，讓 ChatGPT、Google AI 能識別「這是一篇專業報導」而非一般網頁。', priority: 'high' },
-    'Open Graph': { action: '補齊社群分享預覽：標題、摘要文字、封面圖片。文章分享到 LINE / Facebook 時，有圖有摘要的點閱率高出 3 倍，AI 引用時也更容易找到文章。', priority: 'mid' },
-    'AI 爬蟲': { action: '【請技術處理】確認 robots.txt 未封鎖 ChatGPT（GPTBot）、Claude（ClaudeBot）、Perplexity（PerplexityBot）的爬蟲。封鎖等於主動把文章從 AI 的資料庫裡刪掉。', priority: 'high' },
+    'Open Graph': { action: '補齊社群分享預覽：標題、摘要文字、封面圖片（1200×630）。沒設定的話，各平台會自己亂抓圖文，分享出去的賣相會很差。', priority: 'mid' },
+    'AI 爬蟲': { action: '【請技術處理】要被 AI 引用，robots.txt 至少要放行這六隻：OAI-SearchBot（ChatGPT 搜尋）、Claude-SearchBot、Claude-User、PerplexityBot、Googlebot、Bingbot。訓練型爬蟲（GPTBot／ClaudeBot／CCBot／Google-Extended）擋不擋是授權決策，不影響搜尋引用，本工具不計分。', priority: 'high' },
     '問句式標題': { action: '把文章的 H2 小標改成問句形式，例如「台積電 2024 年能維持高獲利嗎？」比「台積電 2024 年展望」更容易出現在 Google「大家也問」欄位。', priority: 'mid' },
-    '答案前置': { action: '每個問句小標「正下方第一段」用 40-120 字直接給結論（例：「答案是肯定的——...」）。精選摘要與 AI Overview 抓的就是「標題→緊接答案」這個結構，位置擺對才抓得到，藏在第三句等於放棄這個曝光位。', priority: 'high' },
+    '答案前置': { action: '每個問句小標的正下方第一段，用 40-120 字直接給結論，第一句就是答案，細節留到後面。這是精選摘要長年偏好的版面結構，對讀者掃讀也最友善（註：Google 未表示 AI 功能需要這種寫法，本項權重已調降）。', priority: 'mid' },
     'E-E-A-T': { action: '文章要有記者全名 + 職稱，以及明確的發布日期。AI 評估一篇文章是否可信、值不值得引用，作者署名和時效性是最基本的判斷門票。', priority: 'high' },
-    '自包含段落': { action: '每個段落寫完整（建議 100-200 字），第一句直接給結論。AI 引用的單位是「段落」不是「全文」——一段話拿出來單獨看要能理解，才有機會被 AI 直接引用（Princeton 論文：引用率 +40%）。', priority: 'high' },
+    '自包含段落': { action: '把過長的段落依論點拆開，每段第一句先給結論，讓一段話單獨看也讀得懂。不必刻意切碎——Google 已把「必須把內容切成小塊」列為迷思，讀起來順暢仍是第一原則。', priority: 'mid' },
+    '具名引述': { action: '把受訪者的直接引言用「」保留在文中，加上姓名與職稱，不要全部改寫成轉述。這是 KDD 2024 的 GEO 論文實測效果最好的一項（約 +41% 可見度），每篇建議 2-4 處。', priority: 'high' },
+    '文章字數': { action: '篇幅偏短時，先確認讀者最可能追問的三個問題有沒有回答到，再決定要不要補背景或案例。字數本身不是排名因素，不要為了湊字數灌水。', priority: 'low' },
     '數據密度': { action: '把模糊形容詞換成具體數字：「成長很多」→「年增 23%」、「規模龐大」→「資產達 8 億」。AI 引用時優先選帶數字的句子，因為是明確的事實主張、不易產生幻覺。', priority: 'mid' },
     '權威來源外連': { action: '在關鍵論點旁加 1-2 個指向 .gov／.edu／Wikipedia／權威機構的外部連結。這是 Google 與 AI 評估 E-E-A-T 權威度的重要訊號，代表你的內容經得起查證。', priority: 'mid' },
-    '比較表格': { action: '文章若涉及「A vs B／方案比較／規格對照」，請改用 HTML 表格呈現。表格式精選摘要競爭最低——多數對手用圖片，Google 抓不到，你做結構化表格就有機會直接拿下第 0 位。', priority: 'mid' },
+    '比較表格': { action: '文章若涉及「A vs B／方案比較／規格對照」，請改用 HTML 表格呈現，不要用圖片或純文字排版——用圖片的話，欄列關係機器讀不到。這是加分項，敘事型報導沒有表格不扣分。', priority: 'low' },
     '列表結構': { action: '遇到「步驟、方法、種類、重點」時改用條列清單（真實的項目符號，不是純文字的 1.2.3.）。每項 5-15 字、動詞開頭、至少 4 項，利於被精選摘要與 AI 擷取。', priority: 'low' },
     '頁面速度': { action: '【請技術處理】依 CrUX 真實用戶數據，重點壓低 LCP（圖片壓至 500KB 以下、延後第三方腳本）與 CLS（廣告版位預留高度）。Core Web Vitals 直接影響 Google 排名。', priority: 'mid' },
     'Mobile': { action: '【請技術處理】確認頁面有 <meta name="viewport" content="width=device-width, initial-scale=1">，並避免 user-scalable=no。Google 採行動優先索引，超過 6 成讀者用手機看新聞。', priority: 'mid' },
-    '結構化資料 + 品牌權威': { action: '【技術部門】加上完整 NewsArticle JSON-LD（headline / author / datePublished / image / publisher）+ Organization schema 與 sameAs 列出官方 FB/IG/LinkedIn/YouTube。這是 AI 理解「這是誰寫的、什麼時候寫的、代表什麼品牌」的最直接方式。', priority: 'high' },
-    '社群分享預覽': { action: '補齊 og:title / og:description / og:image (1200×630) / og:url + twitter:card=summary_large_image。文章分享到 LINE／FB／X 時，有圖有摘要的點閱率高出 3 倍以上。', priority: 'mid' },
-    'RSS': { action: '【技術部門】網站提供 /rss.xml 或 /feed，並在 <head> 加 <link rel="alternate" type="application/rss+xml">。GPTBot / ClaudeBot 靠 RSS 發現新文章，沒有的話 AI 感知你的新內容會慢 1-2 週。', priority: 'low' },
+    '結構化資料 + 品牌權威': { action: '【技術部門】加上 Article／NewsArticle JSON-LD，補齊 Google 的建議屬性：headline、author（Person 物件並附 author.url）、datePublished、dateModified、image。網站層級加 Organization schema 與 sameAs。注意 Google 說 Article 沒有必填屬性，生成式 AI 搜尋也不需要結構化資料——這一項的價值在一般搜尋的呈現。', priority: 'mid' },
+    '社群分享預覽': { action: '補齊 og:title / og:description / og:image（1200×630）/ og:url + twitter:card=summary_large_image。這不是 Google 排名因素，影響的是分享到 LINE／FB／X 時的賣相。', priority: 'mid' },
+    'RSS': { action: '【技術部門】網站提供 /rss.xml 或 /feed，並在 <head> 加 <link rel="alternate" type="application/rss+xml">。這是新聞網站的基本配備，方便聚合器與訂閱工具取得更新。', priority: 'low' },
     '文章結構': { action: '長文開頭加「章節目錄」：用錨點連結(a href=#段落)連到各 H2/H3 小標（標題加 id）。AI 靠章節結構精準引用某一段，Google 也可能顯示「跳到段落」子連結。標題層級分明（H2 主段、H3 子段）也讓 AI 更易切分內容。', priority: 'mid' },
   };
 
@@ -2790,6 +2912,30 @@ async function analyzeDocx(file) {
       hint.textContent = ''; return;
     }
     const doc = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html');
+
+    // Word 小標修正（2026-09）：mammoth 會把 Word 的「標題 1」轉成 <h1>，但小標類指標只認 h2/h3，
+    // 導致習慣用「標題 1」當小標的稿子被誤判成「完全沒有小標」，連帶拖累三個指標。
+    // 這裡把第一個 h1（視為文章大標）之後的 h1 降為 h2。
+    const h1s = Array.from(doc.querySelectorAll('h1'));
+    h1s.slice(1).forEach(h => {
+      const h2 = doc.createElement('h2');
+      h2.innerHTML = h.innerHTML;
+      h.replaceWith(h2);
+    });
+    // 粗體短段：記者常直接用粗體當小標。這無法可靠自動判定（可能只是強調句），
+    // 所以不改結構，改成在橫幅提示記者改用「標題 2」樣式。
+    const boldPseudo = Array.from(doc.querySelectorAll('p')).filter(p => {
+      const t = p.textContent.trim();
+      const b = p.querySelector('strong, b');
+      return b && textLen(t) > 0 && textLen(t) <= 30 && textLen(b.textContent.trim()) === textLen(t);
+    }).length;
+    const headingHintEl = document.getElementById('docHeadingHint');
+    if (headingHintEl) {
+      headingHintEl.innerHTML = boldPseudo >= 2
+        ? `<br>💡 偵測到 ${boldPseudo} 個「粗體短段」，看起來是拿粗體當小標。請改用 Word 的「標題 2」樣式，工具才判讀得出文章結構（目前這些段落不算小標）。`
+        : (h1s.length > 1 ? `<br>💡 已自動把 ${h1s.length - 1} 個「標題 1」視為小標計分。` : '');
+    }
+
     const scores = calculateScores(doc, html, '', null, null, false, true); // isDoc=true
     hint.textContent = '✅ ' + file.name;
     renderResults(file.name, scores);
